@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JEWELS BY J | A jewelry brand offering beautiful, high-quality pieces that bring confidence, elegance, and style to every occasion.</title>
+    <meta name="description"
+        content="Jewels by J offers elegant bracelets, rings, necklaces, earrings, and personalized jewelry made for every occasion. Contact us via WhatsApp.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* ── SPA SECTION SWITCHING ── */
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+            animation: fadeSection 0.45s ease;
+        }
+
+        @keyframes fadeSection {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── DETAIL SECTION ── */
+        #section-detail {
+            padding: 120px 0 80px;
+            background: #0a0a0a;
+            min-height: 100vh;
+        }
+
+        .detail-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: #c9a96e;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-bottom: 48px;
+            padding: 0;
+            transition: gap 0.2s;
+        }
+
+        .detail-back-btn:hover {
+            gap: 14px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 72px;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+                gap: 36px;
+            }
+        }
+
+        .detail-img-wrap {
+            position: relative;
+        }
+
+        .detail-img-wrap img {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            display: block;
+        }
+
+        .detail-img-accent {
+            position: absolute;
+            bottom: -16px;
+            left: -16px;
+            width: 60%;
+            height: 60%;
+            border: 1px solid #c9a96e44;
+            pointer-events: none;
+        }
+
+        .detail-info {
+            padding-top: 12px;
+        }
+
+        .detail-tag {
+            display: inline-block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.68rem;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            color: #c9a96e;
+            border: 1px solid #c9a96e55;
+            padding: 4px 14px;
+            margin-bottom: 22px;
+        }
+
+        .detail-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.9rem, 4vw, 3.1rem);
+            font-weight: 400;
+            color: #f5f0e8;
+            line-height: 1.15;
+            margin-bottom: 10px;
+        }
+
+        .detail-meta {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem;
+            color: #888;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+        }
+
+        .detail-divider {
+            width: 44px;
+            height: 1px;
+            background: #c9a96e;
+            margin-bottom: 28px;
+        }
+
+        .detail-desc {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            color: #aaa;
+            line-height: 1.9;
+            margin-bottom: 36px;
+        }
+
+        .detail-price {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: #f5f0e8;
+            font-weight: 300;
+            letter-spacing: 0.04em;
+            margin-bottom: 32px;
+        }
+
+        .detail-wa-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #25d366;
+            color: #fff;
+            border: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.78rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            text-decoration: none;
+            padding: 14px 28px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .detail-wa-btn:hover {
+            opacity: 0.88;
+        }
+
+        /* ── view-detail hint on gallery overlay ── */
+        .view-detail-hint {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #c9a96e;
+        }
+
+        /* ── contact layout (single column) ── */
+        .contact-solo {
+            max-width: 720px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* ══════════════════════════════════════
+       HAMBURGER & NAV — ALWAYS-ON DROPDOWN
+       (works on every screen size, desktop included;
+       self-contained so it overrides style.css)
+    ══════════════════════════════════════ */
+
+        /* Groups the hamburger icon and brand name together at the left */
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        /* Holds the logo on the right side of the header */
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-right .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Image logo sizing (header + footer) */
+        .logo-img {
+            height: 40px;
+            width: auto;
+            display: block;
+        }
+
+        .footer-brand .logo-img {
+            height: 48px;
+            margin-bottom: 4px;
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            width: 40px;
+            height: 40px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            z-index: 1001;
+        }
+
+        .hamburger .bar {
+            display: block;
+            width: 24px;
+            height: 1.5px;
+            background: #f5f0e8;
+            transition: transform 0.3s ease, opacity 0.3s ease, width 0.3s ease;
+            transform-origin: center;
+        }
+
+        /* Animate bars → X when active */
+        .hamburger.active .bar:nth-child(1) {
+            transform: translateY(6.5px) rotate(45deg);
+        }
+
+        .hamburger.active .bar:nth-child(2) {
+            opacity: 0;
+            width: 0;
+        }
+
+        .hamburger.active .bar:nth-child(3) {
+            transform: translateY(-6.5px) rotate(-45deg);
+        }
+
+        /* Dropdown beneath the header — applies at ALL widths */
+        .nav-menu {
+            display: flex !important;
+            position: absolute !important;
+            top: 100%;
+            left: 24px;
+            right: auto;
+            width: min(260px, calc(100% - 48px));
+            height: auto;
+            background: #0a0a0a;
+            border: 1px solid #c9a96e22;
+            border-radius: 8px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.45);
+            flex-direction: column !important;
+            align-items: flex-start;
+            justify-content: flex-start;
+            gap: 0;
+            padding: 8px 20px 16px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-12px);
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+            z-index: 1000;
+        }
+
+        /* Drop down when active */
+        .nav-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Nav links inside the dropdown */
+        .nav-menu .nav-link {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            font-weight: 400;
+            letter-spacing: 0.06em;
+            color: #f5f0e8;
+            text-decoration: none;
+            padding: 14px 0;
+            border-bottom: 1px solid #c9a96e18;
+            width: 100%;
+            display: block;
+            transition: color 0.2s;
+        }
+
+        .nav-menu .nav-link:last-child {
+            border-bottom: none;
+        }
+
+        .nav-menu .nav-link.active,
+        .nav-menu .nav-link:hover {
+            color: #c9a96e;
+        }
+
+        /* Follow Us section beneath the nav links */
+        .nav-menu-follow {
+            width: 100%;
+            padding-top: 16px;
+            margin-top: 4px;
+        }
+
+        .nav-menu-follow-label {
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.68rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: 14px;
+        }
+
+        .nav-menu-follow-icons {
+            display: flex;
+            gap: 18px;
+        }
+
+        .nav-menu-follow-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border: 1px solid #c9a96e55;
+            border-radius: 50%;
+            color: #c9a96e;
+            font-size: 0.95rem;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .nav-menu-follow-icons a:hover {
+            background: #c9a96e;
+            color: #0a0a0a;
+        }
+
+        /* Dim overlay behind the dropdown */
+        .nav-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 999;
+            backdrop-filter: blur(2px);
+        }
+
+        .nav-overlay.active {
+            display: block;
+        }
+
+        /* ── Fix: About/My Story image was rendering smaller than its accent frame ── */
+        .about-visual .image-box {
+            width: 100%;
+        }
+
+        .about-visual .about-img-main {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ═══════════════════════════════════════
+       HEADER / NAV
+  ════════════════════════════════════════ -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-left">
+                <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu">
+                    <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                </button>
+                <a href="#" class="logo" onclick="navigateTo('home'); return false;">JEWELS BY J</a>
+            </div>
+
+            <nav class="nav-menu" id="navMenu">
+                <a href="#" class="nav-link active" data-page="home"
+                    onclick="navigateTo('home');    return false;">Home</a>
+                <a href="#" class="nav-link" data-page="featured"
+                    onclick="navigateTo('featured'); return false;">Featured</a>
+                <a href="#" class="nav-link" data-page="gallery"
+                    onclick="navigateTo('gallery');  return false;">Gallery</a>
+                <a href="#" class="nav-link" data-page="about" onclick="navigateTo('about');    return false;">About</a>
+                <a href="#" class="nav-link" data-page="contact"
+                    onclick="navigateTo('contact');  return false;">Contact</a>
+
+                <div class="nav-menu-follow">
+                    <span class="nav-menu-follow-label">Follow Us</span>
+                    <div class="nav-menu-follow-icons">
+                        <a href="https://www.instagram.com/Jewels.with_j" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="https://www.snapchat.com/add/jerrilyn.mensah" target="_blank" title="Snapchat"><i class="fa-brands fa-snapchat"></i></a>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="header-right">
+                <a href="#" class="logo" onclick="navigateTo('home'); return false;">
+                    <img src="images/logo.jpg" alt="Jewels by J" class="logo-img">
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- ═══════════════════════════════════════
+         HOME
+    ════════════════════════════════════════ -->
+        <section id="section-home" class="page-section active">
+
+            <!-- Hero -->
+            <div class="hero"
+                style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.75)), url('images/hero.png');">
+                <div class="hero-content">
+                    <span class="hero-subtitle">Jewelry That Defines Your Style.</span>
+                    <h1 class="hero-title">Created for Timeless Moments</h1>
+                    <p class="hero-desc">Discover timeless beauty through our curated selection of handcrafted jewelry and personalized creations.</p>
+                    <div class="hero-ctas">
+                        <button class="btn btn-primary" onclick="navigateTo('featured')">View Collection</button>
+                        <button class="btn btn-secondary" onclick="navigateTo('contact')">Enquiries</button>
+                    </div>
+                </div>
+                <div class="scroll-indicator">
+                    <a href="#" onclick="navigateTo('featured'); return false;"><i
+                            class="fa-solid fa-chevron-down"></i></a>
+                </div>
+            </div>
+
+            <!-- Featured preview on home -->
+           <div class="featured-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="sub-title">The Seasonal Curations</span>
+            <h2 class="section-title">Featured Releases</h2>
+            <div class="accent-line"></div>
+        </div>
+        <div class="featured-grid">
+            <!-- Card 1 -->
+            <div class="product-card">
+                <div class="product-img-wrapper">
+                    <img src="images/jerrilyn.jpg" alt="Miss J Solitaire Ring" class="product-img">
+                </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="product-card">
+                <div class="product-img-wrapper">
+                    <img src="images/moesha.jpg" alt="Elysian Emerald Pendant" class="product-img">
+                </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="product-card">
+                <div class="product-img-wrapper">
+                    <img src="images/kimberry.jpg" alt="Sapphire Filigree Earrings"
+                        class="product-img">
+                </div>
+            </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align:center; margin-top:40px;">
+                        <button class="btn btn-secondary" onclick="navigateTo('gallery')">View Full Gallery</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Brand teaser -->
+            <div class="about-section" style="padding:80px 0;">
+                <div class="container">
+                    <div class="about-grid">
+                        <div class="about-content">
+                            <span class="sub-title font-gold">My Story</span>
+                            <h2 class="about-title">The Art of Fine Craftsmanship</h2>
+                            <p class="about-text">Jewels by J, founded in 2022, represents a dedication to refined design and beautifully crafted jewelry made for every moment.</p>
+                            <button class="btn btn-secondary" style="margin-top:28px;"
+                                onclick="navigateTo('about')">Read Our Story</button>
+                        </div>
+                        <div class="about-visual">
+                            <div class="image-box">
+                                <img src="images/logo.jpg" alt="Jewelry Crafting" class="about-img-main">
+                                <div class="image-box-accent"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════
+         FEATURED
+    ════════════════════════════════════════ -->
+        <section id="section-featured" class="page-section">
+            <div class="featured-section" style="padding-top:120px;">
+                <div class="container">
+                    <div class="section-header">
+                        <span class="sub-title">The Seasonal Curations</span>
+                        <h2 class="section-title">Featured Releases</h2>
+                        <div class="accent-line"></div>
+                    </div>
+                    <div class="featured-grid">
+                        <div class="product-card">
+                            <div class="product-img-wrapper">
+                                <img src="images/hero.png" alt="Miss J Solitaire Ring" class="product-img">
+                                <span class="tag">Signature</span>
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-name">Miss J Solitaire Ring</h3>
+                                <p class="product-category">18k Yellow Gold / 2.5 Carat Diamond</p>
+                                <p class="product-price">$4,500</p>
+                                <div class="product-actions">
+                                    <button class="btn-product-inquiry wa-inquire-btn"
+                                        data-product="Miss J Solitaire Ring">
+                                        <i class="fa-brands fa-whatsapp"></i> WhatsApp Inquiry
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-card">
+                            <div class="product-img-wrapper">
+                                <img src="images/emerald_pendant.png" alt="Elysian Emerald Pendant" class="product-img">
+                                <span class="tag">Rare Gem</span>
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-name">Elysian Emerald Pendant</h3>
+                                <p class="product-category">18k White Gold / Colombian Emerald</p>
+                                <p class="product-price">$8,200</p>
+                                <div class="product-actions">
+                                    <button class="btn-product-inquiry wa-inquire-btn"
+                                        data-product="Elysian Emerald Pendant">
+                                        <i class="fa-brands fa-whatsapp"></i> WhatsApp Inquiry
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-card">
+                            <div class="product-img-wrapper">
+                                <img src="images/sapphire_earrings.png" alt="Sapphire Filigree Earrings"
+                                    class="product-img">
+                                <span class="tag">Limited Edition</span>
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-name">Sapphire Filigree Earrings</h3>
+                                <p class="product-category">Platinum / Sri Lankan Sapphires</p>
+                                <p class="product-price">$3,900</p>
+                                <div class="product-actions">
+                                    <button class="btn-product-inquiry wa-inquire-btn"
+                                        data-product="Sapphire Filigree Earrings">
+                                        <i class="fa-brands fa-whatsapp"></i> WhatsApp Inquiry
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════
+         GALLERY
+    ════════════════════════════════════════ -->
+        <section id="section-gallery" class="page-section">
+            <div class="gallery-section" style="padding-top:120px;">
+                <div class="container">
+                    <div class="section-header">
+                        <span class="sub-title">Exquisite Artistry</span>
+                        <h2 class="section-title">The Gallery</h2>
+                        <div class="accent-line"></div>
+                    </div>
+
+                    <div class="gallery-filters">
+                        <button class="filter-btn active" data-filter="all">All Designs</button>
+                        <button class="filter-btn" data-filter="rings">Rings</button>
+                        <button class="filter-btn" data-filter="necklaces">Necklaces</button>
+                        <button class="filter-btn" data-filter="earrings">Earrings</button>
+                        <button class="filter-btn" data-filter="bracelets">Bracelets</button>
+                    </div>
+
+                    <div class="gallery-grid">
+
+                        <div class="gallery-item" data-category="rings"
+                            data-detail='{"tag":"Signature","title":"Aurelia Solitaire Ring","meta":"18k Yellow Gold / 2.5 Carat Diamond","desc":"A breathtaking brilliant-cut 2.5 carat diamond set in an 18k yellow gold solitaire band. Precision-crafted by our master goldsmiths, each facet is optimised to capture and return the maximum light.","price":"$4,500","img":"images/hero.png","wa":"Hi Jewels by J, I am interested in the Aurelia Solitaire Ring."}'>
+                            <img src="images/hero.png" alt="Aurelia Solitaire Ring">
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Aurelia Solitaire Ring</h4>
+                                    <p>Signature 18k Diamond Ring</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-arrow-right"></i> View
+                                            Details</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="gallery-item" data-category="necklaces"
+                            data-detail='{"tag":"Rare Gem","title":"Elysian Emerald Pendant","meta":"18k White Gold / Colombian Emerald","desc":"A deep, vivid Colombian emerald suspended from a delicate 18k white gold chain encrusted with pavé diamonds. Each stone is individually certified and responsibly sourced from the Muzo mines of Colombia.","price":"$8,200","img":"images/emerald_pendant.png","wa":"Hi Jewels by J, I am interested in the Elysian Emerald Pendant."}'>
+                            <img src="images/emerald_pendant.png" alt="Elysian Emerald Pendant">
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Elysian Emerald Pendant</h4>
+                                    <p>Colombian Emerald Necklace</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-arrow-right"></i> View
+                                            Details</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="gallery-item" data-category="earrings"
+                            data-detail='{"tag":"Limited Edition","title":"Sapphire Filigree Earrings","meta":"Platinum / Sri Lankan Sapphires","desc":"Ornate platinum drop earrings showcasing vivid cushion-cut Sri Lankan sapphires of exceptional clarity. Fine filigree scrollwork frames each stone — a technique requiring over 40 hours of bench time by a single craftsman.","price":"$3,900","img":"images/sapphire_earrings.png","wa":"Hi Jewels by J, I am interested in the Sapphire Filigree Earrings."}'>
+                            <img src="images/sapphire_earrings.png" alt="Sapphire Filigree Earrings">
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Sapphire Filigree Earrings</h4>
+                                    <p>Sri Lankan Sapphire Drops</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-arrow-right"></i> View
+                                            Details</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="gallery-item" data-category="bracelets"
+                            data-detail='{"tag":"Artisan","title":"Classic Gold Cuff","meta":"22k Gold / Polished Obsidian Core","desc":"A minimalist statement cuff hand-hammered from solid 22k gold and formed around a polished obsidian centre block. The contrast of warm gold against deep black stone makes this a piece that commands attention in any setting.","price":"$6,100","img":"images/gold_bracelet.png","wa":"Hi Jewels by J, I am interested in the Classic Gold Cuff."}'>
+                            <img src="images/gold_bracelet.png" alt="Classic Gold Cuff">
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Classic Gold Cuff</h4>
+                                    <p>Polished Obsidian & Gold</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-arrow-right"></i> View
+                                            Details</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="gallery-item" data-category="necklaces"
+                            data-detail='{"tag":"Heritage","title":"Double Strand Pearls","meta":"South Sea Pearls / 18k Gold Clasp","desc":"Highly lustrous double strand of perfectly matched South Sea white pearls, each selected for exceptional roundness and surface quality. Finished with an elegant hand-engraved 18k gold filigree clasp.","price":"$7,400","img":"images/pearl_necklace.png","wa":"Hi Jewels by J, I am interested in the Double Strand Pearls."}'>
+                            <img src="images/pearl_necklace.png" alt="Double Strand Pearls">
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Double Strand Pearls</h4>
+                                    <p>South Sea Pearl Necklace</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-arrow-right"></i> View
+                                            Details</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div><!-- /gallery-grid -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════
+         PIECE DETAIL  (navigated to via gallery)
+    ════════════════════════════════════════ -->
+        <section id="section-detail" class="page-section">
+            <div class="container">
+                <button class="detail-back-btn" onclick="navigateTo('gallery')">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Gallery
+                </button>
+                <div class="detail-grid">
+                    <div class="detail-img-wrap">
+                        <img src="" alt="" id="detailImg">
+                        <div class="detail-img-accent"></div>
+                    </div>
+                    <div class="detail-info">
+                        <span class="detail-tag" id="detailTag"></span>
+                        <h1 class="detail-title" id="detailTitle"></h1>
+                        <p class="detail-meta" id="detailMeta"></p>
+                        <div class="detail-divider"></div>
+                        <p class="detail-desc" id="detailDesc"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════
+         ABOUT
+    ════════════════════════════════════════ -->
+        <section id="section-about" class="page-section">
+            <div class="about-section" style="padding-top:120px;">
+                <div class="container">
+                    <div class="about-grid">
+                        <div class="about-content">
+                            <span class="sub-title font-gold">My Story</span>
+                            <h2 class="about-title">The Story Behind Jewels by J</h2>
+                            <p class="about-text">Jewels by J was founded in 2024 by Jerrilyn Mensah, a university student who turned her passion for jewelry into a growing creative journey. As a sole proprietorship, every piece is designed with care, blending elegance, simplicity, and meaning for everyday wear.</p>
+                            <p class="about-text">I believe jewelry is not just an accessory, but a wearable memoir. From initial sketch to the final polish, each item receives individual artistry to ensure its brilliance lasts for generations. Every piece is thoughtfully brought to life with attention to detail, capturing moments, emotions, and personal stories in designs meant to be worn and cherished every day.</p>
+                            <div class="heritage-stats">
+                                <div class="stat-item"><span class="stat-num">2+</span><span class="stat-lbl">Years of
+                                        Artistry</span></div>
+                                <div class="stat-item"><span class="stat-num">100%</span><span
+                                        class="stat-lbl">Conflict-Free Gems</span></div>
+                                <div class="stat-item"><span class="stat-num">1k+</span><span class="stat-lbl">Happy
+                                        Patrons</span></div>
+                            </div>
+                        </div>
+                        <div class="about-visual">
+                            <div class="image-box">
+                                <img src="images/logo.jpg" alt="Jewelry Crafting" class="about-img-main">
+                                <div class="image-box-accent"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════
+         CONTACT
+    ════════════════════════════════════════ -->
+        <section id="section-contact" class="page-section">
+            <div class="contact-section" style="padding-top:120px;">
+                <div class="container">
+                    <div class="section-header">
+                        <span class="sub-title">Connect With Me</span>
+                        <h2 class="section-title">Inquiries</h2>
+                        <div class="accent-line"></div>
+                    </div>
+                    <div class="contact-solo">
+                        <a href="https://wa.me/0500594879?text=Hello%20Jewels%20by%20J,%20I%27m%20visiting%20your%20website%20and%20have%20an%20inquiry."
+                            target="_blank" class="contact-card wa-card">
+                            <div class="card-icon"><i class="fa-brands fa-whatsapp"></i></div>
+                            <div class="card-details">
+                                <h4>Instant WhatsApp Chat</h4>
+                                <p>Message enquiry, please contact me.</p>
+                                <span class="action-link">Start Chatting <i class="fa-solid fa-arrow-right"></i></span>
+                            </div>
+                        </a>
+                        <div class="contact-card">
+                            <div class="card-icon"><i class="fa-solid fa-location-dot"></i></div>
+                            <div class="card-details">
+                                <h4>Our Showroom</h4>
+                                <p>Accra<br>Ghana</p>
+                            </div>
+                        </div>
+                        <div class="contact-card">
+                            <div class="card-icon"><i class="fa-solid fa-phone"></i></div>
+                            <div class="card-details">
+                                <h4>Call</h4>
+                                <p>+233 59 325 2913</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ═══════════════════════════════════════
+       FOOTER
+  ════════════════════════════════════════ -->
+    <footer class="main-footer">
+        <div class="container footer-container">
+            <div class="footer-brand">
+                <a href="#" class="logo" onclick="navigateTo('home'); return false;">
+                    <p> JEWELS BY J <p>
+                </a>
+                <p>Each piece is made with thought and care, designed to be simple, beautiful, and something you can truly connect with over time.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Explore</h4>
+                <a href="#" onclick="navigateTo('featured'); return false;">Featured Releases</a>
+                <a href="#" onclick="navigateTo('gallery');  return false;">Visual Gallery</a>
+                <a href="#" onclick="navigateTo('about');    return false;">Heritage & Legacy</a>
+                <a href="#" onclick="navigateTo('contact');  return false;">Private Consultation</a>
+            </div>
+            
+        </div>
+        <div class="footer-bottom">
+            <div class="container bottom-container">
+                <p>&copy; 2026 Jewels by J. All rights reserved.</p>
+                <div class="socials">
+                    <a href="https://wa.me/0500594879" target="_blank" title="WhatsApp"><i
+                            class="fa-brands fa-whatsapp"></i></a>
+                    <a href="https://www.instagram.com/Jewels.with_j" target="_blank" title="Instagram"><i
+                            class="fa-brands fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- dim overlay for mobile nav drawer -->
+    <div class="nav-overlay" id="navOverlay"></div>
+
+    <script>
+        /* ════════════════════════════════════════
+           HAMBURGER / MOBILE MENU HELPERS
+           (defined first so navigateTo can call closeMenu)
+        ════════════════════════════════════════ */
+        const hamburger = document.getElementById('hamburger');
+        const navMenu = document.getElementById('navMenu');
+        const overlay = document.getElementById('navOverlay');
+
+        function openMenu() {
+            navMenu.classList.add('active');
+            hamburger.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMenu() {
+            navMenu.classList.remove('active');
+            hamburger.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        if (hamburger) hamburger.addEventListener('click', () => {
+            navMenu.classList.contains('active') ? closeMenu() : openMenu();
+        });
+
+        if (overlay) overlay.addEventListener('click', closeMenu);
+
+        /* ════════════════════════════════════════
+           SPA NAVIGATION
+        ════════════════════════════════════════ */
+        const PAGES = ['home', 'featured', 'gallery', 'detail', 'about', 'contact'];
+
+        function navigateTo(page) {
+            // Hide all sections
+            PAGES.forEach(p => {
+                const el = document.getElementById('section-' + p);
+                if (el) el.classList.remove('active');
+            });
+
+            // Show target
+            const target = document.getElementById('section-' + page);
+            if (target) {
+                target.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // Update nav active state (detail keeps gallery highlighted)
+            const navPage = page === 'detail' ? 'gallery' : page;
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.toggle('active', link.dataset.page === navPage);
+            });
+
+            // Close mobile menu if open
+            closeMenu();
+        }
+
+        /* ════════════════════════════════════════
+           GALLERY → DETAIL
+        ════════════════════════════════════════ */
+        document.querySelectorAll('.gallery-item').forEach(item => {
+            item.style.cursor = 'pointer';
+            item.addEventListener('click', () => {
+                const d = JSON.parse(item.dataset.detail);
+                document.getElementById('detailTag').textContent = d.tag;
+                document.getElementById('detailTitle').textContent = d.title;
+                document.getElementById('detailMeta').textContent = d.meta;
+                document.getElementById('detailDesc').textContent = d.desc;
+                document.getElementById('detailImg').src = d.img;
+                document.getElementById('detailImg').alt = d.title;
+                navigateTo('detail');
+            });
+        });
+
+        /* ════════════════════════════════════════
+           GALLERY FILTERS
+        ════════════════════════════════════════ */
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const filter = btn.dataset.filter;
+                document.querySelectorAll('.gallery-item').forEach(item => {
+                    item.style.display =
+                        (filter === 'all' || item.dataset.category === filter) ? '' : 'none';
+                });
+            });
+        });
+
+        /* ════════════════════════════════════════
+           WHATSAPP INQUIRY BUTTONS
+        ════════════════════════════════════════ */
+        document.querySelectorAll('.wa-inquire-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const msg = encodeURIComponent('Hi Jewels by J, I am interested in the ' + btn.dataset.product + '.');
+                window.open('https://wa.me/0500594879?text=' + msg, '_blank');
+            });
+        });
+
+    </script>
+</body>
+
+</html>
