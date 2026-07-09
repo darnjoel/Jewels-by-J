@@ -189,6 +189,46 @@
             color: #c9a96e;
         }
 
+        /* ── video gallery items: play button overlay ── */
+        .gallery-item .video-play-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(10, 10, 10, 0.55);
+            border: 1px solid #c9a96e88;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f5f0e8;
+            font-size: 1.15rem;
+            pointer-events: none;
+            transition: transform 0.25s ease, background 0.25s ease;
+            z-index: 2;
+        }
+
+        .gallery-item:hover .video-play-btn {
+            transform: translate(-50%, -50%) scale(1.08);
+            background: #c9a96e;
+            color: #0a0a0a;
+        }
+
+        .gallery-item .video-play-btn i {
+            margin-left: 3px;
+        }
+
+        /* ── detail view video ── */
+        .detail-img-wrap video {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            display: block;
+            background: #000;
+        }
+
         /* ── contact layout (single column) ── */
         .contact-solo {
             max-width: 720px;
@@ -507,7 +547,7 @@
                         <div class="about-content">
                             <span class="sub-title font-gold">My Story</span>
                             <h2 class="about-title">The Art of Fine Craftsmanship</h2>
-                            <p class="about-text">Jewels by J, founded in 2022, represents a dedication to refined design and beautifully crafted jewelry made for every moment.</p>
+                            <p class="about-text">Jewels by J, founded in 2024, represents a dedication to refined design and beautifully crafted jewelry made for every moment.</p>
                             <button class="btn btn-secondary" style="margin-top:28px;"
                                 onclick="navigateTo('about')">Read Our Story</button>
                         </div>
@@ -673,13 +713,29 @@
                             </div>
                         </div>
 
-                        <div class="gallery-item" data-category="necklaces"
-                            data-detail='{"tag":"Heritage","title":"Double Strand Pearls","meta":"South Sea Pearls / 18k Gold Clasp","desc":"Highly lustrous double strand of perfectly matched South Sea white pearls, each selected for exceptional roundness and surface quality. Finished with an elegant hand-engraved 18k gold filigree clasp.","price":"$7,400","img":"images/pearl_necklace.png","wa":"Hi Jewels by J, I am interested in the Double Strand Pearls."}'>
-                            <img src="images/pearl_necklace.png" alt="Double Strand Pearls">
+                        <div class="gallery-item" data-category="bracelets"
+                            data-detail='{"tag":"Artisan","title":"Double Strand Pearls","meta":"South Sea Pearls / 18k Gold Clasp","desc":"Highly lustrous double strand of perfectly matched South Sea white pearls, each selected for exceptional roundness and surface quality. Finished with an elegant hand-engraved 18k gold filigree clasp.","price":"$7,400","img":"images/vid1_poster.jpg","video":"videos/vid1.mp4","wa":"Hi Jewels by J, I am interested in the Double Strand Pearls."}'>
+                            <img src="images/vid1_preview.gif" alt="Double Strand Pearls">
+                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
                                     <h4>Double Strand Pearls</h4>
                                     <p>South Sea Pearl Necklace</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-arrow-right"></i> View
+                                            Details</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="gallery-item" data-category="necklaces"
+                            data-detail='{"tag":"Personalized","title":"Golden Initial Pendant","meta":"14k Gold Vermeil / Custom Letter Charm","desc":"A delicate curb-chain necklace finished with a solid gold initial charm — a subtle, personal touch that carries meaning. Each letter is cast individually and finished by hand, making it a timeless everyday piece or a thoughtful gift.","price":"$85","img":"images/A1.jpg","wa":"Hi Jewels by J, I am interested in the Golden Initial Pendant."}'>
+                            <img src="images/A1.jpg" alt="Golden Initial Pendant">
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Golden Initial Pendant</h4>
+                                    <p>Custom Initial Necklace</p>
                                     <div class="overlay-links">
                                         <span class="view-detail-hint"><i class="fa-solid fa-arrow-right"></i> View
                                             Details</span>
@@ -862,6 +918,12 @@
         const PAGES = ['home', 'featured', 'gallery', 'detail', 'about', 'contact'];
 
         function navigateTo(page) {
+            // Pause detail video when leaving the detail page
+            if (page !== 'detail') {
+                const video = document.getElementById('detailVideo');
+                if (video) video.pause();
+            }
+
             // Hide all sections
             PAGES.forEach(p => {
                 const el = document.getElementById('section-' + p);
@@ -896,8 +958,39 @@
                 document.getElementById('detailTitle').textContent = d.title;
                 document.getElementById('detailMeta').textContent = d.meta;
                 document.getElementById('detailDesc').textContent = d.desc;
-                document.getElementById('detailImg').src = d.img;
-                document.getElementById('detailImg').alt = d.title;
+
+                const wrap = document.querySelector('.detail-img-wrap');
+                const existingMedia = wrap.querySelector('#detailImg, #detailVideo');
+
+                if (d.video) {
+                    // Build/replace with a <video> element
+                    let video = document.getElementById('detailVideo');
+                    if (!video) {
+                        video = document.createElement('video');
+                        video.id = 'detailVideo';
+                        video.controls = true;
+                        video.playsInline = true;
+                        video.preload = 'metadata';
+                        wrap.insertBefore(video, wrap.firstChild);
+                    }
+                    video.poster = d.img;
+                    video.src = d.video;
+                    video.style.display = 'block';
+                    video.load();
+                    const img = document.getElementById('detailImg');
+                    if (img) img.style.display = 'none';
+                } else {
+                    const img = document.getElementById('detailImg');
+                    img.src = d.img;
+                    img.alt = d.title;
+                    img.style.display = 'block';
+                    const video = document.getElementById('detailVideo');
+                    if (video) {
+                        video.pause();
+                        video.style.display = 'none';
+                    }
+                }
+
                 navigateTo('detail');
             });
         });
@@ -922,7 +1015,7 @@
         ════════════════════════════════════════ */
         document.querySelectorAll('.wa-inquire-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                const msg = encodeURIComponent('Hi Jewels by J, I am interested in the ' + btn.dataset.product + '.');
+                const msg = encodeURIComponent('Hi Jewels by J!');
                 window.open('https://wa.me/0500594879?text=' + msg, '_blank');
             });
         });
