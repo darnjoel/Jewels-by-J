@@ -433,6 +433,129 @@
             height: 100%;
             object-fit: cover;
         }
+
+        /* ══════════════════════════════════════
+       CONTACT FORM (EmailJS)
+    ══════════════════════════════════════ */
+        .contact-form-card {
+            background: #111;
+            border: 1px solid #c9a96e33;
+            padding: 40px 36px;
+        }
+
+        @media (max-width: 600px) {
+            .contact-form-card {
+                padding: 32px 22px;
+            }
+        }
+
+        .contact-form-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            color: #f5f0e8;
+            font-weight: 400;
+            margin-bottom: 6px;
+        }
+
+        .contact-form-sub {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.82rem;
+            color: #888;
+            margin-bottom: 28px;
+        }
+
+        .contact-form-row {
+            display: flex;
+            gap: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .contact-form-row {
+                flex-direction: column;
+            }
+        }
+
+        .contact-form-group {
+            margin-bottom: 20px;
+            flex: 1;
+        }
+
+        .contact-form-group label {
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.68rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: #c9a96e;
+            margin-bottom: 8px;
+        }
+
+        .contact-form-group input,
+        .contact-form-group textarea {
+            width: 100%;
+            background: #0a0a0a;
+            border: 1px solid #c9a96e33;
+            color: #f5f0e8;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            padding: 12px 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .contact-form-group input:focus,
+        .contact-form-group textarea:focus {
+            border-color: #c9a96e;
+        }
+
+        .contact-form-group textarea {
+            resize: vertical;
+            min-height: 130px;
+            font-family: inherit;
+        }
+
+        .contact-form-submit {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #c9a96e;
+            color: #0a0a0a;
+            border: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            padding: 14px 32px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .contact-form-submit:hover {
+            opacity: 0.88;
+        }
+
+        .contact-form-submit:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .contact-form-status {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .contact-form-status.success {
+            color: #7fd99a;
+            display: block;
+        }
+
+        .contact-form-status.error {
+            color: #e17b7b;
+            display: block;
+        }
     </style>
 </head>
 
@@ -830,7 +953,7 @@
                             <div class="card-icon"><i class="fa-solid fa-location-dot"></i></div>
                             <div class="card-details">
                                 <h4>Our Showroom</h4>
-                                <p>Accra<br>Ghana</p>
+                                <p>Accra,<br>Ghana</p>
                             </div>
                         </div>
                         <div class="contact-card">
@@ -839,6 +962,35 @@
                                 <h4>Call</h4>
                                 <p>+233 59 325 2913</p>
                             </div>
+                        </div>
+
+                        <!-- ── EmailJS Contact Form ── -->
+                        <div class="contact-form-card">
+                            <h3 class="contact-form-title">Send an Inquiry</h3>
+                            <p class="contact-form-sub">Prefer email? Fill this out and I'll get back to you shortly.</p>
+
+                            <form id="contactForm">
+                                <div class="contact-form-row">
+                                    <div class="contact-form-group">
+                                        <label for="fromName">Name</label>
+                                        <input type="text" id="fromName" name="from_name" required>
+                                    </div>
+                                    <div class="contact-form-group">
+                                        <label for="fromEmail">Email</label>
+                                        <input type="email" id="fromEmail" name="from_email" required>
+                                    </div>
+                                </div>
+                                <div class="contact-form-group">
+                                    <label for="messageBody">Message</label>
+                                    <textarea id="messageBody" name="message" required
+                                        placeholder="Tell me what piece you're interested in..."></textarea>
+                                </div>
+                                <button type="submit" class="contact-form-submit" id="contactSubmitBtn">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                    <span id="contactSubmitLabel">Send Message</span>
+                                </button>
+                                <p class="contact-form-status" id="contactFormStatus"></p>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -882,6 +1034,9 @@
 
     <!-- dim overlay for mobile nav drawer -->
     <div class="nav-overlay" id="navOverlay"></div>
+
+    <!-- ── EmailJS SDK ── -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
     <script>
         /* ════════════════════════════════════════
@@ -1020,6 +1175,52 @@
             });
         });
 
+        /* ════════════════════════════════════════
+           EMAILJS CONTACT FORM
+           Replace the 3 placeholders below with your
+           own EmailJS values (see setup notes I sent you).
+        ════════════════════════════════════════ */
+        (function () {
+            const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";
+            const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
+            const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
+
+            if (window.emailjs) {
+                emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+            }
+
+            const form = document.getElementById('contactForm');
+            const submitBtn = document.getElementById('contactSubmitBtn');
+            const submitLabel = document.getElementById('contactSubmitLabel');
+            const statusEl = document.getElementById('contactFormStatus');
+
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    submitBtn.disabled = true;
+                    submitLabel.textContent = 'Sending...';
+                    statusEl.className = 'contact-form-status';
+                    statusEl.textContent = '';
+
+                    emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, form)
+                        .then(function () {
+                            statusEl.textContent = "Message sent! I'll get back to you soon.";
+                            statusEl.className = 'contact-form-status success';
+                            form.reset();
+                        })
+                        .catch(function (err) {
+                            console.error('EmailJS error:', err);
+                            statusEl.textContent = "Something went wrong. Please try WhatsApp instead, or try again.";
+                            statusEl.className = 'contact-form-status error';
+                        })
+                        .finally(function () {
+                            submitBtn.disabled = false;
+                            submitLabel.textContent = 'Send Message';
+                        });
+                });
+            }
+        })();
     </script>
 </body>
 

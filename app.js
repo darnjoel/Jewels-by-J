@@ -15,9 +15,9 @@
 //   {{message}}      — customer's message
 //   {{to_name}}      — shop owner name (e.g. "Aurelia Concierge")
 
-const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY';      // e.g. 'abc123XYZ'
-const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID';      // e.g. 'service_aurelia'
-const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';     // e.g. 'template_inquiry'
+const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";
+const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
+const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
 
 // ─── WhatsApp ─────────────────────────────────────────────────────────────────
 const DEFAULT_PHONE = '+233 50 059 4879'; // Replace with real WhatsApp number (digits only)
