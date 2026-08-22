@@ -189,7 +189,163 @@
             color: #c9a96e;
         }
 
-        /* ── video gallery items: play button overlay ── */
+        /* ── GALLERY BIGGER VIEW LIGHTBOX MODAL ── */
+        .lightbox-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .lightbox-modal.active {
+            display: flex;
+            animation: fadeInLightbox 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeInLightbox {
+            from {
+                opacity: 0;
+                transform: scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .lightbox-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 5, 0.92);
+            backdrop-filter: blur(12px);
+            cursor: pointer;
+        }
+
+        .lightbox-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox-close-btn {
+            position: absolute;
+            top: -50px;
+            right: 0;
+            background: rgba(201, 169, 110, 0.2);
+            border: 1.5px solid #c9a96e;
+            color: #f5f0e8;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            font-size: 1.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.25s ease, transform 0.25s ease;
+            z-index: 10;
+        }
+
+        .lightbox-close-btn:hover {
+            background: #c9a96e;
+            color: #0a0a0a;
+            transform: scale(1.1);
+        }
+
+        .lightbox-body {
+            width: 100%;
+            max-height: 78vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 14px;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.85);
+            background: #000;
+            border: 1px solid rgba(201, 169, 110, 0.3);
+        }
+
+        .lightbox-body img {
+            max-width: 100%;
+            max-height: 78vh;
+            object-fit: contain;
+            display: block;
+            border-radius: 14px;
+        }
+
+        .lightbox-body video {
+            width: 100%;
+            max-height: 78vh;
+            object-fit: contain;
+            display: block;
+            background: #000;
+            border-radius: 14px;
+        }
+
+        .lightbox-caption {
+            margin-top: 16px;
+            text-align: center;
+            color: #f5f0e8;
+        }
+
+        .lightbox-caption h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.7rem;
+            color: #f5f0e8;
+            margin-bottom: 2px;
+            font-weight: 400;
+        }
+
+        .lightbox-caption p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.78rem;
+            color: #c9a96e;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        /* ── video gallery items: play button overlay & video elements ── */
+        .gallery-item video.gallery-item-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: inherit;
+        }
+
+        .gallery-item .video-badge {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            background: rgba(10, 10, 10, 0.8);
+            color: #c9a96e;
+            border: 1px solid rgba(201, 169, 110, 0.5);
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 20px;
+            z-index: 2;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            backdrop-filter: blur(4px);
+        }
+
         .gallery-item .video-play-btn {
             position: absolute;
             top: 50%;
@@ -198,20 +354,21 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: rgba(10, 10, 10, 0.55);
-            border: 1px solid #c9a96e88;
+            background: rgba(10, 10, 10, 0.65);
+            border: 1.5px solid #c9a96e;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #f5f0e8;
-            font-size: 1.15rem;
+            font-size: 1.25rem;
             pointer-events: none;
             transition: transform 0.25s ease, background 0.25s ease;
             z-index: 2;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
 
         .gallery-item:hover .video-play-btn {
-            transform: translate(-50%, -50%) scale(1.08);
+            transform: translate(-50%, -50%) scale(1.1);
             background: #c9a96e;
             color: #0a0a0a;
         }
@@ -223,10 +380,12 @@
         /* ── detail view video ── */
         .detail-img-wrap video {
             width: 100%;
-            aspect-ratio: 3/4;
-            object-fit: cover;
+            max-height: 75vh;
+            object-fit: contain;
             display: block;
             background: #000;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         /* ── contact layout (single column) ── */
@@ -236,6 +395,135 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+        }
+
+        /* ── contact form card styling ── */
+        .contact-form-card {
+            background: #111111;
+            border: 1px solid rgba(201, 169, 110, 0.4);
+            border-radius: 16px;
+            padding: 36px 32px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            margin-top: 10px;
+        }
+
+        .contact-form-title {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.8rem;
+            color: #f5f0e8;
+            margin-bottom: 6px;
+        }
+
+        .contact-form-sub {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .contact-form-sub strong {
+            color: #c9a96e;
+        }
+
+        .contact-form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .contact-form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .contact-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .contact-form-group label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #c9a96e;
+            font-weight: 500;
+        }
+
+        .contact-form-group input,
+        .contact-form-group textarea {
+            background: #181818;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #f5f0e8;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .contact-form-group input:focus,
+        .contact-form-group textarea:focus {
+            outline: none;
+            border-color: #c9a96e;
+            box-shadow: 0 0 10px rgba(201, 169, 110, 0.25);
+        }
+
+        .contact-form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .contact-form-submit {
+            width: 100%;
+            padding: 14px 24px;
+            background: #c9a96e;
+            color: #0a0a0a;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        .contact-form-submit:hover {
+            background: #e0c68e;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(201, 169, 110, 0.35);
+        }
+
+        .contact-form-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .contact-form-status {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            margin-top: 14px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .contact-form-status.success {
+            color: #25D366;
+        }
+
+        .contact-form-status.error {
+            color: #ff6b6b;
         }
 
         /* ══════════════════════════════════════
@@ -265,14 +553,27 @@
 
         /* Image logo sizing (header + footer) */
         .logo-img {
-            height: 40px;
+            height: 44px;
             width: auto;
             display: block;
+            background: linear-gradient(135deg, #FAF2EB 0%, #F4E4D7 100%);
+            padding: 5px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--gold);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            mix-blend-mode: normal;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .logo-img:hover {
+            transform: scale(1.05);
+            border-color: var(--gold-light);
+            box-shadow: 0 6px 20px var(--gold-glow);
         }
 
         .footer-brand .logo-img {
-            height: 48px;
-            margin-bottom: 4px;
+            height: 52px;
+            margin-bottom: 12px;
         }
 
         .hamburger {
@@ -556,6 +857,168 @@
             color: #e17b7b;
             display: block;
         }
+        /* ══════════════════════════════════════
+           TRACK ORDER CSS
+        ══════════════════════════════════════ */
+        .track-container {
+            max-width: 700px;
+            margin: 0 auto;
+            margin-top: 40px;
+        }
+
+        .track-form-card {
+            background: #111;
+            border: 1px solid #c9a96e33;
+            padding: 40px 36px;
+            border-radius: 4px;
+        }
+
+        .track-result-card {
+            background: #111;
+            border: 1px solid #c9a96e;
+            padding: 40px 36px;
+            border-radius: 4px;
+            margin-top: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .track-result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #c9a96e33;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .track-result-header h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            font-size: 1.2rem;
+            color: #f5f0e8;
+            letter-spacing: 0.1em;
+        }
+
+        .track-status-badge {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            background: rgba(201, 169, 110, 0.15);
+            color: #c9a96e;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #c9a96e55;
+        }
+
+        .track-timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .track-timeline::before {
+            content: '';
+            position: absolute;
+            left: 14px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #2a2a2a;
+        }
+
+        .timeline-step {
+            position: relative;
+            padding-bottom: 30px;
+            padding-left: 20px;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+
+        .timeline-step:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-step.completed,
+        .timeline-step.active {
+            opacity: 1;
+        }
+
+        .step-icon {
+            position: absolute;
+            left: -33px; /* relative to padding-left 20px + track padding 30px */
+            top: 0;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #111;
+            border: 2px solid #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: #555;
+            z-index: 2;
+        }
+
+        .timeline-step.completed .step-icon {
+            border-color: #c9a96e;
+            background: #c9a96e;
+            color: #0a0a0a;
+        }
+
+        .timeline-step.active .step-icon {
+            border-color: #c9a96e;
+            background: #111;
+            color: #c9a96e;
+            box-shadow: 0 0 10px rgba(201, 169, 110, 0.4);
+        }
+
+        .timeline-step::after {
+            /* Active line segment */
+            content: '';
+            position: absolute;
+            left: -19px;
+            top: 30px;
+            bottom: 0;
+            width: 2px;
+            background: #c9a96e;
+            display: none;
+            z-index: 1;
+        }
+
+        .timeline-step.completed::after {
+            display: block;
+        }
+
+        .timeline-step:last-child::after {
+            display: none !important;
+        }
+
+        .step-content h4 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: #f5f0e8;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .step-content p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            color: #aaa;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 600px) {
+            .track-form-card, .track-result-card {
+                padding: 32px 22px;
+            }
+        }
     </style>
 </head>
 
@@ -583,6 +1046,8 @@
                 <a href="#" class="nav-link" data-page="about" onclick="navigateTo('about');    return false;">About</a>
                 <a href="#" class="nav-link" data-page="contact"
                     onclick="navigateTo('contact');  return false;">Contact</a>
+                <a href="#" class="nav-link" data-page="track"
+                    onclick="navigateTo('track');  return false;">Track Order</a>
 
                 <div class="nav-menu-follow">
                     <span class="nav-menu-follow-label">Follow Us</span>
@@ -768,6 +1233,7 @@
 
                     <div class="gallery-filters">
                         <button class="filter-btn active" data-filter="all">All Designs</button>
+                        <button class="filter-btn" data-filter="video">Video Showcase</button>
                         <button class="filter-btn" data-filter="rings">Rings</button>
                         <button class="filter-btn" data-filter="necklaces">Necklaces</button>
                         <button class="filter-btn" data-filter="earrings">Earrings</button>
@@ -776,6 +1242,67 @@
 
                     <div class="gallery-grid">
 
+                        <!-- ════════════════ RINGS GROUP ════════════════ -->
+                        <!-- Ring Video 1: missj.MOV -->
+                        <div class="gallery-item" data-category="rings video"
+                            data-detail='{"tag":"Signature Video","title":"Miss J Master Cut Ring","meta":"18k Yellow Gold / Cushion Cut Diamond","desc":"The quintessential Jewels by J creation — a stunning cushion-cut lab or natural diamond held in handcrafted claw prongs atop a silky gold band.","price":"$6,200","img":"images/jerrilyn.jpg","video":"videos/missj.MOV","wa":"Hi Jewels by J, I am interested in the Miss J Master Cut Ring."}'>
+                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
+                                <source src="videos/missj.MOV" type="video/quicktime">
+                                <source src="videos/missj.MOV" type="video/mp4">
+                            </video>
+                            <div class="video-badge"><i class="fa-solid fa-film"></i> Ring Video</div>
+                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Miss J Master Cut Ring</h4>
+                                    <p>Master Cut Diamond Ring</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ring Video 2: asante.MOV -->
+                        <div class="gallery-item" data-category="rings video"
+                            data-detail='{"tag":"Heritage Video","title":"Asante Signet Ring","meta":"18k Heavy Gold Plate / Engraved Crest","desc":"A bold signet ring inspired by traditional Ghanaian royal motifs. Meticulously hand-engraved with intricate cultural symbolism and polished to a mirror finish.","price":"$3,200","img":"images/hand.jpg","video":"videos/asante.MOV","wa":"Hi Jewels by J, I am interested in the Asante Signet Ring."}'>
+                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
+                                <source src="videos/asante.MOV" type="video/quicktime">
+                                <source src="videos/asante.MOV" type="video/mp4">
+                            </video>
+                            <div class="video-badge"><i class="fa-solid fa-film"></i> Ring Video</div>
+                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Asante Signet Ring</h4>
+                                    <p>Royal Heritage Handcrafted Ring</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ring Video 3: gift4.MP4 -->
+                        <div class="gallery-item" data-category="rings video"
+                            data-detail='{"tag":"Curated Video","title":"Royal Crown Diamond Band","meta":"Platinum / Pavé Diamond Setting","desc":"An intricate crown-contoured eternity band with brilliant micro-set pavé diamonds. Beautiful worn solo or paired with engagement rings.","price":"$2,950","img":"images/hand.jpg","video":"videos/gift4.MP4","wa":"Hi Jewels by J, I am interested in the Royal Crown Diamond Band."}'>
+                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
+                                <source src="videos/gift4.MP4" type="video/mp4">
+                            </video>
+                            <div class="video-badge"><i class="fa-solid fa-film"></i> Ring Video</div>
+                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Royal Crown Diamond Band</h4>
+                                    <p>Contoured Pavé Eternity Ring</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ring Photo: hand.jpg -->
                         <div class="gallery-item" data-category="rings"
                             data-detail='{"tag":"Signature","title":"Aurelia Solitaire Ring","meta":"18k Yellow Gold / 2.5 Carat Diamond","desc":"A breathtaking brilliant-cut 2.5 carat diamond set in an 18k yellow gold solitaire band. Precision-crafted by our master goldsmiths, each facet is optimised to capture and return the maximum light.","price":"$4,500","img":"images/hero.png","wa":"Hi Jewels by J, I am interested in the Aurelia Solitaire Ring."}'>
                             <img src="images/hand.jpg" alt="Aurelia Solitaire Ring">
@@ -784,13 +1311,92 @@
                                     <h4>Aurelia Solitaire Ring</h4>
                                     <p>Signature 18k Diamond Ring</p>
                                     <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-arrow-right"></i> View
-                                            Details</span>
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- ════════════════ NECKLACES GROUP ════════════════ -->
+                        <!-- Necklace Video 1: vid1.MP4 -->
+                        <div class="gallery-item" data-category="necklaces video"
+                            data-detail='{"tag":"Artisan Video","title":"Double Strand Pearls","meta":"South Sea Pearls / 18k Gold Clasp","desc":"Highly lustrous double strand of perfectly matched South Sea white pearls, each selected for exceptional roundness and surface quality. Finished with an elegant hand-engraved 18k gold filigree clasp.","price":"$7,400","img":"images/B1.jpg","video":"videos/vid1.MP4","wa":"Hi Jewels by J, I am interested in the Double Strand Pearls."}'>
+                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
+                                <source src="videos/vid1.MP4" type="video/mp4">
+                            </video>
+                            <div class="video-badge"><i class="fa-solid fa-film"></i> Necklace Video</div>
+                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Double Strand Pearls</h4>
+                                    <p>South Sea Pearl Necklace</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Necklace Video 2: gift3.MOV -->
+                        <div class="gallery-item" data-category="necklaces video"
+                            data-detail='{"tag":"Curated Video","title":"Graceful Emerald Pendant","meta":"18k Gold / Muzo Emerald Cut","desc":"A vibrant green Muzo emerald set in a sleek four-prong gold mounting, suspended on a fine diamond-cut cable chain.","price":"$5,400","img":"images/B1.jpg","video":"videos/gift3.MOV","wa":"Hi Jewels by J, I am interested in the Graceful Emerald Pendant."}'>
+                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
+                                <source src="videos/gift3.MOV" type="video/quicktime">
+                                <source src="videos/gift3.MOV" type="video/mp4">
+                            </video>
+                            <div class="video-badge"><i class="fa-solid fa-film"></i> Necklace Video</div>
+                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Graceful Emerald Pendant</h4>
+                                    <p>Vivid Emerald Solitaire Chain</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Necklace Video 3: gift1.MP4 -->
+                        <div class="gallery-item" data-category="necklaces video"
+                            data-detail='{"tag":"Curated Video","title":"Golden Elegance Gift Set","meta":"18k Gold Vermeil / Diamond Accents","desc":"A stunning curated gift collection featuring a classic pendant and matching drop chain, crafted to celebrate milestone occasions with unforgettable sparkle.","price":"$4,100","img":"images/ggift.jpg","video":"videos/gift1.MP4","wa":"Hi Jewels by J, I am interested in the Golden Elegance Gift Set."}'>
+                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
+                                <source src="videos/gift1.MP4" type="video/mp4">
+                            </video>
+                            <div class="video-badge"><i class="fa-solid fa-film"></i> Necklace Video</div>
+                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Golden Elegance Gift Set</h4>
+                                    <p>Curated Fine Jewelry Set</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Necklace Video 4: her eyes.MOV -->
+                        <div class="gallery-item" data-category="necklaces video"
+                            data-detail='{"tag":"Custom Video","title":"Eyes of Desire Pendant","meta":"18k Rose Gold / Blue Sapphire & Diamond","desc":"An alluring eye talisman necklace showcasing an intense sapphire center encircled by halo diamonds, symbolising intuition and protection.","price":"$3,850","img":"images/B2.jpg","video":"videos/her eyes.MOV","wa":"Hi Jewels by J, I am interested in the Eyes of Desire Pendant."}'>
+                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
+                                <source src="videos/her eyes.MOV" type="video/quicktime">
+                                <source src="videos/her eyes.MOV" type="video/mp4">
+                            </video>
+                            <div class="video-badge"><i class="fa-solid fa-film"></i> Necklace Video</div>
+                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Eyes of Desire Pendant</h4>
+                                    <p>Custom Talisman Necklace</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Necklace Photo 1: B1.jpg -->
                         <div class="gallery-item" data-category="necklaces"
                             data-detail='{"tag":"Rare Gem","title":"Elysian Emerald Pendant","meta":"18k White Gold / Colombian Emerald","desc":"A deep, vivid Colombian emerald suspended from a delicate 18k white gold chain encrusted with pavé diamonds. Each stone is individually certified and responsibly sourced from the Muzo mines of Colombia.","price":"$8,200","img":"images/emerald_pendant.png","wa":"Hi Jewels by J, I am interested in the Elysian Emerald Pendant."}'>
                             <img src="images/B1.jpg" alt="Elysian Emerald Pendant">
@@ -799,59 +1405,13 @@
                                     <h4>Elysian Emerald Pendant</h4>
                                     <p>Colombian Emerald Necklace</p>
                                     <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-arrow-right"></i> View
-                                            Details</span>
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="gallery-item" data-category="earrings"
-                            data-detail='{"tag":"Limited Edition","title":"Sapphire Filigree Earrings","meta":"Platinum / Sri Lankan Sapphires","desc":"Ornate platinum drop earrings showcasing vivid cushion-cut Sri Lankan sapphires of exceptional clarity. Fine filigree scrollwork frames each stone — a technique requiring over 40 hours of bench time by a single craftsman.","price":"$3,900","img":"images/sapphire_earrings.png","wa":"Hi Jewels by J, I am interested in the Sapphire Filigree Earrings."}'>
-                            <img src="images/C1.jpg" alt="Sapphire Filigree Earrings">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <h4>Sapphire Filigree Earrings</h4>
-                                    <p>Sri Lankan Sapphire Drops</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-arrow-right"></i> View
-                                            Details</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="gallery-item" data-category="bracelets"
-                            data-detail='{"tag":"Artisan","title":"Classic Gold Cuff","meta":"22k Gold / Polished Obsidian Core","desc":"A minimalist statement cuff hand-hammered from solid 22k gold and formed around a polished obsidian centre block. The contrast of warm gold against deep black stone makes this a piece that commands attention in any setting.","price":"$6,100","img":"images/gold_bracelet.png","wa":"Hi Jewels by J, I am interested in the Classic Gold Cuff."}'>
-                            <img src="images/C2.jpg" alt="Classic Gold Cuff">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <h4>Classic Gold Cuff</h4>
-                                    <p>Polished Obsidian & Gold</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-arrow-right"></i> View
-                                            Details</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="gallery-item" data-category="bracelets"
-                            data-detail='{"tag":"Artisan","title":"Double Strand Pearls","meta":"South Sea Pearls / 18k Gold Clasp","desc":"Highly lustrous double strand of perfectly matched South Sea white pearls, each selected for exceptional roundness and surface quality. Finished with an elegant hand-engraved 18k gold filigree clasp.","price":"$7,400","img":"images/vid1_poster.jpg","video":"videos/vid1.mp4","wa":"Hi Jewels by J, I am interested in the Double Strand Pearls."}'>
-                            <img src="images/vid1_preview.gif" alt="Double Strand Pearls">
-                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <h4>Double Strand Pearls</h4>
-                                    <p>South Sea Pearl Necklace</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-arrow-right"></i> View
-                                            Details</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
+                        <!-- Necklace Photo 2: A1.jpg -->
                         <div class="gallery-item" data-category="necklaces"
                             data-detail='{"tag":"Personalized","title":"Golden Initial Pendant","meta":"14k Gold Vermeil / Custom Letter Charm","desc":"A delicate curb-chain necklace finished with a solid gold initial charm — a subtle, personal touch that carries meaning. Each letter is cast individually and finished by hand, making it a timeless everyday piece or a thoughtful gift.","price":"$85","img":"images/A1.jpg","wa":"Hi Jewels by J, I am interested in the Golden Initial Pendant."}'>
                             <img src="images/A1.jpg" alt="Golden Initial Pendant">
@@ -860,8 +1420,97 @@
                                     <h4>Golden Initial Pendant</h4>
                                     <p>Custom Initial Necklace</p>
                                     <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-arrow-right"></i> View
-                                            Details</span>
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ════════════════ EARRINGS GROUP ════════════════ -->
+                        <!-- Earring Video 1: gift2.MP4 -->
+                        <div class="gallery-item" data-category="earrings video"
+                            data-detail='{"tag":"Curated Video","title":"Luminous Chandelier Drops","meta":"18k White Gold / Brilliant Crystals","desc":"Statement chandelier drop earrings featuring cascade light reflection. Handcrafted for galas, red carpet events, and special evenings.","price":"$3,600","img":"images/C1.jpg","video":"videos/gift2.MP4","wa":"Hi Jewels by J, I am interested in the Luminous Chandelier Drops."}'>
+                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
+                                <source src="videos/gift2.MP4" type="video/mp4">
+                            </video>
+                            <div class="video-badge"><i class="fa-solid fa-film"></i> Earring Video</div>
+                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Luminous Chandelier Drops</h4>
+                                    <p>Statement Drop Earrings</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Earring Photo: C1.jpg -->
+                        <div class="gallery-item" data-category="earrings"
+                            data-detail='{"tag":"Limited Edition","title":"Sapphire Filigree Earrings","meta":"Platinum / Sri Lankan Sapphires","desc":"Ornate platinum drop earrings showcasing vivid cushion-cut Sri Lankan sapphires of exceptional clarity. Fine filigree scrollwork frames each stone — a technique requiring over 40 hours of bench time by a single craftsman.","price":"$3,900","img":"images/sapphire_earrings.png","wa":"Hi Jewels by J, I am interested in the Sapphire Filigree Earrings."}'>
+                            <img src="images/C1.jpg" alt="Sapphire Filigree Earrings">
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Sapphire Filigree Earrings</h4>
+                                    <p>Sri Lankan Sapphire Drops</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ════════════════ BRACELETS GROUP ════════════════ -->
+                        <!-- Bracelet Video 1: vid2.MOV -->
+                        <div class="gallery-item" data-category="bracelets video"
+                            data-detail='{"tag":"Artisan Video","title":"Aurelia Diamond Bangle","meta":"18k Yellow Gold / Diamond Pavé","desc":"A fluid 18k yellow gold bangle embellished with brilliant micro-pavé diamonds. Designed for effortless stackability or standalone elegance.","price":"$5,800","img":"images/C2.jpg","video":"videos/vid2.MOV","wa":"Hi Jewels by J, I am interested in the Aurelia Diamond Bangle."}'>
+                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
+                                <source src="videos/vid2.MOV" type="video/quicktime">
+                                <source src="videos/vid2.MOV" type="video/mp4">
+                            </video>
+                            <div class="video-badge"><i class="fa-solid fa-film"></i> Bracelet Video</div>
+                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Aurelia Diamond Bangle</h4>
+                                    <p>18k Gold & Pavé Diamonds</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-arrow-right"></i> View Details</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bracelet Video 2: bf bracelet.MP4 -->
+                        <div class="gallery-item" data-category="bracelets video"
+                            data-detail='{"tag":"Artisan Video","title":"Butterfly Gold Charm Bracelet","meta":"14k Yellow Gold / Hand-Finished Charms","desc":"An enchanting 14k gold chain bracelet featuring hand-carved butterfly charms that catch light at every gesture. A delicate, graceful accent piece.","price":"$2,450","img":"images/C2.jpg","video":"videos/bf bracelet.MP4","wa":"Hi Jewels by J, I am interested in the Butterfly Gold Charm Bracelet."}'>
+                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
+                                <source src="videos/bf bracelet.MP4" type="video/mp4">
+                            </video>
+                            <div class="video-badge"><i class="fa-solid fa-film"></i> Bracelet Video</div>
+                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Butterfly Gold Charm Bracelet</h4>
+                                    <p>Hand-Finished Gold Charms</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-arrow-right"></i> View Details</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bracelet Photo: C2.jpg -->
+                        <div class="gallery-item" data-category="bracelets"
+                            data-detail='{"tag":"Artisan","title":"Classic Gold Cuff","meta":"22k Gold / Polished Obsidian Core","desc":"A minimalist statement cuff hand-hammered from solid 22k gold and formed around a polished obsidian centre block. The contrast of warm gold against deep black stone makes this a piece that commands attention in any setting.","price":"$6,100","img":"images/gold_bracelet.png","wa":"Hi Jewels by J, I am interested in the Classic Gold Cuff."}'>
+                            <img src="images/C2.jpg" alt="Classic Gold Cuff">
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Classic Gold Cuff</h4>
+                                    <p>Polished Obsidian & Gold</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-arrow-right"></i> View Details</span>
                                     </div>
                                 </div>
                             </div>
@@ -949,48 +1598,142 @@
                                 <span class="action-link">Start Chatting <i class="fa-solid fa-arrow-right"></i></span>
                             </div>
                         </a>
+
+                        <a href="mailto:mensahjerrilyn@gmail.com" class="contact-card">
+                            <div class="card-icon"><i class="fa-solid fa-envelope"></i></div>
+                            <div class="card-details">
+                                <h4>Direct Email Inquiry</h4>
+                                <p>mensahjerrilyn@gmail.com</p>
+                                <span class="action-link">Send Email <i class="fa-solid fa-arrow-right"></i></span>
+                            </div>
+                        </a>
+
                         <div class="contact-card">
                             <div class="card-icon"><i class="fa-solid fa-location-dot"></i></div>
                             <div class="card-details">
-                                <h4>Our Showroom</h4>
-                                <p>Accra,<br>Ghana</p>
+                                <h4>Our Location</h4>
+                                <p>Accra, Ghana</p>
                             </div>
                         </div>
+
                         <div class="contact-card">
                             <div class="card-icon"><i class="fa-solid fa-phone"></i></div>
                             <div class="card-details">
-                                <h4>Call</h4>
-                                <p>+233 59 325 2913</p>
+                                <h4>Call Us</h4>
+                                <p>+233 50 059 4879 / +233 59 325 2913</p>
                             </div>
                         </div>
 
-                        <!-- ── EmailJS Contact Form ── -->
+                        <!-- ── Customer Email Inquiry Form ── -->
                         <div class="contact-form-card">
-                            <h3 class="contact-form-title">Send an Inquiry</h3>
-                            <p class="contact-form-sub">Prefer email? Fill this out and I'll get back to you shortly.</p>
+                            <h3 class="contact-form-title">Send an Email Inquiry</h3>
+                            <p class="contact-form-sub">Enter your details below. Your message will be sent directly to <strong>mensahjerrilyn@gmail.com</strong>.</p>
 
-                            <form id="contactForm">
+                            <form id="contactForm" action="https://formsubmit.co/mensahjerrilyn@gmail.com" method="POST">
+                                <input type="hidden" name="_captcha" value="false">
+                                <input type="hidden" name="_template" value="table">
                                 <div class="contact-form-row">
                                     <div class="contact-form-group">
-                                        <label for="fromName">Name</label>
-                                        <input type="text" id="fromName" name="from_name" required>
+                                        <label for="fromName">Your Name *</label>
+                                        <input type="text" id="fromName" name="name" placeholder="Enter your full name" required>
                                     </div>
                                     <div class="contact-form-group">
-                                        <label for="fromEmail">Email</label>
-                                        <input type="email" id="fromEmail" name="from_email" required>
+                                        <label for="fromEmail">Your Email Address *</label>
+                                        <input type="email" id="fromEmail" name="email" placeholder="Enter your email address" required>
                                     </div>
                                 </div>
                                 <div class="contact-form-group">
-                                    <label for="messageBody">Message</label>
+                                    <label for="formSubject">Subject / Piece of Interest *</label>
+                                    <input type="text" id="formSubject" name="_subject" placeholder="e.g. Custom Ring / Necklace Inquiry" required>
+                                </div>
+                                <div class="contact-form-group">
+                                    <label for="messageBody">Your Message *</label>
                                     <textarea id="messageBody" name="message" required
-                                        placeholder="Tell me what piece you're interested in..."></textarea>
+                                        placeholder="Write your message, customization requests, or questions here..."></textarea>
                                 </div>
                                 <button type="submit" class="contact-form-submit" id="contactSubmitBtn">
                                     <i class="fa-solid fa-paper-plane"></i>
-                                    <span id="contactSubmitLabel">Send Message</span>
+                                    <span id="contactSubmitLabel">Send Email to mensahjerrilyn@gmail.com</span>
                                 </button>
                                 <p class="contact-form-status" id="contactFormStatus"></p>
                             </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════
+           TRACK ORDER SECTION
+        ════════════════════════════════════════ -->
+        <section class="section-content" id="section-track">
+            <div class="container section-container">
+                <div class="section-header">
+                    <span class="section-tag">Order Status</span>
+                    <h2 class="section-title">Track Your Order</h2>
+                    <p class="section-desc" style="max-width: 600px; margin: 0 auto;">
+                        Enter your telephone number to view the progress of your bespoke jewelry. We meticulously craft each piece to perfection.
+                    </p>
+                </div>
+                
+                <div class="track-container">
+                    <div class="track-form-card">
+                        <form id="trackOrderForm" onsubmit="handleTrackOrder(event)">
+                            <div class="contact-form-row">
+                                <div class="contact-form-group">
+                                    <label for="trackPhone">Telephone Number</label>
+                                    <input type="tel" id="trackPhone" placeholder="e.g. 0500594879" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="contact-form-submit" id="trackSubmitBtn" style="width: 100%; justify-content: center;">
+                                <i class="fa-solid fa-location-crosshairs"></i>
+                                <span id="trackSubmitLabel">Track Order</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Tracking Result Card (Hidden by default) -->
+                    <div class="track-result-card" id="trackResultCard" style="display: none;">
+                        <div class="track-result-header">
+                            <h3 id="trackResultTitle">Order #JBJ-10294</h3>
+                            <p id="trackResultStatus" class="track-status-badge">Processing</p>
+                        </div>
+                        <div class="track-timeline">
+                            <div class="timeline-step completed">
+                                <div class="step-icon"><i class="fa-solid fa-check"></i></div>
+                                <div class="step-content">
+                                    <h4>Order Received</h4>
+                                    <p>We have received your order details.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-step active">
+                                <div class="step-icon"><i class="fa-solid fa-hammer"></i></div>
+                                <div class="step-content">
+                                    <h4>Crafting & Setting</h4>
+                                    <p>Your piece is currently being expertly crafted.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-step pending">
+                                <div class="step-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                                <div class="step-content">
+                                    <h4>Quality Assurance</h4>
+                                    <p>Final polishing and rigorous quality checks.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-step pending">
+                                <div class="step-icon"><i class="fa-solid fa-box"></i></div>
+                                <div class="step-content">
+                                    <h4>Packaged & Shipped</h4>
+                                    <p>Your piece is securely packaged and on its way.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-step pending">
+                                <div class="step-icon"><i class="fa-solid fa-house"></i></div>
+                                <div class="step-content">
+                                    <h4>Delivered</h4>
+                                    <p>Enjoy your new Jewels by J piece.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1016,6 +1759,7 @@
                 <a href="#" onclick="navigateTo('gallery');  return false;">Visual Gallery</a>
                 <a href="#" onclick="navigateTo('about');    return false;">Heritage & Legacy</a>
                 <a href="#" onclick="navigateTo('contact');  return false;">Private Consultation</a>
+                <a href="#" onclick="navigateTo('track');    return false;">Track Order</a>
             </div>
             
         </div>
@@ -1034,6 +1778,23 @@
 
     <!-- dim overlay for mobile nav drawer -->
     <div class="nav-overlay" id="navOverlay"></div>
+
+    <!-- ── GALLERY BIGGER VIEW LIGHTBOX MODAL ── -->
+    <div class="lightbox-modal" id="galleryLightbox">
+        <div class="lightbox-backdrop" id="lightboxBackdrop"></div>
+        <div class="lightbox-content">
+            <button class="lightbox-close-btn" id="lightboxCloseBtn" aria-label="Close bigger view">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="lightbox-body" id="lightboxBody">
+                <!-- Image or Video dynamically inserted here -->
+            </div>
+            <div class="lightbox-caption">
+                <h3 id="lightboxTitle"></h3>
+                <p id="lightboxCategory"></p>
+            </div>
+        </div>
+    </div>
 
     <!-- ── EmailJS SDK ── -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -1070,7 +1831,7 @@
         /* ════════════════════════════════════════
            SPA NAVIGATION
         ════════════════════════════════════════ */
-        const PAGES = ['home', 'featured', 'gallery', 'detail', 'about', 'contact'];
+        const PAGES = ['home', 'featured', 'gallery', 'detail', 'about', 'contact', 'track'];
 
         function navigateTo(page) {
             // Pause detail video when leaving the detail page
@@ -1103,51 +1864,80 @@
         }
 
         /* ════════════════════════════════════════
-           GALLERY → DETAIL
+           GALLERY BIGGER VIEW LIGHTBOX MODAL
         ════════════════════════════════════════ */
+        const lightbox = document.getElementById('galleryLightbox');
+        const lightboxBody = document.getElementById('lightboxBody');
+        const lightboxTitle = document.getElementById('lightboxTitle');
+        const lightboxCategory = document.getElementById('lightboxCategory');
+        const lightboxCloseBtn = document.getElementById('lightboxCloseBtn');
+        const lightboxBackdrop = document.getElementById('lightboxBackdrop');
+
+        function openLightbox(d, itemEl) {
+            lightboxBody.innerHTML = '';
+            lightboxTitle.textContent = d.title;
+            lightboxCategory.textContent = d.meta || d.tag || '';
+
+            if (d.video) {
+                const video = document.createElement('video');
+                video.controls = true;
+                video.autoplay = true;
+                video.loop = true;
+                video.playsInline = true;
+
+                if (d.video.toLowerCase().endsWith('.mov')) {
+                    const s1 = document.createElement('source');
+                    s1.src = d.video;
+                    s1.type = 'video/quicktime';
+                    video.appendChild(s1);
+
+                    const s2 = document.createElement('source');
+                    s2.src = d.video;
+                    s2.type = 'video/mp4';
+                    video.appendChild(s2);
+                } else {
+                    const s = document.createElement('source');
+                    s.src = d.video;
+                    s.type = 'video/mp4';
+                    video.appendChild(s);
+                }
+
+                lightboxBody.appendChild(video);
+                video.load();
+                video.play().catch(e => console.log('Autoplay handled:', e));
+            } else {
+                const img = document.createElement('img');
+                const itemImg = itemEl ? itemEl.querySelector('img') : null;
+                img.src = itemImg ? itemImg.src : d.img;
+                img.alt = d.title;
+                lightboxBody.appendChild(img);
+            }
+
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            if (!lightbox || !lightbox.classList.contains('active')) return;
+            const video = lightboxBody.querySelector('video');
+            if (video) video.pause();
+            lightboxBody.innerHTML = '';
+            lightbox.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
         document.querySelectorAll('.gallery-item').forEach(item => {
             item.style.cursor = 'pointer';
             item.addEventListener('click', () => {
                 const d = JSON.parse(item.dataset.detail);
-                document.getElementById('detailTag').textContent = d.tag;
-                document.getElementById('detailTitle').textContent = d.title;
-                document.getElementById('detailMeta').textContent = d.meta;
-                document.getElementById('detailDesc').textContent = d.desc;
-
-                const wrap = document.querySelector('.detail-img-wrap');
-                const existingMedia = wrap.querySelector('#detailImg, #detailVideo');
-
-                if (d.video) {
-                    // Build/replace with a <video> element
-                    let video = document.getElementById('detailVideo');
-                    if (!video) {
-                        video = document.createElement('video');
-                        video.id = 'detailVideo';
-                        video.controls = true;
-                        video.playsInline = true;
-                        video.preload = 'metadata';
-                        wrap.insertBefore(video, wrap.firstChild);
-                    }
-                    video.poster = d.img;
-                    video.src = d.video;
-                    video.style.display = 'block';
-                    video.load();
-                    const img = document.getElementById('detailImg');
-                    if (img) img.style.display = 'none';
-                } else {
-                    const img = document.getElementById('detailImg');
-                    img.src = d.img;
-                    img.alt = d.title;
-                    img.style.display = 'block';
-                    const video = document.getElementById('detailVideo');
-                    if (video) {
-                        video.pause();
-                        video.style.display = 'none';
-                    }
-                }
-
-                navigateTo('detail');
+                openLightbox(d, item);
             });
+        });
+
+        if (lightboxCloseBtn) lightboxCloseBtn.addEventListener('click', closeLightbox);
+        if (lightboxBackdrop) lightboxBackdrop.addEventListener('click', closeLightbox);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
         });
 
         /* ════════════════════════════════════════
@@ -1159,8 +1949,9 @@
                 btn.classList.add('active');
                 const filter = btn.dataset.filter;
                 document.querySelectorAll('.gallery-item').forEach(item => {
+                    const cats = (item.dataset.category || '').split(' ');
                     item.style.display =
-                        (filter === 'all' || item.dataset.category === filter) ? '' : 'none';
+                        (filter === 'all' || cats.includes(filter)) ? '' : 'none';
                 });
             });
         });
@@ -1176,19 +1967,10 @@
         });
 
         /* ════════════════════════════════════════
-           EMAILJS CONTACT FORM
-           Replace the 3 placeholders below with your
-           own EmailJS values (see setup notes I sent you).
+           CUSTOMER EMAIL INQUIRY SUBMISSION
+           Sends customer inquiry directly to mensahjerrilyn@gmail.com
         ════════════════════════════════════════ */
         (function () {
-            const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";
-            const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
-            const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
-
-            if (window.emailjs) {
-                emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-            }
-
             const form = document.getElementById('contactForm');
             const submitBtn = document.getElementById('contactSubmitBtn');
             const submitLabel = document.getElementById('contactSubmitLabel');
@@ -1198,29 +1980,132 @@
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
 
+                    const fromName = document.getElementById('fromName').value.trim();
+                    const fromEmail = document.getElementById('fromEmail').value.trim();
+                    const subject = document.getElementById('formSubject') ? document.getElementById('formSubject').value.trim() : 'Jewels by J Inquiry';
+                    const message = document.getElementById('messageBody').value.trim();
+
+                    if (!fromName || !fromEmail || !message) {
+                        statusEl.textContent = 'Please fill in all required fields.';
+                        statusEl.className = 'contact-form-status error';
+                        return;
+                    }
+
                     submitBtn.disabled = true;
-                    submitLabel.textContent = 'Sending...';
+                    submitLabel.textContent = 'Sending to mensahjerrilyn@gmail.com...';
                     statusEl.className = 'contact-form-status';
                     statusEl.textContent = '';
 
-                    emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, form)
-                        .then(function () {
-                            statusEl.textContent = "Message sent! I'll get back to you soon.";
-                            statusEl.className = 'contact-form-status success';
-                            form.reset();
+                    fetch("https://formsubmit.co/ajax/mensahjerrilyn@gmail.com", {
+                        method: "POST",
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: fromName,
+                            email: fromEmail,
+                            _subject: `Jewels by J Inquiry: ${subject} (from ${fromName})`,
+                            message: message,
+                            _replyto: fromEmail
                         })
-                        .catch(function (err) {
-                            console.error('EmailJS error:', err);
-                            statusEl.textContent = "Something went wrong. Please try WhatsApp instead, or try again.";
-                            statusEl.className = 'contact-form-status error';
-                        })
-                        .finally(function () {
-                            submitBtn.disabled = false;
-                            submitLabel.textContent = 'Send Message';
-                        });
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        statusEl.textContent = `Thank you, ${fromName}! Your message has been sent directly to mensahjerrilyn@gmail.com. We will reply to ${fromEmail} shortly.`;
+                        statusEl.className = 'contact-form-status success';
+                        form.reset();
+                    })
+                    .catch(error => {
+                        console.error('Submission error:', error);
+                        const mailtoUrl = `mailto:mensahjerrilyn@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('From: ' + fromName + ' (' + fromEmail + ')\n\n' + message)}`;
+                        window.location.href = mailtoUrl;
+                        statusEl.textContent = "Opening your mail app to send directly to mensahjerrilyn@gmail.com...";
+                        statusEl.className = 'contact-form-status success';
+                    })
+                    .finally(function () {
+                        submitBtn.disabled = false;
+                        submitLabel.textContent = 'Send Email to mensahjerrilyn@gmail.com';
+                    });
                 });
             }
         })();
+        /* ════════════════════════════════════════
+           ORDER TRACKING LOGIC (MANUAL LIST)
+        ════════════════════════════════════════ */
+        // Order Statuses:
+        // 1 = Order Received
+        // 2 = Crafting & Setting
+        // 3 = Quality Assurance
+        // 4 = Packaged & Shipped
+        // 5 = Delivered
+        const orderStatuses = {
+            "0500594879": 4, // Example: Jerrilyn's number is at step 4
+            "0202033492": 2, // Example: Test number at step 2
+            "0244123456": 5  // Example: Test number at step 5
+        };
+
+        function handleTrackOrder(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('trackSubmitBtn');
+            const submitLabel = document.getElementById('trackSubmitLabel');
+            const phone = document.getElementById('trackPhone').value.trim();
+            const resultCard = document.getElementById('trackResultCard');
+            const resultTitle = document.getElementById('trackResultTitle');
+            const resultStatus = document.getElementById('trackResultStatus');
+            const timelineSteps = resultCard.querySelectorAll('.timeline-step');
+            
+            if (!phone) return;
+
+            // Simulate loading state
+            submitBtn.disabled = true;
+            submitLabel.textContent = 'Searching Orders...';
+            resultCard.style.display = 'none';
+
+            // Mock network request delay
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                submitLabel.textContent = 'Track Order';
+                
+                // Determine the status from our manual list (default to 1 if not found)
+                const currentStep = orderStatuses[phone] || 1;
+                
+                // Update result card with order info
+                resultTitle.textContent = `Order for ${phone}`;
+                
+                const statusLabels = [
+                    "Processing",
+                    "Crafting",
+                    "Quality Check",
+                    "Shipped",
+                    "Delivered"
+                ];
+                resultStatus.textContent = statusLabels[currentStep - 1] || "Processing";
+                
+                // Update the timeline steps visually
+                timelineSteps.forEach((stepEl, index) => {
+                    // index 0 = step 1, index 1 = step 2, etc.
+                    const stepNumber = index + 1;
+                    
+                    // Reset classes
+                    stepEl.classList.remove('completed', 'active', 'pending');
+                    
+                    if (stepNumber < currentStep) {
+                        stepEl.classList.add('completed');
+                    } else if (stepNumber === currentStep) {
+                        stepEl.classList.add('active');
+                    } else {
+                        stepEl.classList.add('pending');
+                    }
+                });
+
+                resultCard.style.display = 'block';
+                
+                // Scroll down slightly to show result
+                resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 1200);
+        }
     </script>
 </body>
 
