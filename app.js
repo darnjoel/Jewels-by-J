@@ -62,11 +62,12 @@ function setupSideDrawer() {
             </button>
         </div>
         <ul class="drawer-links">
-            <li><a href="#home"     class="drawer-link">Home</a></li>
-            <li><a href="#featured" class="drawer-link">Featured</a></li>
-            <li><a href="#gallery"  class="drawer-link">Gallery</a></li>
-            <li><a href="#about"    class="drawer-link">About</a></li>
-            <li><a href="#contact"  class="drawer-link">Contact</a></li>
+            <li><a href="#home"         class="drawer-link">Home</a></li>
+            <li><a href="#featured"     class="drawer-link">Featured</a></li>
+            <li><a href="#gallery"      class="drawer-link">Gallery</a></li>
+            <li><a href="#customer-cam" class="drawer-link">Customer Cam</a></li>
+            <li><a href="#about"        class="drawer-link">About</a></li>
+            <li><a href="#contact"      class="drawer-link">Contact</a></li>
         </ul>
         <div class="drawer-footer">
             <button class="btn btn-primary btn-block" onclick="openSellerPortal(); closeDrawer();">

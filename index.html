@@ -858,165 +858,224 @@
             display: block;
         }
         /* ══════════════════════════════════════
-           TRACK ORDER CSS
+           CUSTOMER CAM CSS
         ══════════════════════════════════════ */
-        .track-container {
-            max-width: 700px;
-            margin: 0 auto;
+        .customer-cam-section {
+            padding-top: 120px;
+            padding-bottom: 80px;
+        }
+
+        .customer-cam-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 26px;
             margin-top: 40px;
         }
 
-        .track-form-card {
+        .customer-cam-card {
             background: #111;
-            border: 1px solid #c9a96e33;
-            padding: 40px 36px;
-            border-radius: 4px;
-        }
-
-        .track-result-card {
-            background: #111;
-            border: 1px solid #c9a96e;
-            padding: 40px 36px;
-            border-radius: 4px;
-            margin-top: 30px;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .track-result-header {
+            border: 1px solid rgba(201, 169, 110, 0.25);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #c9a96e33;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
-
-        .track-result-header h3 {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 500;
-            font-size: 1.2rem;
-            color: #f5f0e8;
-            letter-spacing: 0.1em;
-        }
-
-        .track-status-badge {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            background: rgba(201, 169, 110, 0.15);
-            color: #c9a96e;
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid #c9a96e55;
-        }
-
-        .track-timeline {
+            flex-direction: column;
             position: relative;
-            padding-left: 30px;
         }
 
-        .track-timeline::before {
-            content: '';
+        .customer-cam-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(201, 169, 110, 0.75);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 20px rgba(201, 169, 110, 0.2);
+        }
+
+        .customer-cam-media {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 5;
+            background: #000;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .customer-cam-media video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.6s ease;
+        }
+
+        .customer-cam-card:hover .customer-cam-media video {
+            transform: scale(1.03);
+        }
+
+        .cam-badge {
             position: absolute;
+            top: 14px;
             left: 14px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: #2a2a2a;
+            background: rgba(10, 10, 10, 0.85);
+            color: #c9a96e;
+            border: 1px solid rgba(201, 169, 110, 0.5);
+            font-size: 0.68rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 5px 12px;
+            border-radius: 20px;
+            z-index: 3;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(6px);
         }
 
-        .timeline-step {
-            position: relative;
-            padding-bottom: 30px;
-            padding-left: 20px;
-            opacity: 0.5;
-            transition: opacity 0.3s;
-        }
-
-        .timeline-step:last-child {
-            padding-bottom: 0;
-        }
-
-        .timeline-step.completed,
-        .timeline-step.active {
-            opacity: 1;
-        }
-
-        .step-icon {
-            position: absolute;
-            left: -33px; /* relative to padding-left 20px + track padding 30px */
-            top: 0;
-            width: 30px;
-            height: 30px;
+        .cam-live-dot {
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
-            background: #111;
-            border: 2px solid #2a2a2a;
+            background: #e63946;
+            box-shadow: 0 0 8px #e63946;
+            animation: pulseDot 1.8s infinite;
+        }
+
+        @keyframes pulseDot {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.7; }
+        }
+
+        .cam-expand-btn {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(10, 10, 10, 0.75);
+            border: 1px solid rgba(201, 169, 110, 0.4);
+            color: #f5f0e8;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.8rem;
-            color: #555;
-            z-index: 2;
+            font-size: 0.85rem;
+            z-index: 3;
+            transition: all 0.25s ease;
+            backdrop-filter: blur(6px);
+            cursor: pointer;
         }
 
-        .timeline-step.completed .step-icon {
-            border-color: #c9a96e;
+        .customer-cam-card:hover .cam-expand-btn {
             background: #c9a96e;
             color: #0a0a0a;
+            transform: scale(1.1);
         }
 
-        .timeline-step.active .step-icon {
-            border-color: #c9a96e;
-            background: #111;
-            color: #c9a96e;
-            box-shadow: 0 0 10px rgba(201, 169, 110, 0.4);
-        }
-
-        .timeline-step::after {
-            /* Active line segment */
-            content: '';
+        .cam-play-hint {
             position: absolute;
-            left: -19px;
-            top: 30px;
-            bottom: 0;
-            width: 2px;
-            background: #c9a96e;
-            display: none;
-            z-index: 1;
+            bottom: 14px;
+            right: 14px;
+            background: rgba(0, 0, 0, 0.75);
+            color: #f5f0e8;
+            border: 1px solid rgba(201, 169, 110, 0.3);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 3;
+            pointer-events: none;
+            backdrop-filter: blur(4px);
         }
 
-        .timeline-step.completed::after {
-            display: block;
+        .customer-cam-body {
+            padding: 20px 22px 24px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
         }
 
-        .timeline-step:last-child::after {
-            display: none !important;
-        }
-
-        .step-content h4 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.3rem;
+        .customer-cam-body h4 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.35rem;
+            font-weight: 500;
             color: #f5f0e8;
             margin-bottom: 6px;
-            font-weight: 500;
+            letter-spacing: 0.5px;
         }
 
-        .step-content p {
+        .customer-cam-body p {
             font-family: 'Montserrat', sans-serif;
-            font-size: 0.85rem;
-            color: #aaa;
+            font-size: 0.82rem;
+            color: #a39b8d;
             line-height: 1.5;
+            margin-bottom: 18px;
+            flex-grow: 1;
         }
 
-        @media (max-width: 600px) {
-            .track-form-card, .track-result-card {
-                padding: 32px 22px;
+        .customer-cam-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-cam-view {
+            flex: 1;
+            padding: 10px 14px;
+            background: transparent;
+            border: 1px solid #c9a96e;
+            color: #c9a96e;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-cam-view:hover {
+            background: rgba(201, 169, 110, 0.15);
+            color: #f5f0e8;
+        }
+
+        .btn-cam-wa {
+            flex: 1;
+            padding: 10px 14px;
+            background: #25d366;
+            border: 1px solid #25d366;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+        .btn-cam-wa:hover {
+            background: #1ebe5d;
+            box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+        }
+
+        @media (max-width: 768px) {
+            .customer-cam-grid {
+                grid-template-columns: 1fr;
+                gap: 22px;
             }
         }
     </style>
@@ -1033,7 +1092,7 @@
                 <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu">
                     <span class="bar"></span><span class="bar"></span><span class="bar"></span>
                 </button>
-                <a href="#" class="logo" onclick="navigateTo('home'); return false;">JEWELS BY J</a>
+                <a href="#" class="logo" onclick="navigateTo('home'); return false;">JEWELS BY Jerrilyn</a>
             </div>
 
             <nav class="nav-menu" id="navMenu">
@@ -1043,11 +1102,11 @@
                     onclick="navigateTo('featured'); return false;">Featured</a>
                 <a href="#" class="nav-link" data-page="gallery"
                     onclick="navigateTo('gallery');  return false;">Gallery</a>
+                <a href="#" class="nav-link" data-page="customer-cam"
+                    onclick="navigateTo('customer-cam'); return false;">Customer Cam</a>
                 <a href="#" class="nav-link" data-page="about" onclick="navigateTo('about');    return false;">About</a>
                 <a href="#" class="nav-link" data-page="contact"
                     onclick="navigateTo('contact');  return false;">Contact</a>
-                <a href="#" class="nav-link" data-page="track"
-                    onclick="navigateTo('track');  return false;">Track Order</a>
 
                 <div class="nav-menu-follow">
                     <span class="nav-menu-follow-label">Follow Us</span>
@@ -1075,14 +1134,14 @@
 
             <!-- Hero -->
             <div class="hero"
-                style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.75)), url('images/hero.png');">
+                style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.82)), url('images/hand.jpg'); background-position: center; background-size: cover;">
                 <div class="hero-content">
                     <span class="hero-subtitle">Jewelry That Defines Your Style.</span>
                     <h1 class="hero-title">Created for Timeless Moments</h1>
                     <p class="hero-desc">Discover timeless beauty through our curated selection of handcrafted jewelry and personalized creations.</p>
                     <div class="hero-ctas">
                         <button class="btn btn-primary" onclick="navigateTo('featured')">View Collection</button>
-                        <button class="btn btn-secondary" onclick="navigateTo('contact')">Enquiries</button>
+                        <button class="btn btn-secondary" onclick="navigateTo('customer-cam')"><i class="fa-solid fa-play" style="margin-right:6px; font-size:0.75rem;"></i> Customer Cam</button>
                     </div>
                 </div>
                 <div class="scroll-indicator">
@@ -1093,37 +1152,35 @@
 
             <!-- Featured preview on home -->
            <div class="featured-section">
-    <div class="container">
-        <div class="section-header">
-            <span class="sub-title">The Seasonal Curations</span>
-            <h2 class="section-title">Featured Releases</h2>
-            <div class="accent-line"></div>
-        </div>
-        <div class="featured-grid">
-            <!-- Card 1 -->
-            <div class="product-card">
-                <div class="product-img-wrapper">
-                    <img src="images/jerrilyn.jpg" alt="Miss J Solitaire Ring" class="product-img">
-                </div>
-            </div>
-            <!-- Card 2 -->
-            <div class="product-card">
-                <div class="product-img-wrapper">
-                    <img src="images/moesha.jpg" alt="Elysian Emerald Pendant" class="product-img">
-                </div>
-            </div>
-            <!-- Card 3 -->
-            <div class="product-card">
-                <div class="product-img-wrapper">
-                    <img src="images/kimberry.jpg" alt="Sapphire Filigree Earrings"
-                        class="product-img">
-                </div>
-            </div>
+                <div class="container">
+                    <div class="section-header">
+                        <span class="sub-title">The Seasonal Curations</span>
+                        <h2 class="section-title">Featured Releases</h2>
+                        <div class="accent-line"></div>
+                    </div>
+                    <div class="featured-grid">
+                        <!-- Card 1 -->
+                        <div class="product-card">
+                            <div class="product-img-wrapper">
+                                <img src="images/jerrilyn.jpg" alt="Jerrilyn Duo Butterfly Nameplates" class="product-img">
+                            </div>
+                        </div>
+                        <!-- Card 2 -->
+                        <div class="product-card">
+                            <div class="product-img-wrapper">
+                                <img src="images/moesha.jpg" alt="Moesha Royal Rose Cuban Nameplate" class="product-img">
+                            </div>
+                        </div>
+                        <!-- Card 3 -->
+                        <div class="product-card">
+                            <div class="product-img-wrapper">
+                                <img src="images/B1.jpg" alt="Selorm Custom Silver Cuban ID Bracelet" class="product-img">
                             </div>
                         </div>
                     </div>
-                    <div style="text-align:center; margin-top:40px;">
+                    <div style="text-align:center; margin-top:40px; display:flex; justify-content:center; gap:16px; flex-wrap:wrap;">
                         <button class="btn btn-secondary" onclick="navigateTo('gallery')">View Full Gallery</button>
+                        <button class="btn btn-primary" onclick="navigateTo('customer-cam')"><i class="fa-solid fa-film" style="margin-right:8px;"></i> Watch Customer Cam</button>
                     </div>
                 </div>
             </div>
@@ -1164,16 +1221,16 @@
                     <div class="featured-grid">
                         <div class="product-card">
                             <div class="product-img-wrapper">
-                                <img src="images/hero.png" alt="Miss J Solitaire Ring" class="product-img">
-                                <span class="tag">Signature</span>
+                                <img src="images/jerrilyn.jpg" alt="Jerrilyn Duo Butterfly Nameplates" class="product-img">
+                                <span class="tag">Necklaces</span>
                             </div>
                             <div class="product-info">
-                                <h3 class="product-name">Miss J Solitaire Ring</h3>
-                                <p class="product-category">18k Yellow Gold / 2.5 Carat Diamond</p>
-                                <p class="product-price">$4,500</p>
+                                <h3 class="product-name">Jerrilyn Duo Butterfly Nameplates</h3>
+                                <p class="product-category">Sterling Silver &amp; 18k Gold Plated / Cursive Nameplate</p>
+                                <p class="product-price">Bespoke Custom</p>
                                 <div class="product-actions">
                                     <button class="btn-product-inquiry wa-inquire-btn"
-                                        data-product="Miss J Solitaire Ring">
+                                        data-product="Jerrilyn Duo Butterfly Nameplates">
                                         <i class="fa-brands fa-whatsapp"></i> WhatsApp Inquiry
                                     </button>
                                 </div>
@@ -1181,16 +1238,16 @@
                         </div>
                         <div class="product-card">
                             <div class="product-img-wrapper">
-                                <img src="images/emerald_pendant.png" alt="Elysian Emerald Pendant" class="product-img">
-                                <span class="tag">Rare Gem</span>
+                                <img src="images/moesha.jpg" alt="Moesha Royal Rose Cuban Nameplate" class="product-img">
+                                <span class="tag">Necklaces</span>
                             </div>
                             <div class="product-info">
-                                <h3 class="product-name">Elysian Emerald Pendant</h3>
-                                <p class="product-category">18k White Gold / Colombian Emerald</p>
-                                <p class="product-price">$8,200</p>
+                                <h3 class="product-name">Moesha Royal Rose Cuban Nameplate</h3>
+                                <p class="product-category">18k Heavy Gold Vermeil / Cuban Curb Chain</p>
+                                <p class="product-price">Bespoke Custom</p>
                                 <div class="product-actions">
                                     <button class="btn-product-inquiry wa-inquire-btn"
-                                        data-product="Elysian Emerald Pendant">
+                                        data-product="Moesha Royal Rose Cuban Nameplate">
                                         <i class="fa-brands fa-whatsapp"></i> WhatsApp Inquiry
                                     </button>
                                 </div>
@@ -1198,17 +1255,17 @@
                         </div>
                         <div class="product-card">
                             <div class="product-img-wrapper">
-                                <img src="images/sapphire_earrings.png" alt="Sapphire Filigree Earrings"
+                                <img src="images/B1.jpg" alt="Selorm Custom Silver Cuban ID Bracelet"
                                     class="product-img">
-                                <span class="tag">Limited Edition</span>
+                                <span class="tag">Bracelets</span>
                             </div>
                             <div class="product-info">
-                                <h3 class="product-name">Sapphire Filigree Earrings</h3>
-                                <p class="product-category">Platinum / Sri Lankan Sapphires</p>
-                                <p class="product-price">$3,900</p>
+                                <h3 class="product-name">Selorm Custom Silver Cuban ID Bracelet</h3>
+                                <p class="product-category">Stainless Steel / Polished Cuban Curb Link</p>
+                                <p class="product-price">Bespoke Custom</p>
                                 <div class="product-actions">
                                     <button class="btn-product-inquiry wa-inquire-btn"
-                                        data-product="Sapphire Filigree Earrings">
+                                        data-product="Selorm Custom Silver Cuban ID Bracelet">
                                         <i class="fa-brands fa-whatsapp"></i> WhatsApp Inquiry
                                     </button>
                                 </div>
@@ -1233,177 +1290,22 @@
 
                     <div class="gallery-filters">
                         <button class="filter-btn active" data-filter="all">All Designs</button>
-                        <button class="filter-btn" data-filter="video">Video Showcase</button>
-                        <button class="filter-btn" data-filter="rings">Rings</button>
                         <button class="filter-btn" data-filter="necklaces">Necklaces</button>
-                        <button class="filter-btn" data-filter="earrings">Earrings</button>
                         <button class="filter-btn" data-filter="bracelets">Bracelets</button>
+                        <button class="filter-btn" data-filter="giftsets">Gift Sets</button>
                     </div>
 
                     <div class="gallery-grid">
 
-                        <!-- ════════════════ RINGS GROUP ════════════════ -->
-                        <!-- Ring Video 1: missj.MOV -->
-                        <div class="gallery-item" data-category="rings video"
-                            data-detail='{"tag":"Signature Video","title":"Miss J Master Cut Ring","meta":"18k Yellow Gold / Cushion Cut Diamond","desc":"The quintessential Jewels by J creation — a stunning cushion-cut lab or natural diamond held in handcrafted claw prongs atop a silky gold band.","price":"$6,200","img":"images/jerrilyn.jpg","video":"videos/missj.MOV","wa":"Hi Jewels by J, I am interested in the Miss J Master Cut Ring."}'>
-                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
-                                <source src="videos/missj.MOV" type="video/quicktime">
-                                <source src="videos/missj.MOV" type="video/mp4">
-                            </video>
-                            <div class="video-badge"><i class="fa-solid fa-film"></i> Ring Video</div>
-                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <h4>Miss J Master Cut Ring</h4>
-                                    <p>Master Cut Diamond Ring</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Ring Video 2: asante.MOV -->
-                        <div class="gallery-item" data-category="rings video"
-                            data-detail='{"tag":"Heritage Video","title":"Asante Signet Ring","meta":"18k Heavy Gold Plate / Engraved Crest","desc":"A bold signet ring inspired by traditional Ghanaian royal motifs. Meticulously hand-engraved with intricate cultural symbolism and polished to a mirror finish.","price":"$3,200","img":"images/hand.jpg","video":"videos/asante.MOV","wa":"Hi Jewels by J, I am interested in the Asante Signet Ring."}'>
-                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
-                                <source src="videos/asante.MOV" type="video/quicktime">
-                                <source src="videos/asante.MOV" type="video/mp4">
-                            </video>
-                            <div class="video-badge"><i class="fa-solid fa-film"></i> Ring Video</div>
-                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <h4>Asante Signet Ring</h4>
-                                    <p>Royal Heritage Handcrafted Ring</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Ring Video 3: gift4.MP4 -->
-                        <div class="gallery-item" data-category="rings video"
-                            data-detail='{"tag":"Curated Video","title":"Royal Crown Diamond Band","meta":"Platinum / Pavé Diamond Setting","desc":"An intricate crown-contoured eternity band with brilliant micro-set pavé diamonds. Beautiful worn solo or paired with engagement rings.","price":"$2,950","img":"images/hand.jpg","video":"videos/gift4.MP4","wa":"Hi Jewels by J, I am interested in the Royal Crown Diamond Band."}'>
-                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
-                                <source src="videos/gift4.MP4" type="video/mp4">
-                            </video>
-                            <div class="video-badge"><i class="fa-solid fa-film"></i> Ring Video</div>
-                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <h4>Royal Crown Diamond Band</h4>
-                                    <p>Contoured Pavé Eternity Ring</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Ring Photo: hand.jpg -->
-                        <div class="gallery-item" data-category="rings"
-                            data-detail='{"tag":"Signature","title":"Aurelia Solitaire Ring","meta":"18k Yellow Gold / 2.5 Carat Diamond","desc":"A breathtaking brilliant-cut 2.5 carat diamond set in an 18k yellow gold solitaire band. Precision-crafted by our master goldsmiths, each facet is optimised to capture and return the maximum light.","price":"$4,500","img":"images/hero.png","wa":"Hi Jewels by J, I am interested in the Aurelia Solitaire Ring."}'>
-                            <img src="images/hand.jpg" alt="Aurelia Solitaire Ring">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <h4>Aurelia Solitaire Ring</h4>
-                                    <p>Signature 18k Diamond Ring</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- ════════════════ NECKLACES GROUP ════════════════ -->
-                        <!-- Necklace Video 1: vid1.MP4 -->
-                        <div class="gallery-item" data-category="necklaces video"
-                            data-detail='{"tag":"Artisan Video","title":"Double Strand Pearls","meta":"South Sea Pearls / 18k Gold Clasp","desc":"Highly lustrous double strand of perfectly matched South Sea white pearls, each selected for exceptional roundness and surface quality. Finished with an elegant hand-engraved 18k gold filigree clasp.","price":"$7,400","img":"images/B1.jpg","video":"videos/vid1.MP4","wa":"Hi Jewels by J, I am interested in the Double Strand Pearls."}'>
-                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
-                                <source src="videos/vid1.MP4" type="video/mp4">
-                            </video>
-                            <div class="video-badge"><i class="fa-solid fa-film"></i> Necklace Video</div>
-                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <h4>Double Strand Pearls</h4>
-                                    <p>South Sea Pearl Necklace</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Necklace Video 2: gift3.MOV -->
-                        <div class="gallery-item" data-category="necklaces video"
-                            data-detail='{"tag":"Curated Video","title":"Graceful Emerald Pendant","meta":"18k Gold / Muzo Emerald Cut","desc":"A vibrant green Muzo emerald set in a sleek four-prong gold mounting, suspended on a fine diamond-cut cable chain.","price":"$5,400","img":"images/B1.jpg","video":"videos/gift3.MOV","wa":"Hi Jewels by J, I am interested in the Graceful Emerald Pendant."}'>
-                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
-                                <source src="videos/gift3.MOV" type="video/quicktime">
-                                <source src="videos/gift3.MOV" type="video/mp4">
-                            </video>
-                            <div class="video-badge"><i class="fa-solid fa-film"></i> Necklace Video</div>
-                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <h4>Graceful Emerald Pendant</h4>
-                                    <p>Vivid Emerald Solitaire Chain</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Necklace Video 3: gift1.MP4 -->
-                        <div class="gallery-item" data-category="necklaces video"
-                            data-detail='{"tag":"Curated Video","title":"Golden Elegance Gift Set","meta":"18k Gold Vermeil / Diamond Accents","desc":"A stunning curated gift collection featuring a classic pendant and matching drop chain, crafted to celebrate milestone occasions with unforgettable sparkle.","price":"$4,100","img":"images/ggift.jpg","video":"videos/gift1.MP4","wa":"Hi Jewels by J, I am interested in the Golden Elegance Gift Set."}'>
-                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
-                                <source src="videos/gift1.MP4" type="video/mp4">
-                            </video>
-                            <div class="video-badge"><i class="fa-solid fa-film"></i> Necklace Video</div>
-                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <h4>Golden Elegance Gift Set</h4>
-                                    <p>Curated Fine Jewelry Set</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Necklace Video 4: her eyes.MOV -->
-                        <div class="gallery-item" data-category="necklaces video"
-                            data-detail='{"tag":"Custom Video","title":"Eyes of Desire Pendant","meta":"18k Rose Gold / Blue Sapphire & Diamond","desc":"An alluring eye talisman necklace showcasing an intense sapphire center encircled by halo diamonds, symbolising intuition and protection.","price":"$3,850","img":"images/B2.jpg","video":"videos/her eyes.MOV","wa":"Hi Jewels by J, I am interested in the Eyes of Desire Pendant."}'>
-                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
-                                <source src="videos/her eyes.MOV" type="video/quicktime">
-                                <source src="videos/her eyes.MOV" type="video/mp4">
-                            </video>
-                            <div class="video-badge"><i class="fa-solid fa-film"></i> Necklace Video</div>
-                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <h4>Eyes of Desire Pendant</h4>
-                                    <p>Custom Talisman Necklace</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Necklace Photo 1: B1.jpg -->
+                        <!-- ════════════════ NECKLACES CATEGORY ════════════════ -->
+                        <!-- 1. Jerrilyn Duo Butterfly Nameplates -->
                         <div class="gallery-item" data-category="necklaces"
-                            data-detail='{"tag":"Rare Gem","title":"Elysian Emerald Pendant","meta":"18k White Gold / Colombian Emerald","desc":"A deep, vivid Colombian emerald suspended from a delicate 18k white gold chain encrusted with pavé diamonds. Each stone is individually certified and responsibly sourced from the Muzo mines of Colombia.","price":"$8,200","img":"images/emerald_pendant.png","wa":"Hi Jewels by J, I am interested in the Elysian Emerald Pendant."}'>
-                            <img src="images/B1.jpg" alt="Elysian Emerald Pendant">
+                            data-detail='{"tag":"Necklaces","title":"Jerrilyn Duo Butterfly Nameplates","meta":"Sterling Silver & 18k Gold Plated / Cursive Script","desc":"Bespoke duo nameplate necklaces in classic cursive calligraphy script, crowned with radiant butterfly accent charms. Handcrafted in luminous 18k gold plate and 925 sterling silver.","price":"Bespoke","img":"images/jerrilyn.jpg","wa":"Hi Jewels by J, I would like to order the Jerrilyn Duo Butterfly Nameplates."}'>
+                            <img src="images/jerrilyn.jpg" alt="Jerrilyn Duo Butterfly Nameplates">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Elysian Emerald Pendant</h4>
-                                    <p>Colombian Emerald Necklace</p>
+                                    <h4>Jerrilyn Duo Butterfly Nameplates</h4>
+                                    <p>Silver &amp; Gold Script Necklaces</p>
                                     <div class="overlay-links">
                                         <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
                                     </div>
@@ -1411,14 +1313,14 @@
                             </div>
                         </div>
 
-                        <!-- Necklace Photo 2: A1.jpg -->
+                        <!-- 2. Moesha Royal Rose Cuban Nameplate -->
                         <div class="gallery-item" data-category="necklaces"
-                            data-detail='{"tag":"Personalized","title":"Golden Initial Pendant","meta":"14k Gold Vermeil / Custom Letter Charm","desc":"A delicate curb-chain necklace finished with a solid gold initial charm — a subtle, personal touch that carries meaning. Each letter is cast individually and finished by hand, making it a timeless everyday piece or a thoughtful gift.","price":"$85","img":"images/A1.jpg","wa":"Hi Jewels by J, I am interested in the Golden Initial Pendant."}'>
-                            <img src="images/A1.jpg" alt="Golden Initial Pendant">
+                            data-detail='{"tag":"Necklaces","title":"Moesha Royal Rose Cuban Nameplate","meta":"18k Heavy Gold Vermeil / Cuban Curb Chain","desc":"A commanding statement piece pairing a bold Cuban curb chain with a custom cursive nameplate, adorned with a royal crown, rose motif, and heart accent.","price":"Bespoke","img":"images/moesha.jpg","wa":"Hi Jewels by J, I would like to order the Moesha Royal Rose Cuban Nameplate."}'>
+                            <img src="images/moesha.jpg" alt="Moesha Royal Rose Cuban Nameplate">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Golden Initial Pendant</h4>
-                                    <p>Custom Initial Necklace</p>
+                                    <h4>Moesha Royal Rose Cuban Nameplate</h4>
+                                    <p>Crown &amp; Rose Cuban Chain</p>
                                     <div class="overlay-links">
                                         <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
                                     </div>
@@ -1426,19 +1328,14 @@
                             </div>
                         </div>
 
-                        <!-- ════════════════ EARRINGS GROUP ════════════════ -->
-                        <!-- Earring Video 1: gift2.MP4 -->
-                        <div class="gallery-item" data-category="earrings video"
-                            data-detail='{"tag":"Curated Video","title":"Luminous Chandelier Drops","meta":"18k White Gold / Brilliant Crystals","desc":"Statement chandelier drop earrings featuring cascade light reflection. Handcrafted for galas, red carpet events, and special evenings.","price":"$3,600","img":"images/C1.jpg","video":"videos/gift2.MP4","wa":"Hi Jewels by J, I am interested in the Luminous Chandelier Drops."}'>
-                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
-                                <source src="videos/gift2.MP4" type="video/mp4">
-                            </video>
-                            <div class="video-badge"><i class="fa-solid fa-film"></i> Earring Video</div>
-                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
+                        <!-- 3. Custom Butterfly Trio Nameplates -->
+                        <div class="gallery-item" data-category="necklaces"
+                            data-detail='{"tag":"Necklaces","title":"Custom Butterfly Trio Nameplates","meta":"14k Gold Vermeil / Cable Chain","desc":"Handcrafted trio of personalized cursive nameplates (Aimee, Sophia, Megan) featuring cutout butterfly accents that catch light at every angle.","price":"Bespoke","img":"images/hand.jpg","wa":"Hi Jewels by J, I would like to order the Custom Butterfly Trio Nameplates."}'>
+                            <img src="images/hand.jpg" alt="Custom Butterfly Trio Nameplates">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Luminous Chandelier Drops</h4>
-                                    <p>Statement Drop Earrings</p>
+                                    <h4>Custom Butterfly Trio Nameplates</h4>
+                                    <p>Gold Butterfly Script Trio</p>
                                     <div class="overlay-links">
                                         <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
                                     </div>
@@ -1446,14 +1343,14 @@
                             </div>
                         </div>
 
-                        <!-- Earring Photo: C1.jpg -->
-                        <div class="gallery-item" data-category="earrings"
-                            data-detail='{"tag":"Limited Edition","title":"Sapphire Filigree Earrings","meta":"Platinum / Sri Lankan Sapphires","desc":"Ornate platinum drop earrings showcasing vivid cushion-cut Sri Lankan sapphires of exceptional clarity. Fine filigree scrollwork frames each stone — a technique requiring over 40 hours of bench time by a single craftsman.","price":"$3,900","img":"images/sapphire_earrings.png","wa":"Hi Jewels by J, I am interested in the Sapphire Filigree Earrings."}'>
-                            <img src="images/C1.jpg" alt="Sapphire Filigree Earrings">
+                        <!-- 4. Kimberly Signature Script Necklace -->
+                        <div class="gallery-item" data-category="necklaces"
+                            data-detail='{"tag":"Necklaces","title":"Kimberly Signature Script Necklace","meta":"18k Gold Plated / Fine Link Chain","desc":"Clean, timeless cursive script crafted with silky rounded edges and mirror polish. An everyday luxury essential created for effortless layering.","price":"Bespoke","img":"images/kimberry.jpg","wa":"Hi Jewels by J, I would like to order the Kimberly Signature Script Necklace."}'>
+                            <img src="images/kimberry.jpg" alt="Kimberly Signature Script Necklace">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Sapphire Filigree Earrings</h4>
-                                    <p>Sri Lankan Sapphire Drops</p>
+                                    <h4>Kimberly Signature Script Necklace</h4>
+                                    <p>Personalized Gold Script</p>
                                     <div class="overlay-links">
                                         <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
                                     </div>
@@ -1461,62 +1358,396 @@
                             </div>
                         </div>
 
-                        <!-- ════════════════ BRACELETS GROUP ════════════════ -->
-                        <!-- Bracelet Video 1: vid2.MOV -->
-                        <div class="gallery-item" data-category="bracelets video"
-                            data-detail='{"tag":"Artisan Video","title":"Aurelia Diamond Bangle","meta":"18k Yellow Gold / Diamond Pavé","desc":"A fluid 18k yellow gold bangle embellished with brilliant micro-pavé diamonds. Designed for effortless stackability or standalone elegance.","price":"$5,800","img":"images/C2.jpg","video":"videos/vid2.MOV","wa":"Hi Jewels by J, I am interested in the Aurelia Diamond Bangle."}'>
-                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
-                                <source src="videos/vid2.MOV" type="video/quicktime">
-                                <source src="videos/vid2.MOV" type="video/mp4">
-                            </video>
-                            <div class="video-badge"><i class="fa-solid fa-film"></i> Bracelet Video</div>
-                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
+                        <!-- 5. Regina Butterfly Charm Script Necklace -->
+                        <div class="gallery-item" data-category="necklaces"
+                            data-detail='{"tag":"Necklaces","title":"Regina Butterfly Charm Script Necklace","meta":"18k Gold Plated / Stylized Cursive","desc":"Custom stylized calligraphy script paired with a delicate gold butterfly charm at the end flourish. A sweet and personal everyday treasure.","price":"Bespoke","img":"images/regina.jpg","wa":"Hi Jewels by J, I would like to order the Regina Butterfly Charm Necklace."}'>
+                            <img src="images/regina.jpg" alt="Regina Butterfly Charm Script Necklace">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Aurelia Diamond Bangle</h4>
-                                    <p>18k Gold & Pavé Diamonds</p>
+                                    <h4>Regina Butterfly Charm Script Necklace</h4>
+                                    <p>Butterfly Script Pendant</p>
                                     <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-arrow-right"></i> View Details</span>
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Bracelet Video 2: bf bracelet.MP4 -->
-                        <div class="gallery-item" data-category="bracelets video"
-                            data-detail='{"tag":"Artisan Video","title":"Butterfly Gold Charm Bracelet","meta":"14k Yellow Gold / Hand-Finished Charms","desc":"An enchanting 14k gold chain bracelet featuring hand-carved butterfly charms that catch light at every gesture. A delicate, graceful accent piece.","price":"$2,450","img":"images/C2.jpg","video":"videos/bf bracelet.MP4","wa":"Hi Jewels by J, I am interested in the Butterfly Gold Charm Bracelet."}'>
-                            <video class="gallery-item-video" autoplay loop muted playsinline preload="metadata">
-                                <source src="videos/bf bracelet.MP4" type="video/mp4">
-                            </video>
-                            <div class="video-badge"><i class="fa-solid fa-film"></i> Bracelet Video</div>
-                            <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
+                        <!-- 6. Golden Initial 'A' Pendant -->
+                        <div class="gallery-item" data-category="necklaces"
+                            data-detail='{"tag":"Necklaces","title":"Golden Initial \"A\" Pendant","meta":"14k Gold Vermeil / Cable Chain","desc":"A sleek cable chain necklace suspending a solid gold initial charm — a minimalist, personal emblem cast individually and finished by hand.","price":"Bespoke","img":"images/A1.jpg","wa":"Hi Jewels by J, I am interested in the Golden Initial Pendant."}'>
+                            <img src="images/A1.jpg" alt="Golden Initial A Pendant">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Butterfly Gold Charm Bracelet</h4>
-                                    <p>Hand-Finished Gold Charms</p>
+                                    <h4>Golden Initial "A" Pendant</h4>
+                                    <p>Minimalist Letter Pendant</p>
                                     <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-arrow-right"></i> View Details</span>
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Bracelet Photo: C2.jpg -->
+                        <!-- 7. Butterfly Monogram Initial Pendant -->
+                        <div class="gallery-item" data-category="necklaces"
+                            data-detail='{"tag":"Necklaces","title":"Butterfly Monogram Initial Pendant","meta":"14k Gold Vermeil / Butterfly & Letter Charm","desc":"A whimsical combination of an elegant serif initial charm and a delicate fluttering butterfly silhouette, draped along the collarbone.","price":"Bespoke","img":"images/A2.jpg","wa":"Hi Jewels by J, I am interested in the Butterfly Monogram Initial Pendant."}'>
+                            <img src="images/A2.jpg" alt="Butterfly Monogram Initial Pendant">
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Butterfly Monogram Initial Pendant</h4>
+                                    <p>Initial &amp; Butterfly Monogram</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ════════════════ BRACELETS CATEGORY ════════════════ -->
+                        <!-- 8. Selorm Personalized Cuban ID Bracelet -->
                         <div class="gallery-item" data-category="bracelets"
-                            data-detail='{"tag":"Artisan","title":"Classic Gold Cuff","meta":"22k Gold / Polished Obsidian Core","desc":"A minimalist statement cuff hand-hammered from solid 22k gold and formed around a polished obsidian centre block. The contrast of warm gold against deep black stone makes this a piece that commands attention in any setting.","price":"$6,100","img":"images/gold_bracelet.png","wa":"Hi Jewels by J, I am interested in the Classic Gold Cuff."}'>
-                            <img src="images/C2.jpg" alt="Classic Gold Cuff">
+                            data-detail='{"tag":"Bracelets","title":"Selorm Personalized Cuban ID Bracelet","meta":"Stainless Steel / Polished Cuban Curb Link","desc":"Sturdy and refined Cuban curb link bracelet centered with a gently curved identification plate, laser engraved with custom name or personal date.","price":"Bespoke","img":"images/B1.jpg","wa":"Hi Jewels by J, I would like to order the Selorm Custom Cuban ID Bracelet."}'>
+                            <img src="images/B1.jpg" alt="Selorm Personalized Cuban ID Bracelet">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Classic Gold Cuff</h4>
-                                    <p>Polished Obsidian & Gold</p>
+                                    <h4>Selorm Personalized Cuban ID Bracelet</h4>
+                                    <p>Silver Cuban Nameplate Bracelet</p>
                                     <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-arrow-right"></i> View Details</span>
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 9. Jubilee Link Custom Nameplate Bracelets -->
+                        <div class="gallery-item" data-category="bracelets"
+                            data-detail='{"tag":"Bracelets","title":"Jubilee Link Custom Nameplate Bracelets","meta":"High-Grade Stainless Steel / Laser Engraved","desc":"Iconic five-link Jubilee band with a seamless integrated nameplate bar (Akua, Nana Yaa, Abena, Gina). Durable, tarnish-free, and effortlessly luxurious.","price":"Bespoke","img":"images/B2.jpg","wa":"Hi Jewels by J, I would like to order the Jubilee Link Custom Nameplate Bracelet."}'>
+                            <img src="images/B2.jpg" alt="Jubilee Link Custom Nameplate Bracelets">
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Jubilee Link Custom Nameplate Bracelets</h4>
+                                    <p>Engraved Jubilee Link Stack</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 10. Gina Classic Jubilee Nameplate Bracelet -->
+                        <div class="gallery-item" data-category="bracelets"
+                            data-detail='{"tag":"Bracelets","title":"Gina Classic Jubilee Nameplate Bracelet","meta":"Stainless Steel / Jubilee Wristwatch-Style Link","desc":"Sophisticated wristwatch-style jubilee bracelet featuring a polished custom nameplate. Perfect standalone statement piece or stacked with a timepiece.","price":"Bespoke","img":"images/C2.jpg","wa":"Hi Jewels by J, I would like to order the Classic Jubilee Nameplate Bracelet."}'>
+                            <img src="images/C2.jpg" alt="Gina Classic Jubilee Nameplate Bracelet">
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Gina Classic Jubilee Nameplate Bracelet</h4>
+                                    <p>Polished Jubilee Link Bracelet</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ════════════════ GIFT SETS CATEGORY ════════════════ -->
+                        <!-- 11. Casio Timepiece & Engraved Bracelet Set -->
+                        <div class="gallery-item" data-category="giftsets"
+                            data-detail='{"tag":"Gift Sets","title":"Casio Timepiece & Engraved Bracelet Set","meta":"Black Ion-Plated Casio + Personalized Link Bracelet","desc":"Exclusive gentleman presentation gift box. Includes a black ion-plated Casio square-dial watch paired with a custom engraved link bracelet (Kwaku) and JBJ luxury card.","price":"Complete Set","img":"images/C1.jpg","wa":"Hi Jewels by J, I would like to order the Casio Watch & Engraved Bracelet Gift Set."}'>
+                            <img src="images/C1.jpg" alt="Casio Timepiece & Engraved Bracelet Set">
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>Casio Timepiece &amp; Engraved Bracelet Set</h4>
+                                    <p>Black Casio &amp; Custom Link Bracelet</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 12. The Kiki Luxury 3-Piece Gift Set -->
+                        <div class="gallery-item" data-category="giftsets"
+                            data-detail='{"tag":"Gift Sets","title":"The Kiki Luxury 3-Piece Gift Set","meta":"Casio Watch + Engraved Bracelet + Butterfly Necklace","desc":"The complete luxury gifting experience: matching custom-engraved Casio timepiece, personalized link bracelet, and butterfly nameplate pendant in a deluxe gift box.","price":"Complete Set","img":"images/ggift.jpg","wa":"Hi Jewels by J, I would like to order the Kiki Luxury 3-Piece Gift Set."}'>
+                            <img src="images/ggift.jpg" alt="The Kiki Luxury 3-Piece Gift Set">
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <h4>The Kiki Luxury 3-Piece Gift Set</h4>
+                                    <p>Watch, Bracelet &amp; Butterfly Pendant</p>
+                                    <div class="overlay-links">
+                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Bigger View</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                     </div><!-- /gallery-grid -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════
+           CUSTOMER CAM (Dedicated Video Showcase)
+        ════════════════════════════════════════ -->
+        <section id="section-customer-cam" class="page-section">
+            <div class="customer-cam-section">
+                <div class="container">
+                    <div class="section-header">
+                        <span class="sub-title"><span class="cam-live-dot" style="display:inline-block; vertical-align:middle; margin-right:6px;"></span>Live &amp; Unfiltered</span>
+                        <h2 class="section-title">Customer Cam</h2>
+                        <div class="accent-line"></div>
+                        <p class="section-subtitle-desc" style="max-width: 650px; margin: 16px auto 0; color: #a0988a; font-size: 0.95rem; text-align: center; line-height: 1.6;">
+                            Real moments, real clients, and raw sparkle. Watch our handcrafted jewelry and personalized nameplates in motion. Tap any clip to play in full view.
+                        </p>
+                    </div>
+
+                    <div class="customer-cam-grid">
+
+                        <!-- 1. missj.MOV -->
+                        <div class="customer-cam-card">
+                            <div class="customer-cam-media" onclick='openLightbox({"title":"Miss J Master Cut Ring","tag":"Customer Cam • Signature Ring","desc":"Customer hand preview showcasing the brilliant cushion-cut solitaire ring in movement.","video":"videos/missj.MOV","wa":"Hi Jewels by J, I saw the Miss J Master Cut Ring on your Customer Cam and would like to inquire about it."})'>
+                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
+                                    <source src="videos/missj.MOV" type="video/quicktime">
+                                    <source src="videos/missj.MOV" type="video/mp4">
+                                </video>
+                                <span class="cam-badge"><span class="cam-live-dot"></span> Customer Cam</span>
+                                <button class="cam-expand-btn" aria-label="Expand video"><i class="fa-solid fa-expand"></i></button>
+                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
+                            </div>
+                            <div class="customer-cam-body">
+                                <h4>Miss J Master Cut Ring</h4>
+                                <p>Customer hand preview showcasing the brilliant cushion-cut solitaire ring in movement.</p>
+                                <div class="customer-cam-actions">
+                                    <button class="btn-cam-view" onclick='openLightbox({"title":"Miss J Master Cut Ring","tag":"Customer Cam • Signature Ring","desc":"Customer hand preview showcasing the brilliant cushion-cut solitaire ring in movement.","video":"videos/missj.MOV","wa":"Hi Jewels by J, I saw the Miss J Master Cut Ring on your Customer Cam and would like to inquire about it."})'>
+                                        <i class="fa-solid fa-play"></i> Full View
+                                    </button>
+                                    <a href="https://wa.me/233500594879?text=Hi%20Jewels%20by%20J%2C%20I%20saw%20the%20Miss%20J%20Master%20Cut%20Ring%20on%20your%20Customer%20Cam%20and%20would%20like%20to%20inquire%20about%20it." target="_blank" class="btn-cam-wa">
+                                        <i class="fa-brands fa-whatsapp"></i> Inquire
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. asante.MOV -->
+                        <div class="customer-cam-card">
+                            <div class="customer-cam-media" onclick='openLightbox({"title":"Asante Heritage Signet Ring","tag":"Customer Cam • Heritage Ring","desc":"Live client capture of the hand-engraved Ghanaian royal crest signet ring in 18k gold plate.","video":"videos/asante.MOV","wa":"Hi Jewels by J, I saw the Asante Heritage Signet Ring on your Customer Cam and would like to inquire about it."})'>
+                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
+                                    <source src="videos/asante.MOV" type="video/quicktime">
+                                    <source src="videos/asante.MOV" type="video/mp4">
+                                </video>
+                                <span class="cam-badge"><span class="cam-live-dot"></span> Customer Cam</span>
+                                <button class="cam-expand-btn" aria-label="Expand video"><i class="fa-solid fa-expand"></i></button>
+                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
+                            </div>
+                            <div class="customer-cam-body">
+                                <h4>Asante Heritage Signet Ring</h4>
+                                <p>Live client capture of the hand-engraved Ghanaian royal crest signet ring in 18k gold plate.</p>
+                                <div class="customer-cam-actions">
+                                    <button class="btn-cam-view" onclick='openLightbox({"title":"Asante Heritage Signet Ring","tag":"Customer Cam • Heritage Ring","desc":"Live client capture of the hand-engraved Ghanaian royal crest signet ring in 18k gold plate.","video":"videos/asante.MOV","wa":"Hi Jewels by J, I saw the Asante Heritage Signet Ring on your Customer Cam and would like to inquire about it."})'>
+                                        <i class="fa-solid fa-play"></i> Full View
+                                    </button>
+                                    <a href="https://wa.me/233500594879?text=Hi%20Jewels%20by%20J%2C%20I%20saw%20the%20Asante%20Heritage%20Signet%20Ring%20on%20your%20Customer%20Cam%20and%20would%20like%20to%20inquire%20about%20it." target="_blank" class="btn-cam-wa">
+                                        <i class="fa-brands fa-whatsapp"></i> Inquire
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. gift4.MP4 -->
+                        <div class="customer-cam-card">
+                            <div class="customer-cam-media" onclick='openLightbox({"title":"Royal Crown Pavé Eternity Band","tag":"Customer Cam • Stacking Ring","desc":"Micro-pavé contoured crown eternity band catching the light from every angle.","video":"videos/gift4.MP4","wa":"Hi Jewels by J, I saw the Royal Crown Pavé Band on your Customer Cam and would like to inquire about it."})'>
+                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
+                                    <source src="videos/gift4.MP4" type="video/mp4">
+                                </video>
+                                <span class="cam-badge"><span class="cam-live-dot"></span> Customer Cam</span>
+                                <button class="cam-expand-btn" aria-label="Expand video"><i class="fa-solid fa-expand"></i></button>
+                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
+                            </div>
+                            <div class="customer-cam-body">
+                                <h4>Royal Crown Pavé Eternity Band</h4>
+                                <p>Micro-pavé contoured crown eternity band catching the light from every angle.</p>
+                                <div class="customer-cam-actions">
+                                    <button class="btn-cam-view" onclick='openLightbox({"title":"Royal Crown Pavé Eternity Band","tag":"Customer Cam • Stacking Ring","desc":"Micro-pavé contoured crown eternity band catching the light from every angle.","video":"videos/gift4.MP4","wa":"Hi Jewels by J, I saw the Royal Crown Pavé Band on your Customer Cam and would like to inquire about it."})'>
+                                        <i class="fa-solid fa-play"></i> Full View
+                                    </button>
+                                    <a href="https://wa.me/233500594879?text=Hi%20Jewels%20by%20J%2C%20I%20saw%20the%20Royal%20Crown%20Pav%C3%A9%20Band%20on%20your%20Customer%20Cam%20and%20would%20like%20to%20inquire%20about%20it." target="_blank" class="btn-cam-wa">
+                                        <i class="fa-brands fa-whatsapp"></i> Inquire
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. vid1.MP4 -->
+                        <div class="customer-cam-card">
+                            <div class="customer-cam-media" onclick='openLightbox({"title":"Double Strand South Sea Pearls","tag":"Customer Cam • Fine Necklaces","desc":"Lustrous double strand of South Sea pearls with handcrafted gold filigree clasp.","video":"videos/vid1.MP4","wa":"Hi Jewels by J, I saw the Double Strand Pearls on your Customer Cam and would like to inquire about it."})'>
+                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
+                                    <source src="videos/vid1.MP4" type="video/mp4">
+                                </video>
+                                <span class="cam-badge"><span class="cam-live-dot"></span> Customer Cam</span>
+                                <button class="cam-expand-btn" aria-label="Expand video"><i class="fa-solid fa-expand"></i></button>
+                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
+                            </div>
+                            <div class="customer-cam-body">
+                                <h4>Double Strand South Sea Pearls</h4>
+                                <p>Lustrous double strand of South Sea pearls with handcrafted gold filigree clasp.</p>
+                                <div class="customer-cam-actions">
+                                    <button class="btn-cam-view" onclick='openLightbox({"title":"Double Strand South Sea Pearls","tag":"Customer Cam • Fine Necklaces","desc":"Lustrous double strand of South Sea pearls with handcrafted gold filigree clasp.","video":"videos/vid1.MP4","wa":"Hi Jewels by J, I saw the Double Strand Pearls on your Customer Cam and would like to inquire about it."})'>
+                                        <i class="fa-solid fa-play"></i> Full View
+                                    </button>
+                                    <a href="https://wa.me/233500594879?text=Hi%20Jewels%20by%20J%2C%20I%20saw%20the%20Double%20Strand%20Pearls%20on%20your%20Customer%20Cam%20and%20would%20like%20to%20inquire%20about%20it." target="_blank" class="btn-cam-wa">
+                                        <i class="fa-brands fa-whatsapp"></i> Inquire
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. gift3.MOV -->
+                        <div class="customer-cam-card">
+                            <div class="customer-cam-media" onclick='openLightbox({"title":"Graceful Emerald Solitaire Chain","tag":"Customer Cam • Solitaire Pendant","desc":"Vibrant Colombian emerald cut pendant suspended on diamond-cut gold cable chain.","video":"videos/gift3.MOV","wa":"Hi Jewels by J, I saw the Emerald Solitaire Chain on your Customer Cam and would like to inquire about it."})'>
+                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
+                                    <source src="videos/gift3.MOV" type="video/quicktime">
+                                    <source src="videos/gift3.MOV" type="video/mp4">
+                                </video>
+                                <span class="cam-badge"><span class="cam-live-dot"></span> Customer Cam</span>
+                                <button class="cam-expand-btn" aria-label="Expand video"><i class="fa-solid fa-expand"></i></button>
+                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
+                            </div>
+                            <div class="customer-cam-body">
+                                <h4>Graceful Emerald Solitaire Chain</h4>
+                                <p>Vibrant Colombian emerald cut pendant suspended on diamond-cut gold cable chain.</p>
+                                <div class="customer-cam-actions">
+                                    <button class="btn-cam-view" onclick='openLightbox({"title":"Graceful Emerald Solitaire Chain","tag":"Customer Cam • Solitaire Pendant","desc":"Vibrant Colombian emerald cut pendant suspended on diamond-cut gold cable chain.","video":"videos/gift3.MOV","wa":"Hi Jewels by J, I saw the Emerald Solitaire Chain on your Customer Cam and would like to inquire about it."})'>
+                                        <i class="fa-solid fa-play"></i> Full View
+                                    </button>
+                                    <a href="https://wa.me/233500594879?text=Hi%20Jewels%20by%20J%2C%20I%20saw%20the%20Emerald%20Solitaire%20Chain%20on%20your%20Customer%20Cam%20and%20would%20like%20to%20inquire%20about%20it." target="_blank" class="btn-cam-wa">
+                                        <i class="fa-brands fa-whatsapp"></i> Inquire
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 6. gift1.MP4 -->
+                        <div class="customer-cam-card">
+                            <div class="customer-cam-media" onclick='openLightbox({"title":"Golden Elegance Gift Set","tag":"Customer Cam • Unboxing Video","desc":"Client unboxing of our curated milestone celebration pendant and drop chain collection.","video":"videos/gift1.MP4","wa":"Hi Jewels by J, I saw the Golden Elegance Gift Set on your Customer Cam and would like to inquire about it."})'>
+                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
+                                    <source src="videos/gift1.MP4" type="video/mp4">
+                                </video>
+                                <span class="cam-badge"><span class="cam-live-dot"></span> Customer Cam</span>
+                                <button class="cam-expand-btn" aria-label="Expand video"><i class="fa-solid fa-expand"></i></button>
+                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
+                            </div>
+                            <div class="customer-cam-body">
+                                <h4>Golden Elegance Gift Set</h4>
+                                <p>Client unboxing of our curated milestone celebration pendant and drop chain collection.</p>
+                                <div class="customer-cam-actions">
+                                    <button class="btn-cam-view" onclick='openLightbox({"title":"Golden Elegance Gift Set","tag":"Customer Cam • Unboxing Video","desc":"Client unboxing of our curated milestone celebration pendant and drop chain collection.","video":"videos/gift1.MP4","wa":"Hi Jewels by J, I saw the Golden Elegance Gift Set on your Customer Cam and would like to inquire about it."})'>
+                                        <i class="fa-solid fa-play"></i> Full View
+                                    </button>
+                                    <a href="https://wa.me/233500594879?text=Hi%20Jewels%20by%20J%2C%20I%20saw%20the%20Golden%20Elegance%20Gift%20Set%20on%20your%20Customer%20Cam%20and%20would%20like%20to%20inquire%20about%20it." target="_blank" class="btn-cam-wa">
+                                        <i class="fa-brands fa-whatsapp"></i> Inquire
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 7. her eyes.MOV -->
+                        <div class="customer-cam-card">
+                            <div class="customer-cam-media" onclick='openLightbox({"title":"Eyes of Desire Talisman Pendant","tag":"Customer Cam • Custom Talisman","desc":"Alluring blue sapphire and halo diamond protective eye talisman necklace in motion.","video":"videos/her eyes.MOV","wa":"Hi Jewels by J, I saw the Eyes of Desire Pendant on your Customer Cam and would like to inquire about it."})'>
+                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
+                                    <source src="videos/her eyes.MOV" type="video/quicktime">
+                                    <source src="videos/her eyes.MOV" type="video/mp4">
+                                </video>
+                                <span class="cam-badge"><span class="cam-live-dot"></span> Customer Cam</span>
+                                <button class="cam-expand-btn" aria-label="Expand video"><i class="fa-solid fa-expand"></i></button>
+                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
+                            </div>
+                            <div class="customer-cam-body">
+                                <h4>Eyes of Desire Talisman Pendant</h4>
+                                <p>Alluring blue sapphire and halo diamond protective eye talisman necklace in motion.</p>
+                                <div class="customer-cam-actions">
+                                    <button class="btn-cam-view" onclick='openLightbox({"title":"Eyes of Desire Talisman Pendant","tag":"Customer Cam • Custom Talisman","desc":"Alluring blue sapphire and halo diamond protective eye talisman necklace in motion.","video":"videos/her eyes.MOV","wa":"Hi Jewels by J, I saw the Eyes of Desire Pendant on your Customer Cam and would like to inquire about it."})'>
+                                        <i class="fa-solid fa-play"></i> Full View
+                                    </button>
+                                    <a href="https://wa.me/233500594879?text=Hi%20Jewels%20by%20J%2C%20I%20saw%20the%20Eyes%20of%20Desire%20Pendant%20on%20your%20Customer%20Cam%20and%20would%20like%20to%20inquire%20about%20it." target="_blank" class="btn-cam-wa">
+                                        <i class="fa-brands fa-whatsapp"></i> Inquire
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 8. gift2.MP4 -->
+                        <div class="customer-cam-card">
+                            <div class="customer-cam-media" onclick='openLightbox({"title":"Luminous Chandelier Drops","tag":"Customer Cam • Statement Drops","desc":"Sparkle test video of our cascading crystal drop earrings designed for gala evenings.","video":"videos/gift2.MP4","wa":"Hi Jewels by J, I saw the Luminous Chandelier Drops on your Customer Cam and would like to inquire about it."})'>
+                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
+                                    <source src="videos/gift2.MP4" type="video/mp4">
+                                </video>
+                                <span class="cam-badge"><span class="cam-live-dot"></span> Customer Cam</span>
+                                <button class="cam-expand-btn" aria-label="Expand video"><i class="fa-solid fa-expand"></i></button>
+                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
+                            </div>
+                            <div class="customer-cam-body">
+                                <h4>Luminous Chandelier Drops</h4>
+                                <p>Sparkle test video of our cascading crystal drop earrings designed for gala evenings.</p>
+                                <div class="customer-cam-actions">
+                                    <button class="btn-cam-view" onclick='openLightbox({"title":"Luminous Chandelier Drops","tag":"Customer Cam • Statement Drops","desc":"Sparkle test video of our cascading crystal drop earrings designed for gala evenings.","video":"videos/gift2.MP4","wa":"Hi Jewels by J, I saw the Luminous Chandelier Drops on your Customer Cam and would like to inquire about it."})'>
+                                        <i class="fa-solid fa-play"></i> Full View
+                                    </button>
+                                    <a href="https://wa.me/233500594879?text=Hi%20Jewels%20by%20J%2C%20I%20saw%20the%20Luminous%20Chandelier%20Drops%20on%20your%20Customer%20Cam%20and%20would%20like%20to%20inquire%20about%20it." target="_blank" class="btn-cam-wa">
+                                        <i class="fa-brands fa-whatsapp"></i> Inquire
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 9. vid2.MOV -->
+                        <div class="customer-cam-card">
+                            <div class="customer-cam-media" onclick='openLightbox({"title":"Aurelia Micro-Pavé Bangle","tag":"Customer Cam • Wrist Stack","desc":"18k gold bangle embellished with brilliant micro-pavé diamonds on client wrist.","video":"videos/vid2.MOV","wa":"Hi Jewels by J, I saw the Micro-Pavé Bangle on your Customer Cam and would like to inquire about it."})'>
+                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
+                                    <source src="videos/vid2.MOV" type="video/quicktime">
+                                    <source src="videos/vid2.MOV" type="video/mp4">
+                                </video>
+                                <span class="cam-badge"><span class="cam-live-dot"></span> Customer Cam</span>
+                                <button class="cam-expand-btn" aria-label="Expand video"><i class="fa-solid fa-expand"></i></button>
+                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
+                            </div>
+                            <div class="customer-cam-body">
+                                <h4>Aurelia Micro-Pavé Bangle</h4>
+                                <p>18k gold bangle embellished with brilliant micro-pavé diamonds on client wrist.</p>
+                                <div class="customer-cam-actions">
+                                    <button class="btn-cam-view" onclick='openLightbox({"title":"Aurelia Micro-Pavé Bangle","tag":"Customer Cam • Wrist Stack","desc":"18k gold bangle embellished with brilliant micro-pavé diamonds on client wrist.","video":"videos/vid2.MOV","wa":"Hi Jewels by J, I saw the Micro-Pavé Bangle on your Customer Cam and would like to inquire about it."})'>
+                                        <i class="fa-solid fa-play"></i> Full View
+                                    </button>
+                                    <a href="https://wa.me/233500594879?text=Hi%20Jewels%20by%20J%2C%20I%20saw%20the%20Micro-Pav%C3%A9%20Bangle%20on%20your%20Customer%20Cam%20and%20would%20like%20to%20inquire%20about%20it." target="_blank" class="btn-cam-wa">
+                                        <i class="fa-brands fa-whatsapp"></i> Inquire
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 10. bf bracelet.MP4 -->
+                        <div class="customer-cam-card">
+                            <div class="customer-cam-media" onclick='openLightbox({"title":"Butterfly Gold Charm Bracelet","tag":"Customer Cam • Charm Bracelet","desc":"Hand-finished 14k gold butterfly charms fluttering effortlessly on client wrist.","video":"videos/bf bracelet.MP4","wa":"Hi Jewels by J, I saw the Butterfly Gold Charm Bracelet on your Customer Cam and would like to inquire about it."})'>
+                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
+                                    <source src="videos/bf bracelet.MP4" type="video/mp4">
+                                </video>
+                                <span class="cam-badge"><span class="cam-live-dot"></span> Customer Cam</span>
+                                <button class="cam-expand-btn" aria-label="Expand video"><i class="fa-solid fa-expand"></i></button>
+                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
+                            </div>
+                            <div class="customer-cam-body">
+                                <h4>Butterfly Gold Charm Bracelet</h4>
+                                <p>Hand-finished 14k gold butterfly charms fluttering effortlessly on client wrist.</p>
+                                <div class="customer-cam-actions">
+                                    <button class="btn-cam-view" onclick='openLightbox({"title":"Butterfly Gold Charm Bracelet","tag":"Customer Cam • Charm Bracelet","desc":"Hand-finished 14k gold butterfly charms fluttering effortlessly on client wrist.","video":"videos/bf bracelet.MP4","wa":"Hi Jewels by J, I saw the Butterfly Gold Charm Bracelet on your Customer Cam and would like to inquire about it."})'>
+                                        <i class="fa-solid fa-play"></i> Full View
+                                    </button>
+                                    <a href="https://wa.me/233500594879?text=Hi%20Jewels%20by%20J%2C%20I%20saw%20the%20Butterfly%20Gold%20Charm%20Bracelet%20on%20your%20Customer%20Cam%20and%20would%20like%20to%20inquire%20about%20it." target="_blank" class="btn-cam-wa">
+                                        <i class="fa-brands fa-whatsapp"></i> Inquire
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </section>
@@ -1663,83 +1894,6 @@
             </div>
         </section>
 
-        <!-- ═══════════════════════════════════════
-           TRACK ORDER SECTION
-        ════════════════════════════════════════ -->
-        <section class="section-content" id="section-track">
-            <div class="container section-container">
-                <div class="section-header">
-                    <span class="section-tag">Order Status</span>
-                    <h2 class="section-title">Track Your Order</h2>
-                    <p class="section-desc" style="max-width: 600px; margin: 0 auto;">
-                        Enter your telephone number to view the progress of your bespoke jewelry. We meticulously craft each piece to perfection.
-                    </p>
-                </div>
-                
-                <div class="track-container">
-                    <div class="track-form-card">
-                        <form id="trackOrderForm" onsubmit="handleTrackOrder(event)">
-                            <div class="contact-form-row">
-                                <div class="contact-form-group">
-                                    <label for="trackPhone">Telephone Number</label>
-                                    <input type="tel" id="trackPhone" placeholder="e.g. 0500594879" required>
-                                </div>
-                            </div>
-                            <button type="submit" class="contact-form-submit" id="trackSubmitBtn" style="width: 100%; justify-content: center;">
-                                <i class="fa-solid fa-location-crosshairs"></i>
-                                <span id="trackSubmitLabel">Track Order</span>
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Tracking Result Card (Hidden by default) -->
-                    <div class="track-result-card" id="trackResultCard" style="display: none;">
-                        <div class="track-result-header">
-                            <h3 id="trackResultTitle">Order #JBJ-10294</h3>
-                            <p id="trackResultStatus" class="track-status-badge">Processing</p>
-                        </div>
-                        <div class="track-timeline">
-                            <div class="timeline-step completed">
-                                <div class="step-icon"><i class="fa-solid fa-check"></i></div>
-                                <div class="step-content">
-                                    <h4>Order Received</h4>
-                                    <p>We have received your order details.</p>
-                                </div>
-                            </div>
-                            <div class="timeline-step active">
-                                <div class="step-icon"><i class="fa-solid fa-hammer"></i></div>
-                                <div class="step-content">
-                                    <h4>Crafting & Setting</h4>
-                                    <p>Your piece is currently being expertly crafted.</p>
-                                </div>
-                            </div>
-                            <div class="timeline-step pending">
-                                <div class="step-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
-                                <div class="step-content">
-                                    <h4>Quality Assurance</h4>
-                                    <p>Final polishing and rigorous quality checks.</p>
-                                </div>
-                            </div>
-                            <div class="timeline-step pending">
-                                <div class="step-icon"><i class="fa-solid fa-box"></i></div>
-                                <div class="step-content">
-                                    <h4>Packaged & Shipped</h4>
-                                    <p>Your piece is securely packaged and on its way.</p>
-                                </div>
-                            </div>
-                            <div class="timeline-step pending">
-                                <div class="step-icon"><i class="fa-solid fa-house"></i></div>
-                                <div class="step-content">
-                                    <h4>Delivered</h4>
-                                    <p>Enjoy your new Jewels by J piece.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
     </main>
 
     <!-- ═══════════════════════════════════════
@@ -1757,9 +1911,9 @@
                 <h4>Explore</h4>
                 <a href="#" onclick="navigateTo('featured'); return false;">Featured Releases</a>
                 <a href="#" onclick="navigateTo('gallery');  return false;">Visual Gallery</a>
-                <a href="#" onclick="navigateTo('about');    return false;">Heritage & Legacy</a>
+                <a href="#" onclick="navigateTo('customer-cam'); return false;">Customer Cam</a>
+                <a href="#" onclick="navigateTo('about');    return false;">Heritage &amp; Legacy</a>
                 <a href="#" onclick="navigateTo('contact');  return false;">Private Consultation</a>
-                <a href="#" onclick="navigateTo('track');    return false;">Track Order</a>
             </div>
             
         </div>
@@ -1831,13 +1985,21 @@
         /* ════════════════════════════════════════
            SPA NAVIGATION
         ════════════════════════════════════════ */
-        const PAGES = ['home', 'featured', 'gallery', 'detail', 'about', 'contact', 'track'];
+        const PAGES = ['home', 'featured', 'gallery', 'customer-cam', 'detail', 'about', 'contact'];
 
         function navigateTo(page) {
             // Pause detail video when leaving the detail page
             if (page !== 'detail') {
                 const video = document.getElementById('detailVideo');
                 if (video) video.pause();
+            }
+
+            // Pause Customer Cam videos when navigating away from customer-cam
+            const camVideos = document.querySelectorAll('#section-customer-cam video');
+            if (page !== 'customer-cam') {
+                camVideos.forEach(v => v.pause());
+            } else {
+                camVideos.forEach(v => v.play().catch(() => {}));
             }
 
             // Hide all sections
@@ -1875,7 +2037,7 @@
 
         function openLightbox(d, itemEl) {
             lightboxBody.innerHTML = '';
-            lightboxTitle.textContent = d.title;
+            lightboxTitle.textContent = d.title || '';
             lightboxCategory.textContent = d.meta || d.tag || '';
 
             if (d.video) {
@@ -1909,9 +2071,24 @@
                 const img = document.createElement('img');
                 const itemImg = itemEl ? itemEl.querySelector('img') : null;
                 img.src = itemImg ? itemImg.src : d.img;
-                img.alt = d.title;
+                img.alt = d.title || 'Jewels by J';
                 lightboxBody.appendChild(img);
             }
+
+            // Add or update WhatsApp button in lightbox
+            let actions = document.getElementById('lightboxActions');
+            if (!actions) {
+                actions = document.createElement('div');
+                actions.id = 'lightboxActions';
+                actions.style.marginTop = '14px';
+                document.querySelector('.lightbox-caption').appendChild(actions);
+            }
+            const waMsg = encodeURIComponent(d.wa || `Hi Jewels by J, I would like to inquire about "${d.title}".`);
+            actions.innerHTML = `
+                <a href="https://wa.me/233500594879?text=${waMsg}" target="_blank" class="btn btn-primary" style="padding: 9px 20px; font-size: 0.8rem; border-radius: 20px; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fa-brands fa-whatsapp"></i> Inquire on WhatsApp
+                </a>
+            `;
 
             lightbox.classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -1961,8 +2138,10 @@
         ════════════════════════════════════════ */
         document.querySelectorAll('.wa-inquire-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                const msg = encodeURIComponent('Hi Jewels by J!');
-                window.open('https://wa.me/0500594879?text=' + msg, '_blank');
+                const product = btn.getAttribute('data-product');
+                const customMsg = btn.getAttribute('data-msg');
+                const msg = encodeURIComponent(customMsg || (product ? `Hi Jewels by J, I am interested in the ${product}.` : 'Hi Jewels by J!'));
+                window.open('https://wa.me/233500594879?text=' + msg, '_blank');
             });
         });
 
@@ -2030,82 +2209,6 @@
                 });
             }
         })();
-        /* ════════════════════════════════════════
-           ORDER TRACKING LOGIC (MANUAL LIST)
-        ════════════════════════════════════════ */
-        // Order Statuses:
-        // 1 = Order Received
-        // 2 = Crafting & Setting
-        // 3 = Quality Assurance
-        // 4 = Packaged & Shipped
-        // 5 = Delivered
-        const orderStatuses = {
-            "0500594879": 4, // Example: Jerrilyn's number is at step 4
-            "0202033492": 2, // Example: Test number at step 2
-            "0244123456": 5  // Example: Test number at step 5
-        };
-
-        function handleTrackOrder(e) {
-            e.preventDefault();
-            
-            const submitBtn = document.getElementById('trackSubmitBtn');
-            const submitLabel = document.getElementById('trackSubmitLabel');
-            const phone = document.getElementById('trackPhone').value.trim();
-            const resultCard = document.getElementById('trackResultCard');
-            const resultTitle = document.getElementById('trackResultTitle');
-            const resultStatus = document.getElementById('trackResultStatus');
-            const timelineSteps = resultCard.querySelectorAll('.timeline-step');
-            
-            if (!phone) return;
-
-            // Simulate loading state
-            submitBtn.disabled = true;
-            submitLabel.textContent = 'Searching Orders...';
-            resultCard.style.display = 'none';
-
-            // Mock network request delay
-            setTimeout(() => {
-                submitBtn.disabled = false;
-                submitLabel.textContent = 'Track Order';
-                
-                // Determine the status from our manual list (default to 1 if not found)
-                const currentStep = orderStatuses[phone] || 1;
-                
-                // Update result card with order info
-                resultTitle.textContent = `Order for ${phone}`;
-                
-                const statusLabels = [
-                    "Processing",
-                    "Crafting",
-                    "Quality Check",
-                    "Shipped",
-                    "Delivered"
-                ];
-                resultStatus.textContent = statusLabels[currentStep - 1] || "Processing";
-                
-                // Update the timeline steps visually
-                timelineSteps.forEach((stepEl, index) => {
-                    // index 0 = step 1, index 1 = step 2, etc.
-                    const stepNumber = index + 1;
-                    
-                    // Reset classes
-                    stepEl.classList.remove('completed', 'active', 'pending');
-                    
-                    if (stepNumber < currentStep) {
-                        stepEl.classList.add('completed');
-                    } else if (stepNumber === currentStep) {
-                        stepEl.classList.add('active');
-                    } else {
-                        stepEl.classList.add('pending');
-                    }
-                });
-
-                resultCard.style.display = 'block';
-                
-                // Scroll down slightly to show result
-                resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 1200);
-        }
     </script>
 </body>
 
