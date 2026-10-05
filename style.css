@@ -380,7 +380,7 @@ img {
 .hero-desc {
     font-family: var(--font-sans);
     font-size: clamp(0.95rem, 2vw, 1.1rem);
-    color: var(--text-muted);
+    color: rgba(245, 240, 232, 0.78);
     font-weight: 300;
     margin-bottom: 40px;
     max-width: 600px;
