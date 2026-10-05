@@ -2233,17 +2233,32 @@
                             _replyto: fromEmail
                         })
                     })
-                        .then(response => response.json())
-                        .then(data => {
-                            statusEl.textContent = `Thank you, ${fromName}! Your message has been sent directly to mensahjerrilyn@gmail.com. We will reply to ${fromEmail} shortly.`;
-                            statusEl.className = 'contact-form-status success';
-                            form.reset();
+                        .then(response => {
+                            return response.json().then(data => ({
+                                ok: response.ok,
+                                status: response.status,
+                                data: data
+                            }));
+                        })
+                        .then(({ ok, status, data }) => {
+                            if (data && (data.success === "true" || data.success === true)) {
+                                statusEl.textContent = `Thank you, ${fromName}! Your inquiry has been sent to mensahjerrilyn@gmail.com. We will reply to ${fromEmail} shortly.`;
+                                statusEl.className = 'contact-form-status success';
+                                form.reset();
+                            } else if (data && data.message && data.message.toLowerCase().includes('activate')) {
+                                statusEl.innerHTML = `<strong>Action Required:</strong> FormSubmit sent an activation link to <strong>mensahjerrilyn@gmail.com</strong>. Please check your inbox/spam folder and click <em>"Activate Form"</em> once to start receiving all customer messages.`;
+                                statusEl.className = 'contact-form-status error';
+                            } else {
+                                const msg = (data && data.message) ? data.message : "Unable to send at this moment.";
+                                statusEl.innerHTML = `${msg} <br><a href="mailto:mensahjerrilyn@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('From: ' + fromName + ' (' + fromEmail + ')\n\n' + message)}" style="color:#c9a96e; text-decoration:underline; font-weight:600;">Click here to send directly via your Email app</a>`;
+                                statusEl.className = 'contact-form-status error';
+                            }
                         })
                         .catch(error => {
                             console.error('Submission error:', error);
                             const mailtoUrl = `mailto:mensahjerrilyn@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('From: ' + fromName + ' (' + fromEmail + ')\n\n' + message)}`;
                             window.location.href = mailtoUrl;
-                            statusEl.textContent = "Opening your mail app to send directly to mensahjerrilyn@gmail.com...";
+                            statusEl.innerHTML = `Opening your email app to send directly to <strong>mensahjerrilyn@gmail.com</strong>... <br><a href="${mailtoUrl}" style="color:#c9a96e; text-decoration:underline;">Click here if your mail app didn't open automatically</a>`;
                             statusEl.className = 'contact-form-status success';
                         })
                         .finally(function () {
