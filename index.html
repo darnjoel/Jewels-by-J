@@ -271,7 +271,7 @@
 
         .lightbox-body {
             width: 100%;
-            max-height: 78vh;
+            max-height: 86vh;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -284,7 +284,7 @@
 
         .lightbox-body img {
             max-width: 100%;
-            max-height: 78vh;
+            max-height: 86vh;
             object-fit: contain;
             display: block;
             border-radius: 14px;
@@ -292,33 +292,11 @@
 
         .lightbox-body video {
             width: 100%;
-            max-height: 78vh;
+            max-height: 86vh;
             object-fit: contain;
             display: block;
             background: #000;
             border-radius: 14px;
-        }
-
-        .lightbox-caption {
-            margin-top: 16px;
-            text-align: center;
-            color: #f5f0e8;
-        }
-
-        .lightbox-caption h3 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.7rem;
-            color: #f5f0e8;
-            margin-bottom: 2px;
-            font-weight: 400;
-        }
-
-        .lightbox-caption p {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.78rem;
-            color: #c9a96e;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
         }
 
         /* ── video gallery items: play button overlay & video elements ── */
@@ -1125,8 +1103,7 @@
         <section id="section-home" class="page-section active">
 
             <!-- Hero -->
-            <div class="hero"
-                style="background-image: linear-gradient(180deg, rgba(10, 10, 10, 0.88) 0%, rgba(10, 10, 10, 0.72) 45%, rgba(10, 10, 10, 0.94) 100%), radial-gradient(circle at 50% 50%, rgba(201, 169, 110, 0.08) 0%, rgba(10, 10, 10, 0.85) 100%), url('images/hand.jpg'); background-position: center; background-size: cover;">
+            <div class="hero">
                 <div class="hero-content">
                     <span class="hero-subtitle">Jewelry That Defines Your Style.</span>
                     <h1 class="hero-title">Created for Timeless Moments</h1>
@@ -1981,10 +1958,6 @@
             <div class="lightbox-body" id="lightboxBody">
                 <!-- Image or Video dynamically inserted here -->
             </div>
-            <div class="lightbox-caption">
-                <h3 id="lightboxTitle"></h3>
-                <p id="lightboxCategory"></p>
-            </div>
         </div>
     </div>
 
@@ -2068,15 +2041,11 @@
         ════════════════════════════════════════ */
         const lightbox = document.getElementById('galleryLightbox');
         const lightboxBody = document.getElementById('lightboxBody');
-        const lightboxTitle = document.getElementById('lightboxTitle');
-        const lightboxCategory = document.getElementById('lightboxCategory');
         const lightboxCloseBtn = document.getElementById('lightboxCloseBtn');
         const lightboxBackdrop = document.getElementById('lightboxBackdrop');
 
         function openLightbox(d, itemEl) {
             lightboxBody.innerHTML = '';
-            lightboxTitle.textContent = d.title || '';
-            lightboxCategory.textContent = d.meta || d.tag || '';
 
             if (d.video) {
                 const video = document.createElement('video');
@@ -2111,27 +2080,6 @@
                 img.src = itemImg ? itemImg.src : d.img;
                 img.alt = d.title || 'Jewels by J';
                 lightboxBody.appendChild(img);
-            }
-
-            // Add or update WhatsApp button in lightbox (only for items with inquiry data)
-            let actions = document.getElementById('lightboxActions');
-            if (!actions) {
-                actions = document.createElement('div');
-                actions.id = 'lightboxActions';
-                actions.style.marginTop = '14px';
-                document.querySelector('.lightbox-caption').appendChild(actions);
-            }
-            if (d.wa) {
-                const waMsg = encodeURIComponent(d.wa);
-                actions.innerHTML = `
-                    <a href="https://wa.me/233500594879?text=${waMsg}" target="_blank" class="btn btn-primary" style="padding: 9px 20px; font-size: 0.8rem; border-radius: 20px; display: inline-flex; align-items: center; gap: 8px;">
-                        <i class="fa-brands fa-whatsapp"></i> Inquire on WhatsApp
-                    </a>
-                `;
-                actions.style.display = 'block';
-            } else {
-                actions.innerHTML = '';
-                actions.style.display = 'none';
             }
 
             lightbox.classList.add('active');
