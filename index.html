@@ -594,28 +594,31 @@
             transform: translateY(-6.5px) rotate(-45deg);
         }
 
-        /* Dropdown beneath the header — applies at ALL widths */
+        /* Horizontal Dropdown beneath the header — toggled by hamburger */
         .nav-menu {
             display: flex !important;
             position: absolute !important;
             top: 100%;
-            left: 24px;
-            right: auto;
-            width: min(260px, calc(100% - 48px));
+            left: 0;
+            right: 0;
+            width: 100%;
             height: auto;
-            background: #0a0a0a;
-            border: 1px solid #c9a96e22;
-            border-radius: 8px;
-            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.45);
-            flex-direction: column !important;
-            align-items: flex-start;
-            justify-content: flex-start;
-            gap: 0;
-            padding: 8px 20px 16px;
+            background: rgba(10, 10, 10, 0.96);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(201, 169, 110, 0.15);
+            border-bottom: 1px solid rgba(201, 169, 110, 0.25);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+            flex-direction: row !important;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px 32px;
+            padding: 16px 32px;
             opacity: 0;
             visibility: hidden;
-            transform: translateY(-12px);
-            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
             z-index: 1000;
         }
 
@@ -626,23 +629,39 @@
             transform: translateY(0);
         }
 
-        /* Nav links inside the dropdown */
+        /* Nav links inside the horizontal dropdown */
         .nav-menu .nav-link {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 1.6rem;
-            font-weight: 400;
-            letter-spacing: 0.06em;
+            font-size: 1.3rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
             color: #f5f0e8;
             text-decoration: none;
-            padding: 14px 0;
-            border-bottom: 1px solid #c9a96e18;
-            width: 100%;
-            display: block;
-            transition: color 0.2s;
+            padding: 6px 4px;
+            border-bottom: none;
+            width: auto;
+            display: inline-flex;
+            align-items: center;
+            position: relative;
+            transition: color 0.25s ease, transform 0.25s ease;
         }
 
-        .nav-menu .nav-link:last-child {
-            border-bottom: none;
+        .nav-menu .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1.5px;
+            background: #c9a96e;
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform 0.25s ease;
+        }
+
+        .nav-menu .nav-link:hover::after,
+        .nav-menu .nav-link.active::after {
+            transform: scaleX(1);
         }
 
         .nav-menu .nav-link.active,
@@ -650,44 +669,72 @@
             color: #c9a96e;
         }
 
-        /* Follow Us section beneath the nav links */
+        /* Follow Us section beside the nav links in horizontal layout */
         .nav-menu-follow {
-            width: 100%;
-            padding-top: 16px;
-            margin-top: 4px;
+            width: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 0 0 16px;
+            padding: 0 0 0 20px;
+            border-left: 1px solid rgba(201, 169, 110, 0.25);
         }
 
         .nav-menu-follow-label {
-            display: block;
+            display: inline-block;
             font-family: 'Montserrat', sans-serif;
-            font-size: 0.68rem;
-            letter-spacing: 0.2em;
+            font-size: 0.65rem;
+            letter-spacing: 0.18em;
             text-transform: uppercase;
             color: #888;
-            margin-bottom: 14px;
+            margin-bottom: 0;
+            white-space: nowrap;
         }
 
         .nav-menu-follow-icons {
             display: flex;
-            gap: 18px;
+            gap: 10px;
         }
 
         .nav-menu-follow-icons a {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 34px;
-            height: 34px;
-            border: 1px solid #c9a96e55;
+            width: 32px;
+            height: 32px;
+            border: 1px solid rgba(201, 169, 110, 0.4);
             border-radius: 50%;
             color: #c9a96e;
-            font-size: 0.95rem;
-            transition: background 0.2s, color 0.2s;
+            font-size: 0.85rem;
+            transition: background 0.2s, color 0.2s, transform 0.2s;
         }
 
         .nav-menu-follow-icons a:hover {
             background: #c9a96e;
             color: #0a0a0a;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                gap: 10px 20px;
+                padding: 14px 16px;
+                justify-content: center;
+            }
+
+            .nav-menu .nav-link {
+                font-size: 1.15rem;
+                padding: 4px 6px;
+            }
+
+            .nav-menu-follow {
+                width: 100%;
+                justify-content: center;
+                border-left: none;
+                border-top: 1px solid rgba(201, 169, 110, 0.15);
+                margin: 6px 0 0 0;
+                padding: 10px 0 0 0;
+            }
         }
 
         /* Dim overlay behind the dropdown */
@@ -1197,59 +1244,25 @@
                         <div class="accent-line"></div>
                     </div>
                     <div class="featured-grid">
+                        <!-- Card 1 -->
                         <div class="product-card">
                             <div class="product-img-wrapper">
                                 <img src="images/jerrilyn.jpg" alt="Jerrilyn Duo Butterfly Nameplates"
                                     class="product-img">
-                                <span class="tag">Necklaces</span>
-                            </div>
-                            <div class="product-info">
-                                <h3 class="product-name">Jerrilyn Duo Butterfly Nameplates</h3>
-                                <p class="product-category">Sterling Silver &amp; 18k Gold Plated / Cursive Nameplate
-                                </p>
-                                <p class="product-price">Bespoke Custom</p>
-                                <div class="product-actions">
-                                    <button class="btn-product-inquiry wa-inquire-btn"
-                                        data-product="Jerrilyn Duo Butterfly Nameplates">
-                                        <i class="fa-brands fa-whatsapp"></i> WhatsApp Inquiry
-                                    </button>
-                                </div>
                             </div>
                         </div>
+                        <!-- Card 2 -->
                         <div class="product-card">
                             <div class="product-img-wrapper">
                                 <img src="images/moesha.jpg" alt="Moesha Royal Rose Cuban Nameplate"
                                     class="product-img">
-                                <span class="tag">Necklaces</span>
-                            </div>
-                            <div class="product-info">
-                                <h3 class="product-name">Moesha Royal Rose Cuban Nameplate</h3>
-                                <p class="product-category">18k Heavy Gold Vermeil / Cuban Curb Chain</p>
-                                <p class="product-price">Bespoke Custom</p>
-                                <div class="product-actions">
-                                    <button class="btn-product-inquiry wa-inquire-btn"
-                                        data-product="Moesha Royal Rose Cuban Nameplate">
-                                        <i class="fa-brands fa-whatsapp"></i> WhatsApp Inquiry
-                                    </button>
-                                </div>
                             </div>
                         </div>
+                        <!-- Card 3 -->
                         <div class="product-card">
                             <div class="product-img-wrapper">
                                 <img src="images/B1.jpg" alt="Selorm Custom Silver Cuban ID Bracelet"
                                     class="product-img">
-                                <span class="tag">Bracelets</span>
-                            </div>
-                            <div class="product-info">
-                                <h3 class="product-name">Selorm Custom Silver Cuban ID Bracelet</h3>
-                                <p class="product-category">Stainless Steel / Polished Cuban Curb Link</p>
-                                <p class="product-price">Bespoke Custom</p>
-                                <div class="product-actions">
-                                    <button class="btn-product-inquiry wa-inquire-btn"
-                                        data-product="Selorm Custom Silver Cuban ID Bracelet">
-                                        <i class="fa-brands fa-whatsapp"></i> WhatsApp Inquiry
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     </div>
