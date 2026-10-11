@@ -594,31 +594,28 @@
             transform: translateY(-6.5px) rotate(-45deg);
         }
 
-        /* Horizontal Dropdown beneath the header — toggled by hamburger */
+        /* Dropdown beneath the header — applies at ALL widths */
         .nav-menu {
             display: flex !important;
             position: absolute !important;
             top: 100%;
-            left: 0;
-            right: 0;
-            width: 100%;
+            left: 24px;
+            right: auto;
+            width: min(260px, calc(100% - 48px));
             height: auto;
-            background: rgba(10, 10, 10, 0.96);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(201, 169, 110, 0.15);
-            border-bottom: 1px solid rgba(201, 169, 110, 0.25);
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
-            flex-direction: row !important;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 8px 32px;
-            padding: 16px 32px;
+            background: #0a0a0a;
+            border: 1px solid #c9a96e22;
+            border-radius: 8px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.45);
+            flex-direction: column !important;
+            align-items: flex-start;
+            justify-content: flex-start;
+            gap: 0;
+            padding: 8px 20px 16px;
             opacity: 0;
             visibility: hidden;
-            transform: translateY(-10px);
-            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+            transform: translateY(-12px);
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
             z-index: 1000;
         }
 
@@ -629,39 +626,23 @@
             transform: translateY(0);
         }
 
-        /* Nav links inside the horizontal dropdown */
+        /* Nav links inside the dropdown */
         .nav-menu .nav-link {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 1.3rem;
-            font-weight: 500;
-            letter-spacing: 0.08em;
+            font-size: 1.6rem;
+            font-weight: 400;
+            letter-spacing: 0.06em;
             color: #f5f0e8;
             text-decoration: none;
-            padding: 6px 4px;
-            border-bottom: none;
-            width: auto;
-            display: inline-flex;
-            align-items: center;
-            position: relative;
-            transition: color 0.25s ease, transform 0.25s ease;
-        }
-
-        .nav-menu .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
+            padding: 14px 0;
+            border-bottom: 1px solid #c9a96e18;
             width: 100%;
-            height: 1.5px;
-            background: #c9a96e;
-            transform: scaleX(0);
-            transform-origin: center;
-            transition: transform 0.25s ease;
+            display: block;
+            transition: color 0.2s;
         }
 
-        .nav-menu .nav-link:hover::after,
-        .nav-menu .nav-link.active::after {
-            transform: scaleX(1);
+        .nav-menu .nav-link:last-child {
+            border-bottom: none;
         }
 
         .nav-menu .nav-link.active,
@@ -669,72 +650,44 @@
             color: #c9a96e;
         }
 
-        /* Follow Us section beside the nav links in horizontal layout */
+        /* Follow Us section beneath the nav links */
         .nav-menu-follow {
-            width: auto;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 0 0 0 16px;
-            padding: 0 0 0 20px;
-            border-left: 1px solid rgba(201, 169, 110, 0.25);
+            width: 100%;
+            padding-top: 16px;
+            margin-top: 4px;
         }
 
         .nav-menu-follow-label {
-            display: inline-block;
+            display: block;
             font-family: 'Montserrat', sans-serif;
-            font-size: 0.65rem;
-            letter-spacing: 0.18em;
+            font-size: 0.68rem;
+            letter-spacing: 0.2em;
             text-transform: uppercase;
             color: #888;
-            margin-bottom: 0;
-            white-space: nowrap;
+            margin-bottom: 14px;
         }
 
         .nav-menu-follow-icons {
             display: flex;
-            gap: 10px;
+            gap: 18px;
         }
 
         .nav-menu-follow-icons a {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
-            border: 1px solid rgba(201, 169, 110, 0.4);
+            width: 34px;
+            height: 34px;
+            border: 1px solid #c9a96e55;
             border-radius: 50%;
             color: #c9a96e;
-            font-size: 0.85rem;
-            transition: background 0.2s, color 0.2s, transform 0.2s;
+            font-size: 0.95rem;
+            transition: background 0.2s, color 0.2s;
         }
 
         .nav-menu-follow-icons a:hover {
             background: #c9a96e;
             color: #0a0a0a;
-            transform: translateY(-2px);
-        }
-
-        @media (max-width: 768px) {
-            .nav-menu {
-                gap: 10px 20px;
-                padding: 14px 16px;
-                justify-content: center;
-            }
-
-            .nav-menu .nav-link {
-                font-size: 1.15rem;
-                padding: 4px 6px;
-            }
-
-            .nav-menu-follow {
-                width: 100%;
-                justify-content: center;
-                border-left: none;
-                border-top: 1px solid rgba(201, 169, 110, 0.15);
-                margin: 6px 0 0 0;
-                padding: 10px 0 0 0;
-            }
         }
 
         /* Dim overlay behind the dropdown */
@@ -1128,6 +1081,8 @@
                     <div class="nav-menu-follow-icons">
                         <a href="https://www.instagram.com/Jewels.with_j" target="_blank" title="Instagram"><i
                                 class="fa-brands fa-instagram"></i></a>
+                        <a href="https://www.tiktok.com/@jewels.by_j4" target="_blank" title="TikTok"><i
+                                class="fa-brands fa-tiktok"></i></a>
                         <a href="https://www.snapchat.com/add/jerrilyn.mensah" target="_blank" title="Snapchat"><i
                                 class="fa-brands fa-snapchat"></i></a>
                     </div>
@@ -1848,6 +1803,8 @@
                             class="fa-brands fa-whatsapp"></i></a>
                     <a href="https://www.instagram.com/Jewels.with_j" target="_blank" title="Instagram"><i
                             class="fa-brands fa-instagram"></i></a>
+                    <a href="https://www.tiktok.com/@jewels.by_j4" target="_blank" title="TikTok"><i
+                            class="fa-brands fa-tiktok"></i></a>
                 </div>
             </div>
         </div>
