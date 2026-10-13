@@ -594,114 +594,354 @@
             transform: translateY(-6.5px) rotate(-45deg);
         }
 
-        /* Dropdown beneath the header — applies at ALL widths */
-        .nav-menu {
-            display: flex !important;
-            position: absolute !important;
-            top: 100%;
-            left: 24px;
-            right: auto;
-            width: min(260px, calc(100% - 48px));
-            height: auto;
-            background: #0a0a0a;
-            border: 1px solid #c9a96e22;
-            border-radius: 8px;
-            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.45);
-            flex-direction: column !important;
-            align-items: flex-start;
-            justify-content: flex-start;
-            gap: 0;
-            padding: 8px 20px 16px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-12px);
-            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
-            z-index: 1000;
-        }
+        /* ══════════════════════════════════════
+           SIDEBAR NAVIGATION DRAWER (JEWELS BY J THEME)
+        ══════════════════════════════════════ */
 
-        /* Drop down when active */
-        .nav-menu.active {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        /* Nav links inside the dropdown */
-        .nav-menu .nav-link {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.6rem;
-            font-weight: 400;
-            letter-spacing: 0.06em;
-            color: #f5f0e8;
-            text-decoration: none;
-            padding: 14px 0;
-            border-bottom: 1px solid #c9a96e18;
-            width: 100%;
-            display: block;
-            transition: color 0.2s;
-        }
-
-        .nav-menu .nav-link:last-child {
-            border-bottom: none;
-        }
-
-        .nav-menu .nav-link.active,
-        .nav-menu .nav-link:hover {
-            color: #c9a96e;
-        }
-
-        /* Follow Us section beneath the nav links */
-        .nav-menu-follow {
-            width: 100%;
-            padding-top: 16px;
-            margin-top: 4px;
-        }
-
-        .nav-menu-follow-label {
-            display: block;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.68rem;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: #888;
-            margin-bottom: 14px;
-        }
-
-        .nav-menu-follow-icons {
-            display: flex;
-            gap: 18px;
-        }
-
-        .nav-menu-follow-icons a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 34px;
-            height: 34px;
-            border: 1px solid #c9a96e55;
-            border-radius: 50%;
-            color: #c9a96e;
-            font-size: 0.95rem;
-            transition: background 0.2s, color 0.2s;
-        }
-
-        .nav-menu-follow-icons a:hover {
-            background: #c9a96e;
-            color: #0a0a0a;
-        }
-
-        /* Dim overlay behind the dropdown */
+        /* Dim backdrop overlay behind the drawer */
         .nav-overlay {
-            display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.55);
-            z-index: 999;
-            backdrop-filter: blur(2px);
+            background: rgba(10, 10, 10, 0.75);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
+            z-index: 1200;
         }
 
         .nav-overlay.active {
-            display: block;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Full-Height Left Sidebar Drawer */
+        .nav-drawer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 320px;
+            max-width: 86vw;
+            height: 100vh;
+            height: 100dvh;
+            background: linear-gradient(180deg, #141414 0%, #0c0c0c 55%, #080808 100%);
+            border-right: 1px solid rgba(201, 169, 110, 0.28);
+            box-shadow: 15px 0 50px rgba(0, 0, 0, 0.95), 0 0 25px rgba(201, 169, 110, 0.08);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 20px 22px;
+            z-index: 1250;
+            transform: translateX(-100%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+
+        .nav-drawer.active {
+            transform: translateX(0);
+        }
+
+        /* Drawer Header */
+        .drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(201, 169, 110, 0.18);
+            margin-bottom: 20px;
+        }
+
+        .drawer-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .drawer-logo-img {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1.5px solid var(--gold);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 10px var(--gold-glow);
+            background: linear-gradient(135deg, #FAF2EB 0%, #F4E4D7 100%);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .drawer-brand:hover .drawer-logo-img {
+            transform: scale(1.06);
+            box-shadow: 0 6px 20px var(--gold-glow);
+        }
+
+        .drawer-brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .drawer-brand-title {
+            font-family: var(--font-serif);
+            font-size: 1.3rem;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            color: var(--text-light);
+            line-height: 1.2;
+        }
+
+        .drawer-brand-tagline {
+            font-family: var(--font-sans);
+            font-size: 0.58rem;
+            font-weight: 500;
+            letter-spacing: 0.18em;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-top: 3px;
+        }
+
+        .drawer-close-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(201, 169, 110, 0.08);
+            border: 1px solid rgba(201, 169, 110, 0.25);
+            color: var(--text-light);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .drawer-close-btn:hover {
+            background: var(--gold);
+            color: var(--bg-dark);
+            border-color: var(--gold-light);
+            box-shadow: 0 0 15px var(--gold-glow);
+            transform: rotate(90deg);
+        }
+
+        /* Nav Links inside Drawer */
+        .drawer-links-wrap {
+            flex: 1 1 auto;
+        }
+
+        .drawer-links-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .drawer-links-list li {
+            width: 100%;
+        }
+
+        .nav-drawer .nav-link {
+            display: flex !important;
+            align-items: center;
+            gap: 16px;
+            padding: 13px 18px !important;
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-light) !important;
+            font-family: var(--font-sans) !important;
+            font-size: 0.95rem !important;
+            font-weight: 500 !important;
+            letter-spacing: 0.04em;
+            text-transform: uppercase !important;
+            background: transparent;
+            border: 1px solid transparent !important;
+            border-bottom: 1px solid transparent !important;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            width: 100%;
+            text-align: left !important;
+            margin: 0 !important;
+        }
+
+        .nav-drawer .nav-link::after {
+            display: none !important;
+        }
+
+        .nav-drawer .nav-link .drawer-link-icon {
+            width: 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+            font-size: 1.15rem;
+            transition: transform 0.25s ease, color 0.25s ease;
+            flex-shrink: 0;
+        }
+
+        .nav-drawer .nav-link .drawer-link-text {
+            color: inherit;
+            transition: color 0.25s ease;
+        }
+
+        /* Inactive Link Hover */
+        .nav-drawer .nav-link:hover {
+            background: rgba(201, 169, 110, 0.1);
+            color: #ffffff !important;
+            border-color: rgba(201, 169, 110, 0.35) !important;
+            transform: translateX(4px);
+        }
+
+        .nav-drawer .nav-link:hover .drawer-link-icon {
+            transform: scale(1.15);
+            color: var(--gold-light);
+        }
+
+        /* Active Nav Link — signature Jewels by J gold & obsidian highlight */
+        .nav-drawer .nav-link.active {
+            background: linear-gradient(90deg, rgba(201, 169, 110, 0.22) 0%, rgba(201, 169, 110, 0.06) 100%) !important;
+            border: 1px solid var(--gold) !important;
+            border-bottom: 1px solid var(--gold) !important;
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(201, 169, 110, 0.12);
+        }
+
+        .nav-drawer .nav-link.active .drawer-link-icon {
+            color: var(--gold-light);
+            filter: drop-shadow(0 0 8px var(--gold-glow));
+        }
+
+        /* Drawer Footer */
+        .drawer-footer {
+            margin-top: auto;
+            padding-top: 18px;
+            border-top: 1px solid rgba(201, 169, 110, 0.18);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .drawer-contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .drawer-contact-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-light);
+            font-size: 0.86rem;
+            font-family: var(--font-sans);
+            text-decoration: none;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .drawer-contact-row:hover {
+            color: var(--gold-light);
+            transform: translateX(3px);
+        }
+
+        .drawer-contact-icon {
+            width: 20px;
+            color: var(--gold);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .drawer-contact-text {
+            letter-spacing: 0.02em;
+        }
+
+        /* "Get in Touch" Action Button (Jewels by J signature styling) */
+        .drawer-touch-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px 18px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(201, 169, 110, 0.15) 0%, rgba(201, 169, 110, 0.04) 100%);
+            border: 1px solid var(--gold);
+            color: var(--text-light);
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .drawer-touch-btn i {
+            color: var(--gold);
+            font-size: 0.95rem;
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        .drawer-touch-btn:hover {
+            background: var(--gold);
+            border-color: var(--gold-light);
+            color: var(--bg-dark);
+            box-shadow: 0 4px 18px var(--gold-glow);
+            transform: translateY(-2px);
+        }
+
+        .drawer-touch-btn:hover i {
+            color: var(--bg-dark);
+            transform: translateX(3px) translateY(-2px);
+        }
+
+        /* Social icons in drawer */
+        .drawer-socials {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 4px;
+        }
+
+        .drawer-socials-label {
+            font-family: var(--font-sans);
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .drawer-socials-icons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .drawer-socials-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(201, 169, 110, 0.06);
+            border: 1px solid rgba(201, 169, 110, 0.35);
+            color: var(--gold);
+            font-size: 0.9rem;
+            transition: all 0.25s ease;
+            text-decoration: none;
+        }
+
+        .drawer-socials-icons a:hover {
+            background: var(--gold);
+            color: var(--bg-dark);
+            transform: translateY(-2px);
+            border-color: var(--gold);
+            box-shadow: 0 0 12px var(--gold-glow);
         }
 
         /* ── Fix: About/My Story image was rendering smaller than its accent frame ── */
@@ -1063,32 +1303,6 @@
                 <a href="#" class="logo" onclick="navigateTo('home'); return false;">JEWELS BY J</a>
             </div>
 
-            <nav class="nav-menu" id="navMenu">
-                <a href="#" class="nav-link active" data-page="home"
-                    onclick="navigateTo('home');    return false;">Home</a>
-                <a href="#" class="nav-link" data-page="featured"
-                    onclick="navigateTo('featured'); return false;">Featured</a>
-                <a href="#" class="nav-link" data-page="gallery"
-                    onclick="navigateTo('gallery');  return false;">Gallery</a>
-                <a href="#" class="nav-link" data-page="customer-cam"
-                    onclick="navigateTo('customer-cam'); return false;">Client Cam</a>
-                <a href="#" class="nav-link" data-page="about" onclick="navigateTo('about');    return false;">About</a>
-                <a href="#" class="nav-link" data-page="contact"
-                    onclick="navigateTo('contact');  return false;">Contact</a>
-
-                <div class="nav-menu-follow">
-                    <span class="nav-menu-follow-label">Follow Us</span>
-                    <div class="nav-menu-follow-icons">
-                        <a href="https://www.instagram.com/Jewels.with_j" target="_blank" title="Instagram"><i
-                                class="fa-brands fa-instagram"></i></a>
-                        <a href="https://www.tiktok.com/@jewels.by_j4" target="_blank" title="TikTok"><i
-                                class="fa-brands fa-tiktok"></i></a>
-                        <a href="https://www.snapchat.com/add/jerrilyn.mensah" target="_blank" title="Snapchat"><i
-                                class="fa-brands fa-snapchat"></i></a>
-                    </div>
-                </div>
-            </nav>
-
             <div class="header-right">
                 <a href="#" class="logo" onclick="navigateTo('home'); return false;">
                     <img src="images/logo.jpg" alt="Jewels by J" class="logo-img">
@@ -1096,6 +1310,104 @@
             </div>
         </div>
     </header>
+
+    <!-- ═══════════════════════════════════════
+         SIDEBAR NAVIGATION DRAWER (FEATURE)
+    ════════════════════════════════════════ -->
+    <aside class="nav-drawer" id="navMenu" role="dialog" aria-modal="true" aria-label="Main Navigation">
+        <!-- Drawer Header -->
+        <div class="drawer-header">
+            <div class="drawer-brand" onclick="navigateTo('home'); return false;">
+                <img src="images/logo.jpg" alt="Jewels by J" class="drawer-logo-img">
+                <div class="drawer-brand-text">
+                    <span class="drawer-brand-title">Jewels by J</span>
+                    <span class="drawer-brand-tagline">FINE &amp; CUSTOM JEWELRY</span>
+                </div>
+            </div>
+            <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close menu">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Drawer Links List -->
+        <div class="drawer-links-wrap">
+            <ul class="drawer-links-list">
+                <li>
+                    <a href="#home" class="nav-link active" data-page="home" onclick="navigateTo('home'); return false;">
+                        <span class="drawer-link-icon"><i class="fa-solid fa-house"></i></span>
+                        <span class="drawer-link-text">Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#featured" class="nav-link" data-page="featured" onclick="navigateTo('featured'); return false;">
+                        <span class="drawer-link-icon"><i class="fa-solid fa-gem"></i></span>
+                        <span class="drawer-link-text">Featured</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#gallery" class="nav-link" data-page="gallery" onclick="navigateTo('gallery'); return false;">
+                        <span class="drawer-link-icon"><i class="fa-solid fa-images"></i></span>
+                        <span class="drawer-link-text">Gallery</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#customer-cam" class="nav-link" data-page="customer-cam" onclick="navigateTo('customer-cam'); return false;">
+                        <span class="drawer-link-icon"><i class="fa-solid fa-video"></i></span>
+                        <span class="drawer-link-text">Client Cam</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#about" class="nav-link" data-page="about" onclick="navigateTo('about'); return false;">
+                        <span class="drawer-link-icon"><i class="fa-solid fa-circle-info"></i></span>
+                        <span class="drawer-link-text">About Us</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#contact" class="nav-link" data-page="contact" onclick="navigateTo('contact'); return false;">
+                        <span class="drawer-link-icon"><i class="fa-solid fa-envelope"></i></span>
+                        <span class="drawer-link-text">Contact</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Drawer Footer (Contact info, Get in Touch button, Socials) -->
+        <div class="drawer-footer">
+            <div class="drawer-contact-info">
+                <a href="tel:+233500594879" class="drawer-contact-row">
+                    <span class="drawer-contact-icon"><i class="fa-solid fa-phone"></i></span>
+                    <span class="drawer-contact-text">+233 (0) 50 059 4879</span>
+                </a>
+                <div class="drawer-contact-row">
+                    <span class="drawer-contact-icon"><i class="fa-solid fa-location-dot"></i></span>
+                    <span class="drawer-contact-text">Accra – Ghana</span>
+                </div>
+            </div>
+
+            <button class="drawer-touch-btn" onclick="navigateTo('contact'); return false;">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>Get in Touch</span>
+            </button>
+
+            <div class="drawer-socials">
+                <span class="drawer-socials-label">Follow Us</span>
+                <div class="drawer-socials-icons">
+                    <a href="https://www.instagram.com/Jewels.with_j" target="_blank" rel="noopener" title="Instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="https://www.tiktok.com/@jewels.by_j4" target="_blank" rel="noopener" title="TikTok">
+                        <i class="fa-brands fa-tiktok"></i>
+                    </a>
+                    <a href="https://www.snapchat.com/add/jerrilyn.mensah" target="_blank" rel="noopener" title="Snapchat">
+                        <i class="fa-brands fa-snapchat"></i>
+                    </a>
+                    <a href="https://wa.me/233500594879" target="_blank" rel="noopener" title="WhatsApp">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </aside>
 
     <main>
 
@@ -1831,32 +2143,42 @@
 
     <script>
         /* ════════════════════════════════════════
-           HAMBURGER / MOBILE MENU HELPERS
+           HAMBURGER / SIDEBAR DRAWER MENU HELPERS
            (defined first so navigateTo can call closeMenu)
         ════════════════════════════════════════ */
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('navMenu');
         const overlay = document.getElementById('navOverlay');
+        const drawerCloseBtn = document.getElementById('drawerCloseBtn');
 
         function openMenu() {
-            navMenu.classList.add('active');
-            hamburger.classList.add('active');
-            overlay.classList.add('active');
+            if (navMenu) navMenu.classList.add('active');
+            if (hamburger) hamburger.classList.add('active');
+            if (overlay) overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
 
         function closeMenu() {
-            navMenu.classList.remove('active');
-            hamburger.classList.remove('active');
-            overlay.classList.remove('active');
+            if (navMenu) navMenu.classList.remove('active');
+            if (hamburger) hamburger.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
             document.body.style.overflow = '';
         }
 
         if (hamburger) hamburger.addEventListener('click', () => {
-            navMenu.classList.contains('active') ? closeMenu() : openMenu();
+            if (navMenu) {
+                navMenu.classList.contains('active') ? closeMenu() : openMenu();
+            }
         });
 
+        if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeMenu);
         if (overlay) overlay.addEventListener('click', closeMenu);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && navMenu && navMenu.classList.contains('active')) {
+                closeMenu();
+            }
+        });
 
         /* ════════════════════════════════════════
            SPA NAVIGATION
