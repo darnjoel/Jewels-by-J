@@ -169,9 +169,9 @@ function setupGalleryFilters() {
             const filterValue = button.getAttribute('data-filter');
 
             galleryItems.forEach(item => {
-                const category = item.getAttribute('data-category');
-                if (filterValue === 'all' || category === filterValue) {
-                    item.style.display = 'block';
+                const cats = (item.getAttribute('data-category') || '').split(' ');
+                if (filterValue === 'all' || cats.includes(filterValue)) {
+                    item.style.display = '';
                     setTimeout(() => {
                         item.style.opacity = '1';
                         item.style.transform = 'scale(1)';
