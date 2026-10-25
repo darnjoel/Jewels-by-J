@@ -182,12 +182,49 @@
         }
 
         /* ── view-detail hint on gallery overlay ── */
+        .gallery-overlay {
+            background-color: rgba(8, 8, 8, 0.62) !important;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
         .view-detail-hint {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 11px 22px;
+            background: rgba(14, 14, 14, 0.78);
+            border: 1px solid rgba(201, 169, 110, 0.65);
+            border-radius: 30px;
             font-family: 'Montserrat', sans-serif;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
+            font-weight: 500;
             letter-spacing: 0.18em;
             text-transform: uppercase;
+            color: #f5f0e8;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+
+        .view-detail-hint i {
             color: #c9a96e;
+            font-size: 0.95rem;
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        .gallery-item:hover .view-detail-hint {
+            background: #c9a96e;
+            color: #0a0a0a;
+            border-color: #c9a96e;
+            transform: scale(1.06);
+            box-shadow: 0 8px 25px rgba(201, 169, 110, 0.45);
+        }
+
+        .gallery-item:hover .view-detail-hint i {
+            color: #0a0a0a;
+            transform: scale(1.15);
         }
 
         /* ── GALLERY BIGGER VIEW LIGHTBOX MODAL ── */
@@ -1565,12 +1602,8 @@
                             <img src="images/jerrilyn.jpg" alt="Jerrilyn Duo Butterfly Nameplates">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Jerrilyn Duo Butterfly Nameplates</h4>
-                                    <p>Silver &amp; Gold Script Necklaces</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
@@ -1581,12 +1614,8 @@
                             <img src="images/moesha.jpg" alt="Moesha Royal Rose Cuban Nameplate">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Moesha Royal Rose Cuban Nameplate</h4>
-                                    <p>Crown &amp; Rose Cuban Chain</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
@@ -1597,12 +1626,8 @@
                             <img src="images/hand.jpg" alt="Custom Butterfly Trio Nameplates">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Custom Butterfly Trio Nameplates</h4>
-                                    <p>Gold Butterfly Script Trio</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
@@ -1613,12 +1638,8 @@
                             <img src="images/kimberry.jpg" alt="Kimberly Signature Script Necklace">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Kimberly Signature Script Necklace</h4>
-                                    <p>Personalized Gold Script</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
@@ -1629,12 +1650,8 @@
                             <img src="images/regina.jpg" alt="Regina Butterfly Charm Script Necklace">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Regina Butterfly Charm Script Necklace</h4>
-                                    <p>Butterfly Script Pendant</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
@@ -1645,12 +1662,8 @@
                             <img src="images/A1.jpg" alt="Golden Initial A Pendant">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Golden Initial "A" Pendant</h4>
-                                    <p>Minimalist Letter Pendant</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
@@ -1661,12 +1674,8 @@
                             <img src="images/A2.jpg" alt="Butterfly Monogram Initial Pendant">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Butterfly Monogram Initial Pendant</h4>
-                                    <p>Initial &amp; Butterfly Monogram</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
@@ -1677,12 +1686,8 @@
                             <img src="images/box.jpg" alt="Family Heritage Tiered Heart Nameplate Necklace">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Family Heritage Tiered Heart Nameplate</h4>
-                                    <p>Multi-Name Vertical Keepsake</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
@@ -1693,12 +1698,8 @@
                             <img src="images/bri.jpg" alt="Bridget Ribbon Bow Accent Nameplate Necklace">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Bridget Ribbon Bow Nameplate Necklace</h4>
-                                    <p>Custom Script with Sculpted Bow Charm</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
@@ -1709,12 +1710,8 @@
                             <img src="images/cat.jpg" alt="Cathy Signature Flourish Script Necklace">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Cathy Signature Flourish Script Necklace</h4>
-                                    <p>Dynamic Loop Calligraphy Pendant</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
@@ -1725,12 +1722,8 @@
                             <img src="images/emp.jpg" alt="Empress Blooming Rose Script Necklace">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Empress Blooming Rose Script Necklace</h4>
-                                    <p>Cursive Nameplate with Rose Charm</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
@@ -1741,12 +1734,8 @@
                             <img src="images/heart.jpg" alt="Pulse of Love EKG & Cutout Heart Necklace">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Pulse of Love Heartbeat Necklace</h4>
-                                    <p>Heartbeat Lifeline &amp; Floating Heart</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
@@ -1757,12 +1746,8 @@
                             <img src="images/nam.jpg" alt="Naomi Sweetheart Crescent Frame Necklace">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Naomi Sweetheart Crescent Frame Necklace</h4>
-                                    <p>Script Nameplate inside Heart Frame</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
@@ -1774,12 +1759,8 @@
                             <img src="images/B1.jpg" alt="Selorm Personalized Cuban ID Bracelet">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Selorm Personalized Cuban ID Bracelet</h4>
-                                    <p>Silver Cuban Nameplate Bracelet</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
@@ -1790,12 +1771,8 @@
                             <img src="images/B2.jpg" alt="Jubilee Link Custom Nameplate Bracelets">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Jubilee Link Custom Nameplate Bracelets</h4>
-                                    <p>Engraved Jubilee Link Stack</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
@@ -1806,12 +1783,8 @@
                             <img src="images/C2.jpg" alt="Gina Classic Jubilee Nameplate Bracelet">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Gina Classic Jubilee Nameplate Bracelet</h4>
-                                    <p>Polished Jubilee Link Bracelet</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
@@ -1822,12 +1795,8 @@
                             <img src="images/bet.jpg" alt="Dainty Script Trio Nameplate Bracelets">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Dainty Script Trio Nameplate Bracelets</h4>
-                                    <p>Delicate Gold Chain Script Stack</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
@@ -1839,12 +1808,8 @@
                             <img src="images/C1.jpg" alt="Casio Timepiece & Engraved Bracelet Set">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>Casio Timepiece &amp; Engraved Bracelet Set</h4>
-                                    <p>Black Casio &amp; Custom Link Bracelet</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
@@ -1855,12 +1820,8 @@
                             <img src="images/ggift.jpg" alt="The Kiki Luxury 3-Piece Gift Set">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>The Kiki Luxury 3-Piece Gift Set</h4>
-                                    <p>Watch, Bracelet &amp; Butterfly Pendant</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
@@ -1871,12 +1832,8 @@
                             <img src="images/jan.jpg" alt="The Jannyfer Cuban Set: Necklace & Bracelet">
                             <div class="gallery-overlay">
                                 <div class="overlay-content">
-                                    <h4>The Jannyfer Cuban Set: Necklace &amp; Bracelet</h4>
-                                    <p>Matching Script Duo &amp; Heart Charm in Gift Box</p>
-                                    <div class="overlay-links">
-                                        <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                            Bigger View</span>
-                                    </div>
+                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        Bigger View</span>
                                 </div>
                             </div>
                         </div>
