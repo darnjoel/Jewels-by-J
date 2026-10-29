@@ -4,2165 +4,577 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JEWELS BY J | A jewelry brand offering beautiful, high-quality pieces that bring confidence, elegance, and
-        style to every occasion.</title>
+    <title>Jewels by J — Hi Beautiful, Your Signature Look Starts Here!</title>
     <meta name="description"
-        content="Jewels by J offers elegant bracelets, rings, necklaces, earrings, and personalized jewelry made for every occasion. Contact us via WhatsApp.">
+        content="Handcrafted, bespoke fine jewelry for the modern woman. Shop custom nameplates, initial pendants, Cuban chains, bracelets and gift sets, delivered across Ghana.">
+    <link rel="canonical" href="https://jewelsbyj.com/">
+    <meta name="theme-color" content="#f7dbe3">
+
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Jewels by J">
+    <meta property="og:title" content="Jewels by J | Hi Beautiful, Your Signature Look Starts Here!">
+    <meta property="og:description"
+        content="Handcrafted bespoke jewelry made for confidence, elegance, and style. Shop our collections online, delivered across Ghana.">
+    <meta property="og:image" content="images/jerrilyn.jpg">
+
+    <!-- Google Fonts: Cormorant Garamond, Great Vibes & Inter (The Strand Brand Typography) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@200;300;400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Great+Vibes&family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="style.css">
-
-    <style>
-        /* ── SPA SECTION SWITCHING ── */
-        .page-section {
-            display: none;
-        }
-
-        .page-section.active {
-            display: block;
-            animation: fadeSection 0.45s ease;
-        }
-
-        @keyframes fadeSection {
-            from {
-                opacity: 0;
-                transform: translateY(18px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ── DETAIL SECTION ── */
-        #section-detail {
-            padding: 120px 0 80px;
-            background: #0a0a0a;
-            min-height: 100vh;
-        }
-
-        .detail-back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: none;
-            border: none;
-            color: #c9a96e;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.75rem;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            cursor: pointer;
-            margin-bottom: 48px;
-            padding: 0;
-            transition: gap 0.2s;
-        }
-
-        .detail-back-btn:hover {
-            gap: 14px;
-        }
-
-        .detail-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 72px;
-            align-items: start;
-        }
-
-        @media (max-width: 768px) {
-            .detail-grid {
-                grid-template-columns: 1fr;
-                gap: 36px;
-            }
-        }
-
-        .detail-img-wrap {
-            position: relative;
-        }
-
-        .detail-img-wrap img {
-            width: 100%;
-            aspect-ratio: 3/4;
-            object-fit: cover;
-            display: block;
-        }
-
-        .detail-img-accent {
-            position: absolute;
-            bottom: -16px;
-            left: -16px;
-            width: 60%;
-            height: 60%;
-            border: 1px solid #c9a96e44;
-            pointer-events: none;
-        }
-
-        .detail-info {
-            padding-top: 12px;
-        }
-
-        .detail-tag {
-            display: inline-block;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.68rem;
-            letter-spacing: 0.24em;
-            text-transform: uppercase;
-            color: #c9a96e;
-            border: 1px solid #c9a96e55;
-            padding: 4px 14px;
-            margin-bottom: 22px;
-        }
-
-        .detail-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: clamp(1.9rem, 4vw, 3.1rem);
-            font-weight: 400;
-            color: #f5f0e8;
-            line-height: 1.15;
-            margin-bottom: 10px;
-        }
-
-        .detail-meta {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.75rem;
-            color: #888;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            margin-bottom: 28px;
-        }
-
-        .detail-divider {
-            width: 44px;
-            height: 1px;
-            background: #c9a96e;
-            margin-bottom: 28px;
-        }
-
-        .detail-desc {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.1rem;
-            color: #aaa;
-            line-height: 1.9;
-            margin-bottom: 36px;
-        }
-
-        .detail-price {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 2rem;
-            color: #f5f0e8;
-            font-weight: 300;
-            letter-spacing: 0.04em;
-            margin-bottom: 32px;
-        }
-
-        .detail-wa-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: #25d366;
-            color: #fff;
-            border: none;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.78rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            text-decoration: none;
-            padding: 14px 28px;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-
-        .detail-wa-btn:hover {
-            opacity: 0.88;
-        }
-
-        /* ── view-detail hint on gallery overlay ── */
-        .gallery-overlay {
-            background-color: rgba(8, 8, 8, 0.62) !important;
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-        }
-
-        .view-detail-hint {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 9px;
-            padding: 11px 22px;
-            background: rgba(14, 14, 14, 0.78);
-            border: 1px solid rgba(201, 169, 110, 0.65);
-            border-radius: 30px;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.75rem;
-            font-weight: 500;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: #f5f0e8;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            cursor: pointer;
-        }
-
-        .view-detail-hint i {
-            color: #c9a96e;
-            font-size: 0.95rem;
-            transition: transform 0.3s ease, color 0.3s ease;
-        }
-
-        .gallery-item:hover .view-detail-hint {
-            background: #c9a96e;
-            color: #0a0a0a;
-            border-color: #c9a96e;
-            transform: scale(1.06);
-            box-shadow: 0 8px 25px rgba(201, 169, 110, 0.45);
-        }
-
-        .gallery-item:hover .view-detail-hint i {
-            color: #0a0a0a;
-            transform: scale(1.15);
-        }
-
-        /* ── GALLERY BIGGER VIEW LIGHTBOX MODAL ── */
-        .lightbox-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-        }
-
-        .lightbox-modal.active {
-            display: flex;
-            animation: fadeInLightbox 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes fadeInLightbox {
-            from {
-                opacity: 0;
-                transform: scale(0.96);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .lightbox-backdrop {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(5, 5, 5, 0.92);
-            backdrop-filter: blur(12px);
-            cursor: pointer;
-        }
-
-        .lightbox-content {
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            max-width: 900px;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .lightbox-close-btn {
-            position: absolute;
-            top: -50px;
-            right: 0;
-            background: rgba(201, 169, 110, 0.2);
-            border: 1.5px solid #c9a96e;
-            color: #f5f0e8;
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            font-size: 1.25rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.25s ease, transform 0.25s ease;
-            z-index: 10;
-        }
-
-        .lightbox-close-btn:hover {
-            background: #c9a96e;
-            color: #0a0a0a;
-            transform: scale(1.1);
-        }
-
-        .lightbox-body {
-            width: 100%;
-            max-height: 86vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            border-radius: 14px;
-            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85);
-            background: #000;
-            border: 1px solid rgba(201, 169, 110, 0.3);
-        }
-
-        .lightbox-body img {
-            max-width: 100%;
-            max-height: 86vh;
-            object-fit: contain;
-            display: block;
-            border-radius: 14px;
-        }
-
-        .lightbox-body video {
-            width: 100%;
-            max-height: 86vh;
-            object-fit: contain;
-            display: block;
-            background: #000;
-            border-radius: 14px;
-        }
-
-        /* ── video gallery items: play button overlay & video elements ── */
-        .gallery-item video.gallery-item-video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            border-radius: inherit;
-        }
-
-        .gallery-item .video-badge {
-            position: absolute;
-            top: 14px;
-            left: 14px;
-            background: rgba(10, 10, 10, 0.8);
-            color: #c9a96e;
-            border: 1px solid rgba(201, 169, 110, 0.5);
-            font-size: 0.65rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            padding: 4px 10px;
-            border-radius: 20px;
-            z-index: 2;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            backdrop-filter: blur(4px);
-        }
-
-        .gallery-item .video-play-btn {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: rgba(10, 10, 10, 0.65);
-            border: 1.5px solid #c9a96e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #f5f0e8;
-            font-size: 1.25rem;
-            pointer-events: none;
-            transition: transform 0.25s ease, background 0.25s ease;
-            z-index: 2;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-        }
-
-        .gallery-item:hover .video-play-btn {
-            transform: translate(-50%, -50%) scale(1.1);
-            background: #c9a96e;
-            color: #0a0a0a;
-        }
-
-        .gallery-item .video-play-btn i {
-            margin-left: 3px;
-        }
-
-        /* ── detail view video ── */
-        .detail-img-wrap video {
-            width: 100%;
-            max-height: 75vh;
-            object-fit: contain;
-            display: block;
-            background: #000;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        /* ── contact layout (single column) ── */
-        .contact-solo {
-            max-width: 720px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /* ── contact form card styling ── */
-        .contact-form-card {
-            background: #111111;
-            border: 1px solid rgba(201, 169, 110, 0.4);
-            border-radius: 16px;
-            padding: 36px 32px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
-            margin-top: 10px;
-        }
-
-        .contact-form-title {
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 1.8rem;
-            color: #f5f0e8;
-            margin-bottom: 6px;
-        }
-
-        .contact-form-sub {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.85rem;
-            color: #aaa;
-            margin-bottom: 24px;
-            line-height: 1.5;
-        }
-
-        .contact-form-sub strong {
-            color: #c9a96e;
-        }
-
-        .contact-form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        @media (max-width: 600px) {
-            .contact-form-row {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .contact-form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 18px;
-        }
-
-        .contact-form-group label {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            color: #c9a96e;
-            font-weight: 500;
-        }
-
-        .contact-form-group input,
-        .contact-form-group textarea {
-            background: #181818;
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 12px 16px;
-            color: #f5f0e8;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.9rem;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .contact-form-group input:focus,
-        .contact-form-group textarea:focus {
-            outline: none;
-            border-color: #c9a96e;
-            box-shadow: 0 0 10px rgba(201, 169, 110, 0.25);
-        }
-
-        .contact-form-group textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .contact-form-submit {
-            width: 100%;
-            padding: 14px 24px;
-            background: #c9a96e;
-            color: #0a0a0a;
-            border: none;
-            border-radius: 8px;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-        }
-
-        .contact-form-submit:hover {
-            background: #e0c68e;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(201, 169, 110, 0.35);
-        }
-
-        .contact-form-submit:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .contact-form-status {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.85rem;
-            margin-top: 14px;
-            text-align: center;
-            line-height: 1.5;
-        }
-
-        .contact-form-status.success {
-            color: #25D366;
-        }
-
-        .contact-form-status.error {
-            color: #ff6b6b;
-        }
-
-        /* ══════════════════════════════════════
-       HAMBURGER & NAV — ALWAYS-ON DROPDOWN
-       (works on every screen size, desktop included;
-       self-contained so it overrides style.css)
-    ══════════════════════════════════════ */
-
-        /* Groups the hamburger icon and brand name together at the left */
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        /* Holds the logo on the right side of the header */
-        .header-right {
-            display: flex;
-            align-items: center;
-        }
-
-        .header-right .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Image logo sizing (header + footer) */
-        .logo-img {
-            height: 44px;
-            width: auto;
-            display: block;
-            background: linear-gradient(135deg, #FAF2EB 0%, #F4E4D7 100%);
-            padding: 5px 12px;
-            border-radius: 10px;
-            border: 1px solid var(--gold);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            mix-blend-mode: normal;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-        }
-
-        .logo-img:hover {
-            transform: scale(1.05);
-            border-color: var(--gold-light);
-            box-shadow: 0 6px 20px var(--gold-glow);
-        }
-
-        .footer-brand .logo-img {
-            height: 52px;
-            margin-bottom: 12px;
-        }
-
-        .hamburger {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
-            width: 40px;
-            height: 40px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 4px;
-            z-index: 1001;
-        }
-
-        .hamburger .bar {
-            display: block;
-            width: 24px;
-            height: 1.5px;
-            background: #f5f0e8;
-            transition: transform 0.3s ease, opacity 0.3s ease, width 0.3s ease;
-            transform-origin: center;
-        }
-
-        /* Animate bars → X when active */
-        .hamburger.active .bar:nth-child(1) {
-            transform: translateY(6.5px) rotate(45deg);
-        }
-
-        .hamburger.active .bar:nth-child(2) {
-            opacity: 0;
-            width: 0;
-        }
-
-        .hamburger.active .bar:nth-child(3) {
-            transform: translateY(-6.5px) rotate(-45deg);
-        }
-
-        /* ══════════════════════════════════════
-           SIDEBAR NAVIGATION DRAWER (JEWELS BY J THEME)
-        ══════════════════════════════════════ */
-
-        /* Dim backdrop overlay behind the drawer */
-        .nav-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(10, 10, 10, 0.75);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.35s ease, visibility 0.35s ease;
-            z-index: 1200;
-        }
-
-        .nav-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Full-Height Left Sidebar Drawer */
-        .nav-drawer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 320px;
-            max-width: 86vw;
-            height: 100vh;
-            height: 100dvh;
-            background: linear-gradient(180deg, #141414 0%, #0c0c0c 55%, #080808 100%);
-            border-right: 1px solid rgba(201, 169, 110, 0.28);
-            box-shadow: 15px 0 50px rgba(0, 0, 0, 0.95), 0 0 25px rgba(201, 169, 110, 0.08);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 24px 20px 22px;
-            z-index: 1250;
-            transform: translateX(-100%);
-            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            overflow-y: auto;
-            overscroll-behavior: contain;
-        }
-
-        .nav-drawer.active {
-            transform: translateX(0);
-        }
-
-        /* Drawer Header */
-        .drawer-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(201, 169, 110, 0.18);
-            margin-bottom: 20px;
-        }
-
-        .drawer-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .drawer-logo-img {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 1.5px solid var(--gold);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 10px var(--gold-glow);
-            background: linear-gradient(135deg, #FAF2EB 0%, #F4E4D7 100%);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .drawer-brand:hover .drawer-logo-img {
-            transform: scale(1.06);
-            box-shadow: 0 6px 20px var(--gold-glow);
-        }
-
-        .drawer-brand-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .drawer-brand-title {
-            font-family: var(--font-serif);
-            font-size: 1.3rem;
-            font-weight: 500;
-            letter-spacing: 0.06em;
-            color: var(--text-light);
-            line-height: 1.2;
-        }
-
-        .drawer-brand-tagline {
-            font-family: var(--font-sans);
-            font-size: 0.58rem;
-            font-weight: 500;
-            letter-spacing: 0.18em;
-            color: var(--gold);
-            text-transform: uppercase;
-            margin-top: 3px;
-        }
-
-        .drawer-close-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: rgba(201, 169, 110, 0.08);
-            border: 1px solid rgba(201, 169, 110, 0.25);
-            color: var(--text-light);
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-
-        .drawer-close-btn:hover {
-            background: var(--gold);
-            color: var(--bg-dark);
-            border-color: var(--gold-light);
-            box-shadow: 0 0 15px var(--gold-glow);
-            transform: rotate(90deg);
-        }
-
-        /* Nav Links inside Drawer */
-        .drawer-links-wrap {
-            flex: 1 1 auto;
-        }
-
-        .drawer-links-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .drawer-links-list li {
-            width: 100%;
-        }
-
-        .nav-drawer .nav-link {
-            display: flex !important;
-            align-items: center;
-            gap: 16px;
-            padding: 13px 18px !important;
-            border-radius: 12px;
-            text-decoration: none;
-            color: var(--text-light) !important;
-            font-family: var(--font-sans) !important;
-            font-size: 0.95rem !important;
-            font-weight: 500 !important;
-            letter-spacing: 0.04em;
-            text-transform: uppercase !important;
-            background: transparent;
-            border: 1px solid transparent !important;
-            border-bottom: 1px solid transparent !important;
-            transition: all 0.25s ease;
-            cursor: pointer;
-            width: 100%;
-            text-align: left !important;
-            margin: 0 !important;
-        }
-
-        .nav-drawer .nav-link::after {
-            display: none !important;
-        }
-
-        .nav-drawer .nav-link .drawer-link-icon {
-            width: 22px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--gold);
-            font-size: 1.15rem;
-            transition: transform 0.25s ease, color 0.25s ease;
-            flex-shrink: 0;
-        }
-
-        .nav-drawer .nav-link .drawer-link-text {
-            color: inherit;
-            transition: color 0.25s ease;
-        }
-
-        /* Inactive Link Hover */
-        .nav-drawer .nav-link:hover {
-            background: rgba(201, 169, 110, 0.1);
-            color: #ffffff !important;
-            border-color: rgba(201, 169, 110, 0.35) !important;
-            transform: translateX(4px);
-        }
-
-        .nav-drawer .nav-link:hover .drawer-link-icon {
-            transform: scale(1.15);
-            color: var(--gold-light);
-        }
-
-        /* Active Nav Link — signature Jewels by J gold & obsidian highlight */
-        .nav-drawer .nav-link.active {
-            background: linear-gradient(90deg, rgba(201, 169, 110, 0.22) 0%, rgba(201, 169, 110, 0.06) 100%) !important;
-            border: 1px solid var(--gold) !important;
-            border-bottom: 1px solid var(--gold) !important;
-            color: #ffffff !important;
-            font-weight: 600 !important;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(201, 169, 110, 0.12);
-        }
-
-        .nav-drawer .nav-link.active .drawer-link-icon {
-            color: var(--gold-light);
-            filter: drop-shadow(0 0 8px var(--gold-glow));
-        }
-
-        /* Drawer Footer */
-        .drawer-footer {
-            margin-top: auto;
-            padding-top: 18px;
-            border-top: 1px solid rgba(201, 169, 110, 0.18);
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .drawer-contact-info {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .drawer-contact-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--text-light);
-            font-size: 0.86rem;
-            font-family: var(--font-sans);
-            text-decoration: none;
-            transition: color 0.2s ease, transform 0.2s ease;
-        }
-
-        .drawer-contact-row:hover {
-            color: var(--gold-light);
-            transform: translateX(3px);
-        }
-
-        .drawer-contact-icon {
-            width: 20px;
-            color: var(--gold);
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .drawer-contact-text {
-            letter-spacing: 0.02em;
-        }
-
-        /* "Get in Touch" Action Button (Jewels by J signature styling) */
-        .drawer-touch-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            padding: 12px 18px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, rgba(201, 169, 110, 0.15) 0%, rgba(201, 169, 110, 0.04) 100%);
-            border: 1px solid var(--gold);
-            color: var(--text-light);
-            font-family: var(--font-sans);
-            font-size: 0.85rem;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .drawer-touch-btn i {
-            color: var(--gold);
-            font-size: 0.95rem;
-            transition: transform 0.3s ease, color 0.3s ease;
-        }
-
-        .drawer-touch-btn:hover {
-            background: var(--gold);
-            border-color: var(--gold-light);
-            color: var(--bg-dark);
-            box-shadow: 0 4px 18px var(--gold-glow);
-            transform: translateY(-2px);
-        }
-
-        .drawer-touch-btn:hover i {
-            color: var(--bg-dark);
-            transform: translateX(3px) translateY(-2px);
-        }
-
-        /* Social icons in drawer */
-        .drawer-socials {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-top: 4px;
-        }
-
-        .drawer-socials-label {
-            font-family: var(--font-sans);
-            font-size: 0.65rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: var(--text-muted);
-        }
-
-        .drawer-socials-icons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .drawer-socials-icons a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: rgba(201, 169, 110, 0.06);
-            border: 1px solid rgba(201, 169, 110, 0.35);
-            color: var(--gold);
-            font-size: 0.9rem;
-            transition: all 0.25s ease;
-            text-decoration: none;
-        }
-
-        .drawer-socials-icons a:hover {
-            background: var(--gold);
-            color: var(--bg-dark);
-            transform: translateY(-2px);
-            border-color: var(--gold);
-            box-shadow: 0 0 12px var(--gold-glow);
-        }
-
-        /* ── Fix: About/My Story image was rendering smaller than its accent frame ── */
-        .about-visual .image-box {
-            width: 100%;
-        }
-
-        .about-visual .about-img-main {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* ══════════════════════════════════════
-       CONTACT FORM (EmailJS)
-    ══════════════════════════════════════ */
-        .contact-form-card {
-            background: #111;
-            border: 1px solid #c9a96e33;
-            padding: 40px 36px;
-        }
-
-        @media (max-width: 600px) {
-            .contact-form-card {
-                padding: 32px 22px;
-            }
-        }
-
-        .contact-form-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.6rem;
-            color: #f5f0e8;
-            font-weight: 400;
-            margin-bottom: 6px;
-        }
-
-        .contact-form-sub {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.82rem;
-            color: #888;
-            margin-bottom: 28px;
-        }
-
-        .contact-form-row {
-            display: flex;
-            gap: 16px;
-        }
-
-        @media (max-width: 600px) {
-            .contact-form-row {
-                flex-direction: column;
-            }
-        }
-
-        .contact-form-group {
-            margin-bottom: 20px;
-            flex: 1;
-        }
-
-        .contact-form-group label {
-            display: block;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.68rem;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            color: #c9a96e;
-            margin-bottom: 8px;
-        }
-
-        .contact-form-group input,
-        .contact-form-group textarea {
-            width: 100%;
-            background: #0a0a0a;
-            border: 1px solid #c9a96e33;
-            color: #f5f0e8;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.9rem;
-            padding: 12px 14px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .contact-form-group input:focus,
-        .contact-form-group textarea:focus {
-            border-color: #c9a96e;
-        }
-
-        .contact-form-group textarea {
-            resize: vertical;
-            min-height: 130px;
-            font-family: inherit;
-        }
-
-        .contact-form-submit {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: #c9a96e;
-            color: #0a0a0a;
-            border: none;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.78rem;
-            font-weight: 600;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            padding: 14px 32px;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-
-        .contact-form-submit:hover {
-            opacity: 0.88;
-        }
-
-        .contact-form-submit:disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-        }
-
-        .contact-form-status {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.8rem;
-            margin-top: 16px;
-            display: none;
-        }
-
-        .contact-form-status.success {
-            color: #7fd99a;
-            display: block;
-        }
-
-        .contact-form-status.error {
-            color: #e17b7b;
-            display: block;
-        }
-
-        /* ══════════════════════════════════════
-           CUSTOMER CAM CSS
-        ══════════════════════════════════════ */
-        .customer-cam-section {
-            padding-top: 120px;
-            padding-bottom: 80px;
-        }
-
-        .customer-cam-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 26px;
-            margin-top: 40px;
-        }
-
-        .customer-cam-card {
-            background: #111;
-            border: 1px solid rgba(201, 169, 110, 0.25);
-            border-radius: 12px;
-            overflow: hidden;
-            transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .customer-cam-card:hover {
-            transform: translateY(-6px);
-            border-color: rgba(201, 169, 110, 0.75);
-            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 20px rgba(201, 169, 110, 0.2);
-        }
-
-        .customer-cam-media {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 4 / 5;
-            background: #000;
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        .customer-cam-media video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.6s ease;
-        }
-
-        .customer-cam-card:hover .customer-cam-media video {
-            transform: scale(1.03);
-        }
-
-        .cam-badge {
-            position: absolute;
-            top: 14px;
-            left: 14px;
-            background: rgba(10, 10, 10, 0.85);
-            color: #c9a96e;
-            border: 1px solid rgba(201, 169, 110, 0.5);
-            font-size: 0.68rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            padding: 5px 12px;
-            border-radius: 20px;
-            z-index: 3;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            backdrop-filter: blur(6px);
-        }
-
-        .cam-live-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #e63946;
-            box-shadow: 0 0 8px #e63946;
-            animation: pulseDot 1.8s infinite;
-        }
-
-        @keyframes pulseDot {
-            0% {
-                transform: scale(0.9);
-                opacity: 0.7;
-            }
-
-            50% {
-                transform: scale(1.3);
-                opacity: 1;
-            }
-
-            100% {
-                transform: scale(0.9);
-                opacity: 0.7;
-            }
-        }
-
-        .cam-expand-btn {
-            position: absolute;
-            top: 14px;
-            right: 14px;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: rgba(10, 10, 10, 0.75);
-            border: 1px solid rgba(201, 169, 110, 0.4);
-            color: #f5f0e8;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
-            z-index: 3;
-            transition: all 0.25s ease;
-            backdrop-filter: blur(6px);
-            cursor: pointer;
-        }
-
-        .customer-cam-card:hover .cam-expand-btn {
-            background: #c9a96e;
-            color: #0a0a0a;
-            transform: scale(1.1);
-        }
-
-        .cam-play-hint {
-            position: absolute;
-            bottom: 14px;
-            right: 14px;
-            background: rgba(0, 0, 0, 0.75);
-            color: #f5f0e8;
-            border: 1px solid rgba(201, 169, 110, 0.3);
-            border-radius: 20px;
-            padding: 4px 10px;
-            font-size: 0.7rem;
-            letter-spacing: 0.08em;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            z-index: 3;
-            pointer-events: none;
-            backdrop-filter: blur(4px);
-        }
-
-        .customer-cam-body {
-            padding: 20px 22px 24px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-
-        .customer-cam-body h4 {
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 1.35rem;
-            font-weight: 500;
-            color: #f5f0e8;
-            margin-bottom: 6px;
-            letter-spacing: 0.5px;
-        }
-
-        .customer-cam-body p {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.82rem;
-            color: #a39b8d;
-            line-height: 1.5;
-            margin-bottom: 18px;
-            flex-grow: 1;
-        }
-
-        .customer-cam-actions {
-            display: flex;
-            align-items: center;
-            margin-top: auto;
-        }
-
-        .btn-cam-view {
-            width: 100%;
-            padding: 11px 16px;
-            background: transparent;
-            border: 1px solid #c9a96e;
-            color: #c9a96e;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.75rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-cam-view:hover {
-            background: #c9a96e;
-            color: #0a0a0a;
-            box-shadow: 0 4px 15px rgba(201, 169, 110, 0.35);
-        }
-
-        @media (max-width: 768px) {
-            .customer-cam-grid {
-                grid-template-columns: 1fr;
-                gap: 22px;
-            }
-        }
-    </style>
 </head>
 
 <body>
 
-    <!-- ═══════════════════════════════════════
-       HEADER / NAV
-  ════════════════════════════════════════ -->
-    <header class="main-header">
-        <div class="header-container">
-            <div class="header-left">
-                <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu">
-                    <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    <!-- ═══════════════════════════════════════════════════════════════════════
+       1. TOP ANNOUNCEMENT BAR
+       ═══════════════════════════════════════════════════════════════════════ -->
+    <aside class="announcement-bar" role="complementary" aria-label="Store Announcement">
+        <span>Premium Handcrafted Jewelry</span>
+        <span class="gold-dot">•</span>
+        <span>Quality You Can Trust</span>
+        <span class="gold-dot">•</span>
+        <span class="hide-mobile">Delivered to Your Door in Ghana</span>
+    </aside>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+       2. STICKY NAVBAR (BLUSH GLASSMORPHISM)
+       ═══════════════════════════════════════════════════════════════════════ -->
+    <header class="site-header">
+        <div class="container navbar-inner">
+            <div class="nav-left">
+                <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle navigation menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </button>
-                <a href="#" class="logo" onclick="navigateTo('home'); return false;">JEWELS BY J</a>
+                <a href="#" class="nav-brand" data-nav="home">
+                    <img src="images/logo.jpg" alt="Jewels by J Logo" class="nav-logo-img">
+                    <div class="nav-brand-text">
+                        <span class="nav-brand-title">JEWELS BY J</span>
+                        <span class="nav-brand-subtitle">Fine &amp; Bespoke Jewelry</span>
+                    </div>
+                </a>
             </div>
 
-            <div class="header-right">
-                <a href="#" class="logo" onclick="navigateTo('home'); return false;">
-                    <img src="images/logo.jpg" alt="Jewels by J" class="logo-img">
-                </a>
+            <!-- Desktop Links -->
+            <nav class="nav-desktop" aria-label="Primary Navigation">
+                <ul class="nav-links">
+                    <li><a href="#home" class="nav-link active" data-nav="home" data-section="home">Home</a></li>
+                    <li><a href="#shop" class="nav-link" data-nav="shop" data-section="shop" data-category="all">Shop All</a></li>
+                    <li><a href="#shop" class="nav-link" data-nav="shop" data-category="necklaces">Necklaces</a></li>
+                    <li><a href="#shop" class="nav-link" data-nav="shop" data-category="bracelets">Bracelets</a></li>
+                    <li><a href="#shop" class="nav-link" data-nav="shop" data-category="giftsets">Gift Sets</a></li>
+                    <li><a href="#cam" class="nav-link" data-nav="cam" data-section="cam">Client Cam</a></li>
+                    <li><a href="#about" class="nav-link" data-nav="about" data-section="about">About</a></li>
+                    <li><a href="#contact" class="nav-link" data-nav="contact" data-section="contact">Inquiries</a></li>
+                </ul>
+            </nav>
+
+            <!-- Actions (Wishlist & Shopping Bag) -->
+            <div class="nav-actions">
+                <button class="nav-action-btn" id="navSearchTrigger" aria-label="Search Catalog"
+                    onclick="navigateTo('shop'); document.getElementById('shopSearchInput')?.focus();">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+                <button class="nav-action-btn" id="wishlistToggleBtn" aria-label="View Wishlist"
+                    onclick="navigateTo('shop');">
+                    <i class="fa-regular fa-heart"></i>
+                    <span class="badge-count" id="wishlistBadgeCount" style="display:none;">0</span>
+                </button>
+                <button class="nav-action-btn" id="cartToggleBtn" aria-label="Open Shopping Bag">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span class="badge-count" id="cartBadgeCount" style="display:none;">0</span>
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- ═══════════════════════════════════════
-         SIDEBAR NAVIGATION DRAWER (FEATURE)
-    ════════════════════════════════════════ -->
-    <aside class="nav-drawer" id="navMenu" role="dialog" aria-modal="true" aria-label="Main Navigation">
-        <!-- Drawer Header -->
-        <div class="drawer-header">
-            <div class="drawer-brand" onclick="navigateTo('home'); return false;">
-                <img src="images/logo.jpg" alt="Jewels by J" class="drawer-logo-img">
-                <div class="drawer-brand-text">
-                    <span class="drawer-brand-title">Jewels by J</span>
-                    <span class="drawer-brand-tagline">FINE &amp; CUSTOM JEWELRY</span>
+    <!-- ═══════════════════════════════════════════════════════════════════════
+       3. MOBILE NAVIGATION DRAWER
+       ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+    <aside class="mobile-nav-drawer" id="mobileNavDrawer" role="dialog" aria-modal="true" aria-label="Mobile Navigation">
+        <div class="drawer-top">
+            <div class="nav-brand">
+                <img src="images/logo.jpg" alt="Jewels by J" class="nav-logo-img">
+                <div class="nav-brand-text">
+                    <span class="nav-brand-title">JEWELS BY J</span>
+                    <span class="nav-brand-subtitle">Fine &amp; Bespoke Jewelry</span>
                 </div>
             </div>
             <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close menu">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
-
-        <!-- Drawer Links List -->
-        <div class="drawer-links-wrap">
-            <ul class="drawer-links-list">
-                <li>
-                    <a href="#home" class="nav-link active" data-page="home" onclick="navigateTo('home'); return false;">
-                        <span class="drawer-link-icon"><i class="fa-solid fa-house"></i></span>
-                        <span class="drawer-link-text">Home</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#featured" class="nav-link" data-page="featured" onclick="navigateTo('featured'); return false;">
-                        <span class="drawer-link-icon"><i class="fa-solid fa-gem"></i></span>
-                        <span class="drawer-link-text">Featured</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#gallery" class="nav-link" data-page="gallery" onclick="navigateTo('gallery'); return false;">
-                        <span class="drawer-link-icon"><i class="fa-solid fa-images"></i></span>
-                        <span class="drawer-link-text">Gallery</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#customer-cam" class="nav-link" data-page="customer-cam" onclick="navigateTo('customer-cam'); return false;">
-                        <span class="drawer-link-icon"><i class="fa-solid fa-video"></i></span>
-                        <span class="drawer-link-text">Client Cam</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#about" class="nav-link" data-page="about" onclick="navigateTo('about'); return false;">
-                        <span class="drawer-link-icon"><i class="fa-solid fa-circle-info"></i></span>
-                        <span class="drawer-link-text">About Us</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#contact" class="nav-link" data-page="contact" onclick="navigateTo('contact'); return false;">
-                        <span class="drawer-link-icon"><i class="fa-solid fa-envelope"></i></span>
-                        <span class="drawer-link-text">Contact</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Drawer Footer (Contact info, Get in Touch button, Socials) -->
+        <ul class="drawer-menu">
+            <li><a href="#home" class="drawer-menu-link active" data-nav="home">Home <i class="fa-solid fa-chevron-right"></i></a></li>
+            <li><a href="#shop" class="drawer-menu-link" data-nav="shop" data-category="all">Shop All Pieces <i class="fa-solid fa-chevron-right"></i></a></li>
+            <li><a href="#shop" class="drawer-menu-link" data-nav="shop" data-category="necklaces">Nameplate Necklaces <i class="fa-solid fa-chevron-right"></i></a></li>
+            <li><a href="#shop" class="drawer-menu-link" data-nav="shop" data-category="bracelets">Bracelets &amp; Bangles <i class="fa-solid fa-chevron-right"></i></a></li>
+            <li><a href="#shop" class="drawer-menu-link" data-nav="shop" data-category="giftsets">Gift Sets &amp; Keepsakes <i class="fa-solid fa-chevron-right"></i></a></li>
+            <li><a href="#cam" class="drawer-menu-link" data-nav="cam">Client Cam (Videos) <i class="fa-solid fa-chevron-right"></i></a></li>
+            <li><a href="#about" class="drawer-menu-link" data-nav="about">Our Story <i class="fa-solid fa-chevron-right"></i></a></li>
+            <li><a href="#contact" class="drawer-menu-link" data-nav="contact">Private Inquiries <i class="fa-solid fa-chevron-right"></i></a></li>
+        </ul>
         <div class="drawer-footer">
-            <div class="drawer-contact-info">
-                <a href="tel:+233500594879" class="drawer-contact-row">
-                    <span class="drawer-contact-icon"><i class="fa-solid fa-phone"></i></span>
-                    <span class="drawer-contact-text">+233 (0) 50 059 4879</span>
-                </a>
-                <div class="drawer-contact-row">
-                    <span class="drawer-contact-icon"><i class="fa-solid fa-location-dot"></i></span>
-                    <span class="drawer-contact-text">Accra – Ghana</span>
-                </div>
-            </div>
-
-            <button class="drawer-touch-btn" onclick="navigateTo('contact'); return false;">
-                <i class="fa-solid fa-paper-plane"></i>
-                <span>Get in Touch</span>
-            </button>
-
-            <div class="drawer-socials">
-                <span class="drawer-socials-label">Follow Us</span>
-                <div class="drawer-socials-icons">
-                    <a href="https://www.instagram.com/Jewels.with_j" target="_blank" rel="noopener" title="Instagram">
-                        <i class="fa-brands fa-instagram"></i>
-                    </a>
-                    <a href="https://www.tiktok.com/@jewels.by_j4" target="_blank" rel="noopener" title="TikTok">
-                        <i class="fa-brands fa-tiktok"></i>
-                    </a>
-                    <a href="https://www.snapchat.com/add/jerrilyn.mensah" target="_blank" rel="noopener" title="Snapchat">
-                        <i class="fa-brands fa-snapchat"></i>
-                    </a>
-                    <a href="https://wa.me/233500594879" target="_blank" rel="noopener" title="WhatsApp">
-                        <i class="fa-brands fa-whatsapp"></i>
-                    </a>
-                </div>
-            </div>
+            <a href="https://wa.me/233500594879?text=Hello%20Jewels%20by%20J,%20I%20would%20like%20to%20inquire%20about%20your%20jewelry."
+                target="_blank" class="btn btn-whatsapp btn-block">
+                <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
+            </a>
         </div>
     </aside>
 
+    <!-- ═══════════════════════════════════════════════════════════════════════
+       4. MAIN SPA CONTENT CONTAINER
+       ═══════════════════════════════════════════════════════════════════════ -->
     <main>
 
-        <!-- ═══════════════════════════════════════
-         HOME
-    ════════════════════════════════════════ -->
+        <!-- ─────────────────────────────────────────────────────────────────
+           SECTION A: HOME (HERO + CURATIONS + STORY TEASER)
+           ───────────────────────────────────────────────────────────────── -->
         <section id="section-home" class="page-section active">
 
-            <!-- Hero -->
-            <div class="hero">
-                <div class="hero-content">
-                    <span class="hero-subtitle">Jewelry That Defines Your Style.</span>
-                    <h1 class="hero-title">Created for Timeless Moments</h1>
-                    <p class="hero-desc">Discover timeless beauty through our curated selection of handcrafted jewelry
-                        and personalized creations.</p>
-                    <div class="hero-ctas">
-                        <button class="btn btn-primary" onclick="navigateTo('featured')">View Collection</button>
-                        <button class="btn btn-secondary" onclick="navigateTo('customer-cam')"><i
-                                class="fa-solid fa-play" style="margin-right:6px; font-size:0.75rem;"></i> Client
-                            Cam</button>
-                    </div>
-                </div>
-                <div class="scroll-indicator">
-                    <a href="#" onclick="navigateTo('featured'); return false;"><i
-                            class="fa-solid fa-chevron-down"></i></a>
-                </div>
-            </div>
-
-            <!-- Featured preview on home -->
-            <div class="featured-section">
-                <div class="container">
-                    <div class="section-header">
-                        <span class="sub-title">The Seasonal Curations</span>
-                        <h2 class="section-title">Featured Releases</h2>
-                        <div class="accent-line"></div>
-                    </div>
-                    <div class="featured-grid">
-                        <!-- Card 1 -->
-                        <div class="product-card">
-                            <div class="product-img-wrapper">
-                                <img src="images/jerrilyn.jpg" alt="Jerrilyn Duo Butterfly Nameplates"
-                                    class="product-img">
-                            </div>
-                        </div>
-                        <!-- Card 2 -->
-                        <div class="product-card">
-                            <div class="product-img-wrapper">
-                                <img src="images/moesha.jpg" alt="Moesha Royal Rose Cuban Nameplate"
-                                    class="product-img">
-                            </div>
-                        </div>
-                        <!-- Card 3 -->
-                        <div class="product-card">
-                            <div class="product-img-wrapper">
-                                <img src="images/B1.jpg" alt="Selorm Custom Silver Cuban ID Bracelet"
-                                    class="product-img">
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        style="text-align:center; margin-top:40px; display:flex; justify-content:center; gap:16px; flex-wrap:wrap;">
-                        <button class="btn btn-secondary" onclick="navigateTo('gallery')">View Full Gallery</button>
-                        <button class="btn btn-primary" onclick="navigateTo('customer-cam')"><i class="fa-solid fa-film"
-                                style="margin-right:8px;"></i> Watch Client Cam</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Brand teaser -->
-            <div class="about-section" style="padding:80px 0;">
-                <div class="container">
-                    <div class="about-grid">
-                        <div class="about-content">
-                            <span class="sub-title font-gold">My Story</span>
-                            <h2 class="about-title">The Art of Fine Craftsmanship</h2>
-                            <p class="about-text">Jewels by J, founded in 2024, represents a dedication to refined
-                                design and beautifully crafted jewelry made for every moment.</p>
-                            <button class="btn btn-secondary" style="margin-top:28px;"
-                                onclick="navigateTo('about')">Read Our Story</button>
-                        </div>
-                        <div class="about-visual">
-                            <div class="image-box">
-                                <img src="images/logo.jpg" alt="Jewelry Crafting" class="about-img-main">
-                                <div class="image-box-accent"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══════════════════════════════════════
-         FEATURED
-    ════════════════════════════════════════ -->
-        <section id="section-featured" class="page-section">
-            <div class="featured-section" style="padding-top:120px;">
-                <div class="container">
-                    <div class="section-header">
-                        <span class="sub-title">The Seasonal Curations</span>
-                        <h2 class="section-title">Featured Releases</h2>
-                        <div class="accent-line"></div>
-                    </div>
-                    <div class="featured-grid">
-                        <!-- Card 1 -->
-                        <div class="product-card">
-                            <div class="product-img-wrapper">
-                                <img src="images/jerrilyn.jpg" alt="Jerrilyn Duo Butterfly Nameplates"
-                                    class="product-img">
-                            </div>
-                        </div>
-                        <!-- Card 2 -->
-                        <div class="product-card">
-                            <div class="product-img-wrapper">
-                                <img src="images/moesha.jpg" alt="Moesha Royal Rose Cuban Nameplate"
-                                    class="product-img">
-                            </div>
-                        </div>
-                        <!-- Card 3 -->
-                        <div class="product-card">
-                            <div class="product-img-wrapper">
-                                <img src="images/B1.jpg" alt="Selorm Custom Silver Cuban ID Bracelet"
-                                    class="product-img">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══════════════════════════════════════
-         GALLERY
-    ════════════════════════════════════════ -->
-        <section id="section-gallery" class="page-section">
-            <div class="gallery-section" style="padding-top:120px;">
-                <div class="container">
-                    <div class="section-header">
-                        <span class="sub-title">Exquisite Artistry</span>
-                        <h2 class="section-title">The Gallery</h2>
-                        <div class="accent-line"></div>
-                    </div>
-
-                    <div class="gallery-filters">
-                        <button class="filter-btn active" data-filter="all">All Designs</button>
-                        <button class="filter-btn" data-filter="necklaces">Necklaces</button>
-                        <button class="filter-btn" data-filter="bracelets">Bracelets</button>
-                        <button class="filter-btn" data-filter="giftsets">Gift Sets</button>
-                    </div>
-
-                    <div class="gallery-grid">
-
-                        <!-- ════════════════ NECKLACES CATEGORY ════════════════ -->
-                        <!-- 1. Jerrilyn Duo Butterfly Nameplates -->
-                        <div class="gallery-item" data-category="necklaces"
-                            data-detail='{"tag":"Necklaces","title":"Jerrilyn Duo Butterfly Nameplates","meta":"Sterling Silver & 18k Gold Plated / Cursive Script","desc":"Bespoke duo nameplate necklaces in classic cursive calligraphy script, crowned with radiant butterfly accent charms. Handcrafted in luminous 18k gold plate and 925 sterling silver.","price":"Bespoke","img":"images/jerrilyn.jpg","wa":"Hi Jewels by J, I would like to order the Jerrilyn Duo Butterfly Nameplates."}'>
-                            <img src="images/jerrilyn.jpg" alt="Jerrilyn Duo Butterfly Nameplates">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 2. Moesha Royal Rose Cuban Nameplate -->
-                        <div class="gallery-item" data-category="necklaces"
-                            data-detail='{"tag":"Necklaces","title":"Moesha Royal Rose Cuban Nameplate","meta":"18k Heavy Gold Vermeil / Cuban Curb Chain","desc":"A commanding statement piece pairing a bold Cuban curb chain with a custom cursive nameplate, adorned with a royal crown, rose motif, and heart accent.","price":"Bespoke","img":"images/moesha.jpg","wa":"Hi Jewels by J, I would like to order the Moesha Royal Rose Cuban Nameplate."}'>
-                            <img src="images/moesha.jpg" alt="Moesha Royal Rose Cuban Nameplate">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 3. Custom Butterfly Trio Nameplates -->
-                        <div class="gallery-item" data-category="necklaces"
-                            data-detail='{"tag":"Necklaces","title":"Custom Butterfly Trio Nameplates","meta":"14k Gold Vermeil / Cable Chain","desc":"Handcrafted trio of personalized cursive nameplates (Aimee, Sophia, Megan) featuring cutout butterfly accents that catch light at every angle.","price":"Bespoke","img":"images/hand.jpg","wa":"Hi Jewels by J, I would like to order the Custom Butterfly Trio Nameplates."}'>
-                            <img src="images/hand.jpg" alt="Custom Butterfly Trio Nameplates">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 4. Kimberly Signature Script Necklace -->
-                        <div class="gallery-item" data-category="necklaces"
-                            data-detail='{"tag":"Necklaces","title":"Kimberly Signature Script Necklace","meta":"18k Gold Plated / Fine Link Chain","desc":"Clean, timeless cursive script crafted with silky rounded edges and mirror polish. An everyday luxury essential created for effortless layering.","price":"Bespoke","img":"images/kimberry.jpg","wa":"Hi Jewels by J, I would like to order the Kimberly Signature Script Necklace."}'>
-                            <img src="images/kimberry.jpg" alt="Kimberly Signature Script Necklace">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 5. Regina Butterfly Charm Script Necklace -->
-                        <div class="gallery-item" data-category="necklaces"
-                            data-detail='{"tag":"Necklaces","title":"Regina Butterfly Charm Script Necklace","meta":"18k Gold Plated / Stylized Cursive","desc":"Custom stylized calligraphy script paired with a delicate gold butterfly charm at the end flourish. A sweet and personal everyday treasure.","price":"Bespoke","img":"images/regina.jpg","wa":"Hi Jewels by J, I would like to order the Regina Butterfly Charm Necklace."}'>
-                            <img src="images/regina.jpg" alt="Regina Butterfly Charm Script Necklace">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 6. Golden Initial 'A' Pendant -->
-                        <div class="gallery-item" data-category="necklaces"
-                            data-detail='{"tag":"Necklaces","title":"Golden Initial \"A\" Pendant","meta":"14k Gold Vermeil / Cable Chain","desc":"A sleek cable chain necklace suspending a solid gold initial charm — a minimalist, personal emblem cast individually and finished by hand.","price":"Bespoke","img":"images/A1.jpg","wa":"Hi Jewels by J, I am interested in the Golden Initial Pendant."}'>
-                            <img src="images/A1.jpg" alt="Golden Initial A Pendant">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 7. Butterfly Monogram Initial Pendant -->
-                        <div class="gallery-item" data-category="necklaces"
-                            data-detail='{"tag":"Necklaces","title":"Butterfly Monogram Initial Pendant","meta":"14k Gold Vermeil / Butterfly & Letter Charm","desc":"A whimsical combination of an elegant serif initial charm and a delicate fluttering butterfly silhouette, draped along the collarbone.","price":"Bespoke","img":"images/A2.jpg","wa":"Hi Jewels by J, I am interested in the Butterfly Monogram Initial Pendant."}'>
-                            <img src="images/A2.jpg" alt="Butterfly Monogram Initial Pendant">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 8. Family Heritage Tiered Heart Nameplate Necklace -->
-                        <div class="gallery-item" data-category="necklaces"
-                            data-detail='{"tag":"Necklaces","title":"Family Heritage Tiered Heart Nameplate Necklace","meta":"18k Gold Plated / Heart-Linked Vertical Names","desc":"A meaningful multi-name heirloom necklace linking beloved family names with radiant heart connectors, suspended from a delicate polished gold chain.","price":"Bespoke","img":"images/box.jpg","wa":"Hi Jewels by J, I would like to order the Family Heritage Tiered Heart Nameplate Necklace."}'>
-                            <img src="images/box.jpg" alt="Family Heritage Tiered Heart Nameplate Necklace">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 9. Bridget Ribbon Bow Accent Nameplate Necklace -->
-                        <div class="gallery-item" data-category="necklaces"
-                            data-detail='{"tag":"Necklaces","title":"Bridget Ribbon Bow Accent Nameplate Necklace","meta":"18k Gold Plated / Classic Link Chain","desc":"Custom cursive calligraphy script accented with a delicate sculpted ribbon bow charm at the flourish. Hand-polished to an opulent mirror glow.","price":"Bespoke","img":"images/bri.jpg","wa":"Hi Jewels by J, I would like to order the Bridget Ribbon Bow Accent Nameplate Necklace."}'>
-                            <img src="images/bri.jpg" alt="Bridget Ribbon Bow Accent Nameplate Necklace">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 10. Cathy Signature Flourish Script Necklace -->
-                        <div class="gallery-item" data-category="necklaces"
-                            data-detail='{"tag":"Necklaces","title":"Cathy Signature Flourish Script Necklace","meta":"18k Gold Plated / Cable Link Chain","desc":"Dramatic fluid calligraphy script featuring sweeping oversized loop flourishes and clean modern silhouettes. An expressive bespoke centerpiece.","price":"Bespoke","img":"images/cat.jpg","wa":"Hi Jewels by J, I would like to order the Cathy Signature Flourish Script Necklace."}'>
-                            <img src="images/cat.jpg" alt="Cathy Signature Flourish Script Necklace">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 11. Empress Blooming Rose Script Necklace -->
-                        <div class="gallery-item" data-category="necklaces"
-                            data-detail='{"tag":"Necklaces","title":"Empress Blooming Rose Script Necklace","meta":"18k Gold Plated / Fine Oval Link Chain","desc":"Regal cursive typography spelling Empress crowned with an intricately detailed blooming rose blossom charm. Designed for effortless everyday royalty.","price":"Bespoke","img":"images/emp.jpg","wa":"Hi Jewels by J, I would like to order the Empress Blooming Rose Script Necklace."}'>
-                            <img src="images/emp.jpg" alt="Empress Blooming Rose Script Necklace">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 12. Pulse of Love EKG & Cutout Heart Necklace -->
-                        <div class="gallery-item" data-category="necklaces"
-                            data-detail='{"tag":"Necklaces","title":"Pulse of Love EKG & Cutout Heart Necklace","meta":"18k Gold Plated / Cable Chain & Floating Heart Accent","desc":"A contemporary celebration of love featuring a rhythmic heartbeat lifeline pulse pendant and an asymmetrical floating open heart charm along the chain.","price":"Bespoke","img":"images/heart.jpg","wa":"Hi Jewels by J, I would like to order the Pulse of Love Heartbeat Necklace."}'>
-                            <img src="images/heart.jpg" alt="Pulse of Love EKG & Cutout Heart Necklace">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 13. Naomi Sweetheart Crescent Frame Necklace -->
-                        <div class="gallery-item" data-category="necklaces"
-                            data-detail='{"tag":"Necklaces","title":"Naomi Sweetheart Crescent Frame Necklace","meta":"18k Gold Plated / Delicate Link Chain","desc":"Fluid bespoke cursive script nestled gracefully within a sweeping heart crescent outline. A tender, romantic silhouette crafted in high-shine 18k gold plate.","price":"Bespoke","img":"images/nam.jpg","wa":"Hi Jewels by J, I would like to order the Naomi Sweetheart Crescent Frame Necklace."}'>
-                            <img src="images/nam.jpg" alt="Naomi Sweetheart Crescent Frame Necklace">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- ════════════════ BRACELETS CATEGORY ════════════════ -->
-                        <!-- 14. Selorm Personalized Cuban ID Bracelet -->
-                        <div class="gallery-item" data-category="bracelets"
-                            data-detail='{"tag":"Bracelets","title":"Selorm Personalized Cuban ID Bracelet","meta":"Stainless Steel / Polished Cuban Curb Link","desc":"Sturdy and refined Cuban curb link bracelet centered with a gently curved identification plate, laser engraved with custom name or personal date.","price":"Bespoke","img":"images/B1.jpg","wa":"Hi Jewels by J, I would like to order the Selorm Custom Cuban ID Bracelet."}'>
-                            <img src="images/B1.jpg" alt="Selorm Personalized Cuban ID Bracelet">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 15. Jubilee Link Custom Nameplate Bracelets -->
-                        <div class="gallery-item" data-category="bracelets"
-                            data-detail='{"tag":"Bracelets","title":"Jubilee Link Custom Nameplate Bracelets","meta":"High-Grade Stainless Steel / Laser Engraved","desc":"Iconic five-link Jubilee band with a seamless integrated nameplate bar (Akua, Nana Yaa, Abena, Gina). Durable, tarnish-free, and effortlessly luxurious.","price":"Bespoke","img":"images/B2.jpg","wa":"Hi Jewels by J, I would like to order the Jubilee Link Custom Nameplate Bracelet."}'>
-                            <img src="images/B2.jpg" alt="Jubilee Link Custom Nameplate Bracelets">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 16. Gina Classic Jubilee Nameplate Bracelet -->
-                        <div class="gallery-item" data-category="bracelets"
-                            data-detail='{"tag":"Bracelets","title":"Gina Classic Jubilee Nameplate Bracelet","meta":"Stainless Steel / Jubilee Wristwatch-Style Link","desc":"Sophisticated wristwatch-style jubilee bracelet featuring a polished custom nameplate. Perfect standalone statement piece or stacked with a timepiece.","price":"Bespoke","img":"images/C2.jpg","wa":"Hi Jewels by J, I would like to order the Classic Jubilee Nameplate Bracelet."}'>
-                            <img src="images/C2.jpg" alt="Gina Classic Jubilee Nameplate Bracelet">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 17. Dainty Script Trio Nameplate Bracelets -->
-                        <div class="gallery-item" data-category="bracelets"
-                            data-detail='{"tag":"Bracelets","title":"Dainty Script Trio Nameplate Bracelets","meta":"18k Gold Plated / Fine Box Chain","desc":"An ultra-delicate trio of personalized nameplate chain bracelets (Brooklyn, Sophia, Olivia) rendered in refined cursive script with a luminous mirror finish.","price":"Bespoke","img":"images/bet.jpg","wa":"Hi Jewels by J, I would like to order the Dainty Script Trio Nameplate Bracelets."}'>
-                            <img src="images/bet.jpg" alt="Dainty Script Trio Nameplate Bracelets">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- ════════════════ GIFT SETS CATEGORY ════════════════ -->
-                        <!-- 18. Casio Timepiece & Engraved Bracelet Set -->
-                        <div class="gallery-item" data-category="giftsets"
-                            data-detail='{"tag":"Gift Sets","title":"Casio Timepiece & Engraved Bracelet Set","meta":"Black Ion-Plated Casio + Personalized Link Bracelet","desc":"Exclusive gentleman presentation gift box. Includes a black ion-plated Casio square-dial watch paired with a custom engraved link bracelet (Kwaku) and JBJ luxury card.","price":"Complete Set","img":"images/C1.jpg","wa":"Hi Jewels by J, I would like to order the Casio Watch & Engraved Bracelet Gift Set."}'>
-                            <img src="images/C1.jpg" alt="Casio Timepiece & Engraved Bracelet Set">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 19. The Kiki Luxury 3-Piece Gift Set -->
-                        <div class="gallery-item" data-category="giftsets"
-                            data-detail='{"tag":"Gift Sets","title":"The Kiki Luxury 3-Piece Gift Set","meta":"Casio Watch + Engraved Bracelet + Butterfly Necklace","desc":"The complete luxury gifting experience: matching custom-engraved Casio timepiece, personalized link bracelet, and butterfly nameplate pendant in a deluxe gift box.","price":"Complete Set","img":"images/ggift.jpg","wa":"Hi Jewels by J, I would like to order the Kiki Luxury 3-Piece Gift Set."}'>
-                            <img src="images/ggift.jpg" alt="The Kiki Luxury 3-Piece Gift Set">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 20. The Jannyfer Cuban Set: Necklace & Bracelet -->
-                        <div class="gallery-item" data-category="giftsets"
-                            data-detail='{"tag":"Gift Sets","title":"The Jannyfer Cuban Set: Necklace & Bracelet","meta":"18k Gold Plated / Cuban Chain & Script Nameplates","desc":"A deluxe matching 2-piece set featuring a personalized cursive nameplate necklace paired with a matching Cuban link ID bracelet with mini heart charm, presented in a luxury gift box.","price":"Complete Set","img":"images/jan.jpg","wa":"Hi Jewels by J, I would like to order the Jannyfer Cuban Necklace & Bracelet Gift Set."}'>
-                            <img src="images/jan.jpg" alt="The Jannyfer Cuban Set: Necklace & Bracelet">
-                            <div class="gallery-overlay">
-                                <div class="overlay-content">
-                                    <span class="view-detail-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        Bigger View</span>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div><!-- /gallery-grid -->
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══════════════════════════════════════
-           CLIENT CAM (Dedicated Video Showcase)
-        ════════════════════════════════════════ -->
-        <section id="section-customer-cam" class="page-section">
-            <div class="customer-cam-section">
-                <div class="container">
-                    <div class="section-header">
-                        <span class="sub-title"><span class="cam-live-dot"
-                                style="display:inline-block; vertical-align:middle; margin-right:6px;"></span>Live &amp;
-                            Unfiltered</span>
-                        <h2 class="section-title">Client Cam</h2>
-                        <div class="accent-line"></div>
-                        <p class="section-subtitle-desc"
-                            style="max-width: 650px; margin: 16px auto 0; color: #a0988a; font-size: 0.95rem; text-align: center; line-height: 1.6;">
-                            Real moments, real clients, and raw sparkle. Watch our handcrafted jewelry and personalized
-                            nameplates in motion. Tap any clip to play in full view.
+            <!-- Hero Section (Strand Brand Aesthetic) -->
+            <div class="hero-section">
+                <div class="container hero-grid">
+                    <div class="hero-content">
+                        <span class="hero-tag"><i class="fa-solid fa-sparkles"></i> Handcrafted Atelier in Ghana</span>
+                        <h1 class="hero-heading">Hi Beautiful,</h1>
+                        <span class="hero-heading-script">Your Signature Look Starts Here!</span>
+                        <p class="hero-desc">
+                            Discover exquisite bespoke nameplates, initial pendants, and handcrafted jewelry designed to
+                            celebrate your unique story with timeless elegance.
                         </p>
+                        <div class="hero-ctas">
+                            <button class="btn btn-primary" data-nav="shop" data-category="all">
+                                <i class="fa-solid fa-bag-shopping"></i> Shop All Pieces
+                            </button>
+                            <button class="btn btn-outline" data-nav="cam">
+                                <i class="fa-solid fa-play"></i> Watch Client Cam
+                            </button>
+                        </div>
+                    </div>
+                    <div class="hero-visual">
+                        <div class="hero-image-frame">
+                            <img src="images/jerrilyn.jpg" alt="Jerrilyn Duo Butterfly Nameplates">
+                            <div class="hero-badge-floating">
+                                <i class="fa-solid fa-gem"></i>
+                                <div>
+                                    <div class="hero-badge-title">100% Conflict-Free</div>
+                                    <div class="hero-badge-sub">Quality You Can Trust</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trust Bar -->
+            <div class="trust-bar">
+                <div class="container trust-grid">
+                    <div class="trust-item">
+                        <div class="trust-icon"><i class="fa-solid fa-truck-fast"></i></div>
+                        <div>
+                            <div class="trust-title">Nationwide Delivery</div>
+                            <div class="trust-sub">Prompt delivery across all 16 regions in Ghana</div>
+                        </div>
+                    </div>
+                    <div class="trust-item">
+                        <div class="trust-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                        <div>
+                            <div class="trust-title">Custom &amp; Bespoke</div>
+                            <div class="trust-sub">Hand-finished calligraphy &amp; custom engraving</div>
+                        </div>
+                    </div>
+                    <div class="trust-item">
+                        <div class="trust-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                        <div>
+                            <div class="trust-title">Certified Craftsmanship</div>
+                            <div class="trust-sub">Solid silver &amp; heavy 18k gold vermeil</div>
+                        </div>
+                    </div>
+                    <div class="trust-item">
+                        <div class="trust-icon"><i class="fa-brands fa-whatsapp"></i></div>
+                        <div>
+                            <div class="trust-title">WhatsApp Concierge</div>
+                            <div class="trust-sub">Personal styling &amp; instant order support</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Curated Bestsellers Preview -->
+            <div class="shop-section" style="padding-bottom: 40px;">
+                <div class="container">
+                    <div class="shop-header">
+                        <span class="shop-eyebrow">The Seasonal Curations</span>
+                        <h2 class="shop-title">Featured Releases</h2>
+                        <p class="shop-subtitle">Most adored by our cherished clientele</p>
                     </div>
 
-                    <div class="customer-cam-grid">
-
-                        <!-- 1. missj.MOV -->
-                        <div class="customer-cam-card">
-                            <div class="customer-cam-media"
-                                onclick='openLightbox({"title":"Miss J Master Cut Ring","tag":"Client Cam • Signature Ring","desc":"Client hand preview showcasing the brilliant cushion-cut solitaire ring in movement.","video":"videos/missj.MOV"})'>
-                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
-                                    <source src="videos/missj.MOV" type="video/quicktime">
-                                    <source src="videos/missj.MOV" type="video/mp4">
-                                </video>
-                                <span class="cam-badge"><span class="cam-live-dot"></span> Client Cam</span>
-                                <button class="cam-expand-btn" aria-label="Expand video"><i
-                                        class="fa-solid fa-expand"></i></button>
-                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
+                    <!-- 4 Highlight Cards -->
+                    <div class="product-grid" style="margin-bottom: 40px;">
+                        <!-- Card 1 -->
+                        <div class="product-card">
+                            <div class="product-card-image" onclick="openQuickView('p1')">
+                                <img src="images/jerrilyn.jpg" alt="Jerrilyn Duo Butterfly Nameplates">
+                                <div class="product-card-badges"><span class="badge badge-bestseller">Bestseller</span></div>
+                                <button class="wishlist-btn" onclick="toggleWishlist('p1', event)"><i class="fa-regular fa-heart"></i></button>
+                                <button class="quick-view-overlay-btn"><i class="fa-regular fa-eye"></i> Quick View</button>
+                            </div>
+                            <div class="product-card-body">
+                                <span class="product-card-category">Nameplate Necklaces</span>
+                                <h3 class="product-card-title" onclick="openQuickView('p1')">Jerrilyn Duo Butterfly Nameplates</h3>
+                                <div class="product-card-price-row">
+                                    <span class="price-current">GH₵ 380.00</span>
+                                    <span class="price-original">GH₵ 420.00</span>
+                                </div>
+                                <div class="product-card-actions">
+                                    <button class="btn-card-add" onclick="quickAddToCart('p1')"><i class="fa-solid fa-bag-shopping"></i> Add to Bag</button>
+                                    <button class="btn-card-wa" onclick="orderItemDirectWhatsApp('p1')"><i class="fa-brands fa-whatsapp"></i></button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 2. asante.MOV -->
-                        <div class="customer-cam-card">
-                            <div class="customer-cam-media"
-                                onclick='openLightbox({"title":"Asante Heritage Signet Ring","tag":"Client Cam • Heritage Ring","desc":"Live client capture of the hand-engraved Ghanaian royal crest signet ring in 18k gold plate.","video":"videos/asante.MOV"})'>
-                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
-                                    <source src="videos/asante.MOV" type="video/quicktime">
-                                    <source src="videos/asante.MOV" type="video/mp4">
-                                </video>
-                                <span class="cam-badge"><span class="cam-live-dot"></span> Client Cam</span>
-                                <button class="cam-expand-btn" aria-label="Expand video"><i
-                                        class="fa-solid fa-expand"></i></button>
-                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
+                        <!-- Card 2 -->
+                        <div class="product-card">
+                            <div class="product-card-image" onclick="openQuickView('p2')">
+                                <img src="images/moesha.jpg" alt="Moesha Royal Rose Cuban Nameplate">
+                                <div class="product-card-badges"><span class="badge badge-bestseller">Bestseller</span></div>
+                                <button class="wishlist-btn" onclick="toggleWishlist('p2', event)"><i class="fa-regular fa-heart"></i></button>
+                                <button class="quick-view-overlay-btn"><i class="fa-regular fa-eye"></i> Quick View</button>
+                            </div>
+                            <div class="product-card-body">
+                                <span class="product-card-category">Nameplate Necklaces</span>
+                                <h3 class="product-card-title" onclick="openQuickView('p2')">Moesha Royal Rose Cuban Nameplate</h3>
+                                <div class="product-card-price-row">
+                                    <span class="price-current">GH₵ 420.00</span>
+                                </div>
+                                <div class="product-card-actions">
+                                    <button class="btn-card-add" onclick="quickAddToCart('p2')"><i class="fa-solid fa-bag-shopping"></i> Add to Bag</button>
+                                    <button class="btn-card-wa" onclick="orderItemDirectWhatsApp('p2')"><i class="fa-brands fa-whatsapp"></i></button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 3. gift4.MP4 -->
-                        <div class="customer-cam-card">
-                            <div class="customer-cam-media"
-                                onclick='openLightbox({"title":"Royal Crown Pavé Eternity Band","tag":"Client Cam • Stacking Ring","desc":"Micro-pavé contoured crown eternity band catching the light from every angle.","video":"videos/gift4.MP4"})'>
-                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
-                                    <source src="videos/gift4.MP4" type="video/mp4">
-                                </video>
-                                <span class="cam-badge"><span class="cam-live-dot"></span> Client Cam</span>
-                                <button class="cam-expand-btn" aria-label="Expand video"><i
-                                        class="fa-solid fa-expand"></i></button>
-                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
+                        <!-- Card 3 -->
+                        <div class="product-card">
+                            <div class="product-card-image" onclick="openQuickView('p8')">
+                                <img src="images/B1.jpg" alt="Selorm Custom Silver Cuban ID Bracelet">
+                                <div class="product-card-badges"><span class="badge badge-bestseller">Bestseller</span></div>
+                                <button class="wishlist-btn" onclick="toggleWishlist('p8', event)"><i class="fa-regular fa-heart"></i></button>
+                                <button class="quick-view-overlay-btn"><i class="fa-regular fa-eye"></i> Quick View</button>
+                            </div>
+                            <div class="product-card-body">
+                                <span class="product-card-category">Bracelets &amp; Bangles</span>
+                                <h3 class="product-card-title" onclick="openQuickView('p8')">Selorm Custom Silver Cuban ID Bracelet</h3>
+                                <div class="product-card-price-row">
+                                    <span class="price-current">GH₵ 390.00</span>
+                                </div>
+                                <div class="product-card-actions">
+                                    <button class="btn-card-add" onclick="quickAddToCart('p8')"><i class="fa-solid fa-bag-shopping"></i> Add to Bag</button>
+                                    <button class="btn-card-wa" onclick="orderItemDirectWhatsApp('p8')"><i class="fa-brands fa-whatsapp"></i></button>
+                                </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- 4. vid1.MP4 -->
-                        <div class="customer-cam-card">
-                            <div class="customer-cam-media"
-                                onclick='openLightbox({"title":"Double Strand South Sea Pearls","tag":"Client Cam • Fine Necklaces","desc":"Lustrous double strand of South Sea pearls with handcrafted gold filigree clasp.","video":"videos/vid1.MP4"})'>
-                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
-                                    <source src="videos/vid1.MP4" type="video/mp4">
-                                </video>
-                                <span class="cam-badge"><span class="cam-live-dot"></span> Client Cam</span>
-                                <button class="cam-expand-btn" aria-label="Expand video"><i
-                                        class="fa-solid fa-expand"></i></button>
-                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
-                            </div>
-                        </div>
+                    <div style="text-align: center;">
+                        <button class="btn btn-outline" data-nav="shop" data-category="all" style="padding: 14px 44px;">
+                            View Full Shop Collection <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-                        <!-- 5. gift3.MOV -->
-                        <div class="customer-cam-card">
-                            <div class="customer-cam-media"
-                                onclick='openLightbox({"title":"Graceful Emerald Solitaire Chain","tag":"Client Cam • Solitaire Pendant","desc":"Vibrant Colombian emerald cut pendant suspended on diamond-cut gold cable chain.","video":"videos/gift3.MOV"})'>
-                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
-                                    <source src="videos/gift3.MOV" type="video/quicktime">
-                                    <source src="videos/gift3.MOV" type="video/mp4">
-                                </video>
-                                <span class="cam-badge"><span class="cam-live-dot"></span> Client Cam</span>
-                                <button class="cam-expand-btn" aria-label="Expand video"><i
-                                        class="fa-solid fa-expand"></i></button>
-                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
-                            </div>
-                        </div>
-
-                        <!-- 6. gift1.MP4 -->
-                        <div class="customer-cam-card">
-                            <div class="customer-cam-media"
-                                onclick='openLightbox({"title":"Golden Elegance Gift Set","tag":"Client Cam • Unboxing Video","desc":"Client unboxing of our curated milestone celebration pendant and drop chain collection.","video":"videos/gift1.MP4"})'>
-                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
-                                    <source src="videos/gift1.MP4" type="video/mp4">
-                                </video>
-                                <span class="cam-badge"><span class="cam-live-dot"></span> Client Cam</span>
-                                <button class="cam-expand-btn" aria-label="Expand video"><i
-                                        class="fa-solid fa-expand"></i></button>
-                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
-                            </div>
-                        </div>
-
-                        <!-- 7. her eyes.MOV -->
-                        <div class="customer-cam-card">
-                            <div class="customer-cam-media"
-                                onclick='openLightbox({"title":"Eyes of Desire Talisman Pendant","tag":"Client Cam • Custom Talisman","desc":"Alluring blue sapphire and halo diamond protective eye talisman necklace in motion.","video":"videos/her eyes.MOV"})'>
-                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
-                                    <source src="videos/her eyes.MOV" type="video/quicktime">
-                                    <source src="videos/her eyes.MOV" type="video/mp4">
-                                </video>
-                                <span class="cam-badge"><span class="cam-live-dot"></span> Client Cam</span>
-                                <button class="cam-expand-btn" aria-label="Expand video"><i
-                                        class="fa-solid fa-expand"></i></button>
-                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
-                            </div>
-                        </div>
-
-                        <!-- 8. gift2.MP4 -->
-                        <div class="customer-cam-card">
-                            <div class="customer-cam-media"
-                                onclick='openLightbox({"title":"Luminous Chandelier Drops","tag":"Client Cam • Statement Drops","desc":"Sparkle test video of our cascading crystal drop earrings designed for gala evenings.","video":"videos/gift2.MP4"})'>
-                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
-                                    <source src="videos/gift2.MP4" type="video/mp4">
-                                </video>
-                                <span class="cam-badge"><span class="cam-live-dot"></span> Client Cam</span>
-                                <button class="cam-expand-btn" aria-label="Expand video"><i
-                                        class="fa-solid fa-expand"></i></button>
-                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
-                            </div>
-                        </div>
-
-                        <!-- 9. vid2.MOV -->
-                        <div class="customer-cam-card">
-                            <div class="customer-cam-media"
-                                onclick='openLightbox({"title":"Aurelia Micro-Pavé Bangle","tag":"Client Cam • Wrist Stack","desc":"18k gold bangle embellished with brilliant micro-pavé diamonds on client wrist.","video":"videos/vid2.MOV"})'>
-                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
-                                    <source src="videos/vid2.MOV" type="video/quicktime">
-                                    <source src="videos/vid2.MOV" type="video/mp4">
-                                </video>
-                                <span class="cam-badge"><span class="cam-live-dot"></span> Client Cam</span>
-                                <button class="cam-expand-btn" aria-label="Expand video"><i
-                                        class="fa-solid fa-expand"></i></button>
-                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
-                            </div>
-                        </div>
-
-                        <!-- 10. bf bracelet.MP4 -->
-                        <div class="customer-cam-card">
-                            <div class="customer-cam-media"
-                                onclick='openLightbox({"title":"Butterfly Gold Charm Bracelet","tag":"Client Cam • Charm Bracelet","desc":"Hand-finished 14k gold butterfly charms fluttering effortlessly on client wrist.","video":"videos/bf bracelet.MP4"})'>
-                                <video class="cam-video" autoplay loop muted playsinline preload="metadata">
-                                    <source src="videos/bf bracelet.MP4" type="video/mp4">
-                                </video>
-                                <span class="cam-badge"><span class="cam-live-dot"></span> Client Cam</span>
-                                <button class="cam-expand-btn" aria-label="Expand video"><i
-                                        class="fa-solid fa-expand"></i></button>
-                                <span class="cam-play-hint"><i class="fa-solid fa-play"></i> Watch Full</span>
-                            </div>
-                        </div>
-
+            <!-- Founder & Story Teaser -->
+            <div class="about-section" style="border-top: 1px solid var(--color-border); background: var(--color-surface-soft);">
+                <div class="container about-grid">
+                    <div class="about-content">
+                        <span class="shop-eyebrow">The Atelier</span>
+                        <h2 class="about-heading">The Story Behind Jewels by J</h2>
+                        <p class="about-text">
+                            Founded in 2024 by Jerrilyn Mensah, Jewels by J was born from a deep devotion to wearable memoirs.
+                            We believe fine jewelry should never be ordinary — every curve, link, and letter represents a milestone,
+                            a loved one, or a declaration of self-love.
+                        </p>
+                        <p class="about-text">
+                            From custom nameplates engraved in solid sterling silver to lustrous 18k gold vermeil Cuban chains,
+                            each creation is brought to life with meticulous attention to detail.
+                        </p>
+                        <button class="btn btn-primary" data-nav="about" style="margin-top: 14px;">
+                            Read Founder's Story
+                        </button>
+                    </div>
+                    <div class="about-img-box">
+                        <img src="images/logo.jpg" alt="Jewels by J Founder Story">
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ═══════════════════════════════════════
-         PIECE DETAIL  (navigated to via gallery)
-    ════════════════════════════════════════ -->
-        <section id="section-detail" class="page-section">
-            <div class="container">
-                <button class="detail-back-btn" onclick="navigateTo('gallery')">
-                    <i class="fa-solid fa-arrow-left"></i> Back to Gallery
-                </button>
-                <div class="detail-grid">
-                    <div class="detail-img-wrap">
-                        <img src="" alt="" id="detailImg">
-                        <div class="detail-img-accent"></div>
+        <!-- ─────────────────────────────────────────────────────────────────
+           SECTION B: SHOP CATALOG (MATCHES THE STRAND BRAND /shop)
+           ───────────────────────────────────────────────────────────────── -->
+        <section id="section-shop" class="page-section">
+            <div class="shop-section">
+                <div class="container">
+                    <!-- Shop Heading -->
+                    <div class="shop-header">
+                        <span class="shop-eyebrow">Atelier Collection</span>
+                        <h2 class="shop-title" id="shopCurrentTitle">All Pieces</h2>
+                        <p class="shop-subtitle">Find a piece that speaks to your story</p>
                     </div>
-                    <div class="detail-info">
-                        <span class="detail-tag" id="detailTag"></span>
-                        <h1 class="detail-title" id="detailTitle"></h1>
-                        <p class="detail-meta" id="detailMeta"></p>
-                        <div class="detail-divider"></div>
-                        <p class="detail-desc" id="detailDesc"></p>
+
+                    <!-- 2-Column Responsive Layout -->
+                    <div class="shop-layout">
+                        <!-- Left Desktop Sidebar Filters -->
+                        <aside class="shop-sidebar" aria-label="Catalog Filters">
+                            <div class="filter-group">
+                                <h3 class="filter-heading">Categories</h3>
+                                <ul class="category-filter-list">
+                                    <li>
+                                        <button class="category-filter-btn active" data-cat="all">
+                                            <span>All Designs</span>
+                                            <span class="category-count">21</span>
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="category-filter-btn" data-cat="necklaces">
+                                            <span>Nameplate Necklaces</span>
+                                            <span class="category-count">15</span>
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="category-filter-btn" data-cat="bracelets">
+                                            <span>Bracelets &amp; Bangles</span>
+                                            <span class="category-count">4</span>
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="category-filter-btn" data-cat="giftsets">
+                                            <span>Gift Sets &amp; Boxes</span>
+                                            <span class="category-count">2</span>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="filter-group">
+                                <h3 class="filter-heading">Metal &amp; Finish</h3>
+                                <p style="font-size: 0.82rem; color: var(--color-text-muted); line-height: 1.6;">
+                                    Crafted with heavy 18K Gold Vermeil, 925 Sterling Silver, and premium tarnish-resistant coating.
+                                </p>
+                            </div>
+
+                            <div class="filter-group" style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--color-border);">
+                                <h3 class="filter-heading">Bespoke Inquiry</h3>
+                                <p style="font-size: 0.82rem; color: var(--color-text-muted); margin-bottom: 14px;">
+                                    Looking for a unique custom font, stone setting, or sizing?
+                                </p>
+                                <a href="https://wa.me/233500594879?text=Hi%20Jewels%20by%20J,%20I%20would%20like%20to%20request%20a%20bespoke%20jewelry%20design."
+                                    target="_blank" class="btn btn-blush btn-sm btn-block">
+                                    <i class="fa-brands fa-whatsapp"></i> Chat with Jerrilyn
+                                </a>
+                            </div>
+                        </aside>
+
+                        <!-- Main Catalog Grid Area -->
+                        <div class="shop-main">
+                            <!-- Toolbar -->
+                            <div class="shop-toolbar">
+                                <div class="shop-results-count" id="shopResultCount">
+                                    Showing 21 Pieces
+                                </div>
+                                <div class="shop-controls">
+                                    <!-- Mobile Category Dropdown -->
+                                    <select class="shop-select mobile-category-dropdown" id="mobileCategorySelect" aria-label="Select Category">
+                                        <option value="all">All Designs (21)</option>
+                                        <option value="necklaces">Nameplates &amp; Necklaces</option>
+                                        <option value="bracelets">Bracelets &amp; Bangles</option>
+                                        <option value="giftsets">Gift Sets &amp; Keepsakes</option>
+                                    </select>
+
+                                    <!-- Sort Dropdown -->
+                                    <select class="shop-select" id="shopSortSelect" aria-label="Sort Pieces">
+                                        <option value="featured">Sort by: Featured</option>
+                                        <option value="price-low">Price: Low to High</option>
+                                        <option value="price-high">Price: High to Low</option>
+                                        <option value="newest">Newest Arrivals</option>
+                                        <option value="name">Alphabetical (A-Z)</option>
+                                    </select>
+
+                                    <!-- Live Search -->
+                                    <input type="text" class="shop-search-input" id="shopSearchInput"
+                                        placeholder="Search jewelry..." aria-label="Search Catalog">
+                                </div>
+                            </div>
+
+                            <!-- Product Cards Grid (Dynamically Populated by app.js) -->
+                            <div class="product-grid" id="productGrid">
+                                <!-- Cards rendered via JS -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ═══════════════════════════════════════
-         ABOUT
-    ════════════════════════════════════════ -->
+        <!-- ─────────────────────────────────────────────────────────────────
+           SECTION C: CLIENT CAM (REAL VIDEO SOCIAL PROOF)
+           ───────────────────────────────────────────────────────────────── -->
+        <section id="section-cam" class="page-section">
+            <div class="cam-section">
+                <div class="container">
+                    <div class="cam-header">
+                        <div class="cam-badge-top">
+                            <span class="cam-live-pulse"></span>
+                            Live Social Proof
+                        </div>
+                        <h2 class="shop-title">Client Cam</h2>
+                        <p class="shop-subtitle">Real moments, unboxings &amp; styling from our happy clientele</p>
+                    </div>
+
+                    <!-- Client Video Cam Grid (Populated via JS) -->
+                    <div class="cam-grid" id="clientCamGrid">
+                        <!-- Video cards inserted by app.js -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─────────────────────────────────────────────────────────────────
+           SECTION D: ABOUT & FOUNDER HERITAGE
+           ───────────────────────────────────────────────────────────────── -->
         <section id="section-about" class="page-section">
-            <div class="about-section" style="padding-top:120px;">
-                <div class="container">
-                    <div class="about-grid">
-                        <div class="about-content">
-                            <span class="sub-title font-gold">My Story</span>
-                            <h2 class="about-title">The Story Behind Jewels by J</h2>
-                            <p class="about-text">Jewels by J was founded in 2024 by Jerrilyn Mensah, a university
-                                student who turned her passion for jewelry into a growing creative journey. As a sole
-                                proprietorship, every piece is designed with care, blending elegance, simplicity, and
-                                meaning for everyday wear.</p>
-                            <p class="about-text">I believe jewelry is not just an accessory, but a wearable memoir.
-                                From initial sketch to the final polish, each item receives individual artistry to
-                                ensure its brilliance lasts for generations. Every piece is thoughtfully brought to life
-                                with attention to detail, capturing moments, emotions, and personal stories in designs
-                                meant to be worn and cherished every day.</p>
-                            <div class="heritage-stats">
-                                <div class="stat-item"><span class="stat-num">2+</span><span class="stat-lbl">Years of
-                                        Artistry</span></div>
-                                <div class="stat-item"><span class="stat-num">100%</span><span
-                                        class="stat-lbl">Conflict-Free Gems</span></div>
-                                <div class="stat-item"><span class="stat-num">1k+</span><span class="stat-lbl">Happy
-                                        Patrons</span></div>
+            <div class="about-section">
+                <div class="container about-grid">
+                    <div class="about-content">
+                        <span class="shop-eyebrow">Our Heritage</span>
+                        <h2 class="about-heading">The Story Behind Jewels by J</h2>
+                        <p class="about-text">
+                            Jewels by J was founded in 2024 by <strong>Jerrilyn Mensah</strong> in Accra, Ghana.
+                            Starting as a creative passion for distinctive, meaningful accessories, it has quickly flourished
+                            into a beloved boutique jewelry house known for bespoke cursive nameplates and heirloom presentation.
+                        </p>
+                        <p class="about-text">
+                            I believe jewelry is not just an adornment, but a wearable memoir. From initial sketch to the final polish,
+                            each item receives individual artistry to ensure its brilliance lasts for generations.
+                            Every piece is thoughtfully brought to life with attention to detail, capturing moments, emotions,
+                            and personal stories meant to be worn and cherished every day.
+                        </p>
+                        <div class="heritage-stats">
+                            <div class="stat-item">
+                                <span class="stat-num">2+</span>
+                                <span class="stat-lbl">Years of Artistry</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-num">100%</span>
+                                <span class="stat-lbl">Conflict-Free Gems</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-num">1k+</span>
+                                <span class="stat-lbl">Happy Patrons</span>
                             </div>
                         </div>
-                        <div class="about-visual">
-                            <div class="image-box">
-                                <img src="images/logo.jpg" alt="Jewelry Crafting" class="about-img-main">
-                                <div class="image-box-accent"></div>
-                            </div>
-                        </div>
+                    </div>
+                    <div class="about-img-box">
+                        <img src="images/logo.jpg" alt="Jewels by J Atelier Logo">
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ═══════════════════════════════════════
-         CONTACT
-    ════════════════════════════════════════ -->
+        <!-- ─────────────────────────────────────────────────────────────────
+           SECTION E: CONTACT & INQUIRIES
+           ───────────────────────────────────────────────────────────────── -->
         <section id="section-contact" class="page-section">
-            <div class="contact-section" style="padding-top:120px;">
+            <div class="contact-section">
                 <div class="container">
-                    <div class="section-header">
-                        <span class="sub-title">Connect With Me</span>
-                        <h2 class="section-title">Inquiries</h2>
-                        <div class="accent-line"></div>
+                    <div class="shop-header">
+                        <span class="shop-eyebrow">Private Concierge</span>
+                        <h2 class="shop-title">Get in Touch</h2>
+                        <p class="shop-subtitle">We are here to assist with sizing, bespoke orders &amp; delivery</p>
                     </div>
-                    <div class="contact-solo">
-                        <a href="https://wa.me/0500594879?text=Hello%20Jewels%20by%20J,%20I%27m%20visiting%20your%20website%20and%20have%20an%20inquiry."
-                            target="_blank" class="contact-card wa-card">
-                            <div class="card-icon"><i class="fa-brands fa-whatsapp"></i></div>
-                            <div class="card-details">
-                                <h4>Instant WhatsApp Chat</h4>
-                                <p>Message enquiry, please contact me.</p>
-                                <span class="action-link">Start Chatting <i class="fa-solid fa-arrow-right"></i></span>
+
+                    <!-- Contact Cards Grid -->
+                    <div class="contact-cards-grid">
+                        <a href="https://wa.me/233500594879?text=Hello%20Jewels%20by%20J,%20I%20have%20an%20inquiry%20regarding%20your%20jewelry."
+                            target="_blank" class="contact-card">
+                            <div class="contact-card-icon" style="background:#25d36622; color:#25d366;">
+                                <i class="fa-brands fa-whatsapp"></i>
                             </div>
+                            <h3 class="contact-card-title">Instant WhatsApp</h3>
+                            <p class="contact-card-desc">+233 50 059 4879<br>Direct messaging &amp; orders</p>
                         </a>
 
                         <a href="mailto:mensahjerrilyn@gmail.com" class="contact-card">
-                            <div class="card-icon"><i class="fa-solid fa-envelope"></i></div>
-                            <div class="card-details">
-                                <h4>Direct Email Inquiry</h4>
-                                <p>mensahjerrilyn@gmail.com</p>
-                                <span class="action-link">Send Email <i class="fa-solid fa-arrow-right"></i></span>
+                            <div class="contact-card-icon">
+                                <i class="fa-solid fa-envelope"></i>
                             </div>
+                            <h3 class="contact-card-title">Direct Email</h3>
+                            <p class="contact-card-desc">mensahjerrilyn@gmail.com<br>Inquiries &amp; collaborations</p>
                         </a>
 
                         <div class="contact-card">
-                            <div class="card-icon"><i class="fa-solid fa-location-dot"></i></div>
-                            <div class="card-details">
-                                <h4>Our Location</h4>
-                                <p>Accra, Ghana</p>
+                            <div class="contact-card-icon">
+                                <i class="fa-solid fa-location-dot"></i>
                             </div>
+                            <h3 class="contact-card-title">Atelier Location</h3>
+                            <p class="contact-card-desc">Accra, Ghana<br>Fast nationwide delivery</p>
                         </div>
 
                         <div class="contact-card">
-                            <div class="card-icon"><i class="fa-solid fa-phone"></i></div>
-                            <div class="card-details">
-                                <h4>Call Us</h4>
-                                <p>+233 50 059 4879 / +233 59 325 2913</p>
+                            <div class="contact-card-icon">
+                                <i class="fa-solid fa-phone"></i>
                             </div>
+                            <h3 class="contact-card-title">Customer Care</h3>
+                            <p class="contact-card-desc">+233 50 059 4879<br>+233 59 325 2913</p>
                         </div>
+                    </div>
 
-                        <!-- ── Customer Email Inquiry Form ── -->
-                        <div class="contact-form-card">
-                            <h3 class="contact-form-title">Send an Email Inquiry</h3>
-                            <p class="contact-form-sub">Enter your details below. Your message will be sent directly to
-                                <strong>mensahjerrilyn@gmail.com</strong>.</p>
+                    <!-- Email Inquiry Form -->
+                    <div class="contact-form-box">
+                        <h3 class="contact-form-title">Send a Private Inquiry</h3>
+                        <p class="contact-form-sub">
+                            Have a custom design idea or specific question? Leave a note and we will reply promptly to your email.
+                        </p>
 
-                            <form id="contactForm" action="https://formsubmit.co/mensahjerrilyn@gmail.com"
-                                method="POST">
-                                <input type="hidden" name="_captcha" value="false">
-                                <input type="hidden" name="_template" value="table">
-                                <div class="contact-form-row">
-                                    <div class="contact-form-group">
-                                        <label for="fromName">Your Name *</label>
-                                        <input type="text" id="fromName" name="name" placeholder="Enter your full name"
-                                            required>
-                                    </div>
-                                    <div class="contact-form-group">
-                                        <label for="fromEmail">Your Email Address *</label>
-                                        <input type="email" id="fromEmail" name="email"
-                                            placeholder="Enter your email address" required>
-                                    </div>
+                        <form id="customerContactForm">
+                            <div class="form-grid-2">
+                                <div class="form-field">
+                                    <label for="contactName">Your Name *</label>
+                                    <input type="text" id="contactName" required placeholder="e.g. Ama Serwaa">
                                 </div>
-                                <div class="contact-form-group">
-                                    <label for="formSubject">Subject / Piece of Interest *</label>
-                                    <input type="text" id="formSubject" name="_subject"
-                                        placeholder="e.g. Custom Ring / Necklace Inquiry" required>
+                                <div class="form-field">
+                                    <label for="contactEmail">Your Email *</label>
+                                    <input type="email" id="contactEmail" required placeholder="e.g. ama@example.com">
                                 </div>
-                                <div class="contact-form-group">
-                                    <label for="messageBody">Your Message *</label>
-                                    <textarea id="messageBody" name="message" required
-                                        placeholder="Write your message, customization requests, or questions here..."></textarea>
-                                </div>
-                                <button type="submit" class="contact-form-submit" id="contactSubmitBtn">
-                                    <i class="fa-solid fa-paper-plane"></i>
-                                    <span id="contactSubmitLabel">Send Email to mensahjerrilyn@gmail.com</span>
-                                </button>
-                                <p class="contact-form-status" id="contactFormStatus"></p>
-                            </form>
-                        </div>
+                            </div>
+                            <div class="form-field">
+                                <label for="contactSubject">Piece of Interest / Subject *</label>
+                                <input type="text" id="contactSubject" required
+                                    placeholder="e.g. Moesha Royal Rose Cuban Nameplate or Custom Ring">
+                            </div>
+                            <div class="form-field">
+                                <label for="contactMessage">Your Message *</label>
+                                <textarea id="contactMessage" required
+                                    placeholder="Write your custom text requirements, chain length preferences, or questions here..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block" id="contactSubmitBtn">
+                                <i class="fa-solid fa-paper-plane"></i> Send Consultation Inquiry
+                            </button>
+                            <p class="form-status-msg" id="contactFormStatus"></p>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -2170,325 +582,205 @@
 
     </main>
 
-    <!-- ═══════════════════════════════════════
-       FOOTER
-  ════════════════════════════════════════ -->
-    <footer class="main-footer">
-        <div class="container footer-container">
-            <div class="footer-brand">
-                <a href="#" class="logo" onclick="navigateTo('home'); return false;">
-                    <p> JEWELS BY J <p>
-                </a>
-                <p>Each piece is made with thought and care, designed to be simple, beautiful, and something you can
-                    truly connect with over time.</p>
-            </div>
-            <div class="footer-links">
-                <h4>Explore</h4>
-                <a href="#" onclick="navigateTo('featured'); return false;">Featured Releases</a>
-                <a href="#" onclick="navigateTo('gallery');  return false;">Visual Gallery</a>
-                <a href="#" onclick="navigateTo('customer-cam'); return false;">Client Cam</a>
-                <a href="#" onclick="navigateTo('about');    return false;">Heritage &amp; Legacy</a>
-                <a href="#" onclick="navigateTo('contact');  return false;">Private Consultation</a>
-            </div>
-
-        </div>
-        <div class="footer-bottom">
-            <div class="container bottom-container">
-                <p>&copy; 2026 Jewels by J. All rights reserved.</p>
-                <div class="socials">
-                    <a href="https://wa.me/0500594879" target="_blank" title="WhatsApp"><i
-                            class="fa-brands fa-whatsapp"></i></a>
-                    <a href="https://www.instagram.com/Jewels.with_j" target="_blank" title="Instagram"><i
-                            class="fa-brands fa-instagram"></i></a>
-                    <a href="https://www.tiktok.com/@jewels.by_j4" target="_blank" title="TikTok"><i
-                            class="fa-brands fa-tiktok"></i></a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- dim overlay for mobile nav drawer -->
-    <div class="nav-overlay" id="navOverlay"></div>
-
-    <!-- ── GALLERY BIGGER VIEW LIGHTBOX MODAL ── -->
-    <div class="lightbox-modal" id="galleryLightbox">
-        <div class="lightbox-backdrop" id="lightboxBackdrop"></div>
-        <div class="lightbox-content">
-            <button class="lightbox-close-btn" id="lightboxCloseBtn" aria-label="Close bigger view">
+    <!-- ═══════════════════════════════════════════════════════════════════════
+       5. SLIDE-OUT CART DRAWER (#cartDrawer)
+       ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="cart-backdrop" id="cartBackdrop"></div>
+    <aside class="cart-drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-label="Shopping Bag">
+        <div class="cart-header">
+            <h2 class="cart-title">
+                <i class="fa-solid fa-bag-shopping"></i> Shopping Bag
+            </h2>
+            <button class="cart-close-btn" id="cartCloseBtn" aria-label="Close Bag">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <div class="lightbox-body" id="lightboxBody">
-                <!-- Image or Video dynamically inserted here -->
+        </div>
+
+        <!-- Free Delivery Progress Meter -->
+        <div class="cart-delivery-meter" id="cartDeliveryMeter">
+            <i class="fa-solid fa-truck" style="color:var(--color-gold);"></i>
+            <span id="deliveryMeterText">Add GH₵ 500.00 more for Free Delivery across Ghana!</span>
+        </div>
+
+        <!-- Cart Items List -->
+        <div class="cart-items-container" id="cartItemsContainer">
+            <!-- Dynamically populated by app.js -->
+        </div>
+
+        <!-- Cart Summary Footer -->
+        <div class="cart-footer">
+            <div class="cart-summary-row">
+                <span>Subtotal</span>
+                <span id="cartSubtotal">GH₵ 0.00</span>
+            </div>
+            <div class="cart-summary-row">
+                <span>Delivery (Ghana)</span>
+                <span>Calculated at Checkout</span>
+            </div>
+            <div class="cart-summary-row cart-summary-total">
+                <span>Estimated Total</span>
+                <span id="cartTotal">GH₵ 0.00</span>
+            </div>
+            <button class="btn btn-whatsapp btn-block cart-checkout-btn" id="cartCheckoutBtn">
+                <i class="fa-brands fa-whatsapp" style="font-size:1.1rem;"></i> Order via WhatsApp
+            </button>
+            <button class="cart-clear-btn" id="cartClearBtn">Empty Shopping Bag</button>
+        </div>
+    </aside>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+       6. QUICK VIEW / PRODUCT DETAILS MODAL
+       ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="quick-modal-backdrop" id="quickModalBackdrop">
+        <div class="quick-modal-card">
+            <button class="modal-close-btn" id="modalCloseBtn" aria-label="Close modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="quick-modal-grid">
+                <div class="quick-modal-media">
+                    <img id="modalProductImg" src="" alt="Jewelry Preview">
+                </div>
+                <div class="quick-modal-info">
+                    <span class="modal-category-tag" id="modalProductCategory">Necklaces</span>
+                    <h2 class="modal-product-title" id="modalProductTitle">Product Title</h2>
+                    <div class="modal-rating-row">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <span>5.0 (Client Favorite)</span>
+                    </div>
+                    <div class="modal-price-row">
+                        <span class="modal-price-current" id="modalProductPriceCurrent">GH₵ 380.00</span>
+                        <span class="modal-price-original" id="modalProductPriceOrig">GH₵ 420.00</span>
+                    </div>
+                    <p class="modal-desc" id="modalProductDesc">Product description goes here.</p>
+
+                    <!-- Options (Length / Variant) -->
+                    <div class="modal-options-group" id="modalOptionsWrap">
+                        <h4 class="modal-options-title">Select Chain Length / Size:</h4>
+                        <div class="options-pill-list" id="modalOptionsContainer">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Quantity & Add to Cart Row -->
+                    <div class="modal-qty-actions-row">
+                        <div class="modal-qty-selector">
+                            <button id="modalQtyMinus">-</button>
+                            <span id="modalQtyVal">1</span>
+                            <button id="modalQtyPlus">+</button>
+                        </div>
+                        <button class="btn btn-primary modal-add-btn" id="modalAddToCartBtn">
+                            <i class="fa-solid fa-bag-shopping"></i> Add to Bag
+                        </button>
+                        <button class="modal-wa-btn" id="modalWhatsAppBtn" title="Instant Order via WhatsApp">
+                            <i class="fa-brands fa-whatsapp"></i> Buy Now
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- ── EmailJS SDK ── -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <!-- ═══════════════════════════════════════════════════════════════════════
+       7. GENERAL VIDEO & IMAGE LIGHTBOX MODAL
+       ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="lightbox-modal" id="generalLightboxModal">
+        <div class="lightbox-content-box">
+            <button class="lightbox-close-btn" id="lightboxCloseBtn" aria-label="Close lightbox">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="lightbox-body" id="lightboxBody">
+                <!-- Video or image injected via JS -->
+            </div>
+        </div>
+    </div>
 
-    <script>
-        /* ════════════════════════════════════════
-           HAMBURGER / SIDEBAR DRAWER MENU HELPERS
-           (defined first so navigateTo can call closeMenu)
-        ════════════════════════════════════════ */
-        const hamburger = document.getElementById('hamburger');
-        const navMenu = document.getElementById('navMenu');
-        const overlay = document.getElementById('navOverlay');
-        const drawerCloseBtn = document.getElementById('drawerCloseBtn');
+    <!-- ═══════════════════════════════════════════════════════════════════════
+       8. SITE FOOTER (STRAND BRAND BLUSH WINE SIGNATURE)
+       ═══════════════════════════════════════════════════════════════════════ -->
+    <footer class="site-footer">
+        <div class="container footer-top-grid">
+            <!-- Brand Column -->
+            <div>
+                <h3 class="footer-brand-title">JEWELS BY J</h3>
+                <p class="footer-brand-desc">
+                    Fine handcrafted &amp; bespoke jewelry founded in Accra, Ghana.
+                    Crafted to inspire elegance, confidence, and treasured moments that last a lifetime.
+                </p>
+                <div class="footer-social-links">
+                    <a href="https://wa.me/233500594879" target="_blank" class="footer-social-link" aria-label="WhatsApp">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </a>
+                    <a href="https://www.instagram.com/Jewels.with_j" target="_blank" class="footer-social-link" aria-label="Instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="https://www.tiktok.com/@jewels.by_j4" target="_blank" class="footer-social-link" aria-label="TikTok">
+                        <i class="fa-brands fa-tiktok"></i>
+                    </a>
+                </div>
+            </div>
 
-        function openMenu() {
-            if (navMenu) navMenu.classList.add('active');
-            if (hamburger) hamburger.classList.add('active');
-            if (overlay) overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
+            <!-- Quick Links -->
+            <div>
+                <h4 class="footer-col-title">Navigation</h4>
+                <ul class="footer-links-list">
+                    <li><a href="#home" data-nav="home">Home</a></li>
+                    <li><a href="#shop" data-nav="shop" data-category="all">Shop All Pieces</a></li>
+                    <li><a href="#cam" data-nav="cam">Client Cam (Videos)</a></li>
+                    <li><a href="#about" data-nav="about">Our Story</a></li>
+                    <li><a href="#contact" data-nav="contact">Private Inquiries</a></li>
+                </ul>
+            </div>
 
-        function closeMenu() {
-            if (navMenu) navMenu.classList.remove('active');
-            if (hamburger) hamburger.classList.remove('active');
-            if (overlay) overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
+            <!-- Jewelry Categories -->
+            <div>
+                <h4 class="footer-col-title">Collections</h4>
+                <ul class="footer-links-list">
+                    <li><a href="#shop" data-nav="shop" data-category="necklaces">Nameplate Necklaces</a></li>
+                    <li><a href="#shop" data-nav="shop" data-category="bracelets">Bracelets &amp; Bangles</a></li>
+                    <li><a href="#shop" data-nav="shop" data-category="giftsets">Gift Sets &amp; Boxes</a></li>
+                    <li><a href="#shop" data-nav="shop" data-category="all">Initial Charms</a></li>
+                    <li><a href="#contact" data-nav="contact">Bespoke Consultations</a></li>
+                </ul>
+            </div>
 
-        if (hamburger) hamburger.addEventListener('click', () => {
-            if (navMenu) {
-                navMenu.classList.contains('active') ? closeMenu() : openMenu();
-            }
-        });
+            <!-- Newsletter Signup -->
+            <div>
+                <h4 class="footer-col-title">Join the Jewels Family</h4>
+                <p class="footer-newsletter-text">
+                    Subscribe for exclusive seasonal drops, new arrival notifications, and styling inspirations.
+                </p>
+                <form class="newsletter-form" id="newsletterForm">
+                    <input type="email" class="newsletter-input" required placeholder="Enter your email" aria-label="Email address">
+                    <button type="submit" class="btn btn-primary btn-sm">Join</button>
+                </form>
+            </div>
+        </div>
 
-        if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeMenu);
-        if (overlay) overlay.addEventListener('click', closeMenu);
+        <div class="container footer-bottom">
+            <p>&copy; 2026 Jewels by J. All rights reserved. Handcrafted with love in Ghana.</p>
+            <div class="payment-badges-row">
+                <span class="payment-chip"><i class="fa-solid fa-mobile-screen"></i> MTN MoMo</span>
+                <span class="payment-chip"><i class="fa-solid fa-wallet"></i> Telecel Cash</span>
+                <span class="payment-chip"><i class="fa-brands fa-cc-visa"></i> Visa</span>
+                <span class="payment-chip"><i class="fa-brands fa-cc-mastercard"></i> Mastercard</span>
+            </div>
+        </div>
+    </footer>
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && navMenu && navMenu.classList.contains('active')) {
-                closeMenu();
-            }
-        });
+    <!-- ═══════════════════════════════════════════════════════════════════════
+       9. FLOATING WHATSAPP BUTTON (FAB)
+       ═══════════════════════════════════════════════════════════════════════ -->
+    <a href="https://wa.me/233500594879?text=Hello%20Jewels%20by%20J,%20I'm%20visiting%20your%20website%20and%20would%20like%20to%20order."
+        target="_blank" class="whatsapp-fab" aria-label="Chat on WhatsApp" title="Chat on WhatsApp">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
 
-        /* ════════════════════════════════════════
-           SPA NAVIGATION
-        ════════════════════════════════════════ */
-        const PAGES = ['home', 'featured', 'gallery', 'customer-cam', 'detail', 'about', 'contact'];
-
-        function navigateTo(page) {
-            // Pause detail video when leaving the detail page
-            if (page !== 'detail') {
-                const video = document.getElementById('detailVideo');
-                if (video) video.pause();
-            }
-
-            // Pause Customer Cam videos when navigating away from customer-cam
-            const camVideos = document.querySelectorAll('#section-customer-cam video');
-            if (page !== 'customer-cam') {
-                camVideos.forEach(v => v.pause());
-            } else {
-                camVideos.forEach(v => v.play().catch(() => { }));
-            }
-
-            // Hide all sections
-            PAGES.forEach(p => {
-                const el = document.getElementById('section-' + p);
-                if (el) el.classList.remove('active');
-            });
-
-            // Show target
-            const target = document.getElementById('section-' + page);
-            if (target) {
-                target.classList.add('active');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-
-            // Update nav active state (detail keeps gallery highlighted)
-            const navPage = page === 'detail' ? 'gallery' : page;
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.toggle('active', link.dataset.page === navPage);
-            });
-
-            // Close mobile menu if open
-            closeMenu();
-        }
-
-        /* ════════════════════════════════════════
-           GALLERY BIGGER VIEW LIGHTBOX MODAL
-        ════════════════════════════════════════ */
-        const lightbox = document.getElementById('galleryLightbox');
-        const lightboxBody = document.getElementById('lightboxBody');
-        const lightboxCloseBtn = document.getElementById('lightboxCloseBtn');
-        const lightboxBackdrop = document.getElementById('lightboxBackdrop');
-
-        function openLightbox(d, itemEl) {
-            lightboxBody.innerHTML = '';
-
-            if (d.video) {
-                const video = document.createElement('video');
-                video.controls = true;
-                video.autoplay = true;
-                video.loop = true;
-                video.playsInline = true;
-
-                if (d.video.toLowerCase().endsWith('.mov')) {
-                    const s1 = document.createElement('source');
-                    s1.src = d.video;
-                    s1.type = 'video/quicktime';
-                    video.appendChild(s1);
-
-                    const s2 = document.createElement('source');
-                    s2.src = d.video;
-                    s2.type = 'video/mp4';
-                    video.appendChild(s2);
-                } else {
-                    const s = document.createElement('source');
-                    s.src = d.video;
-                    s.type = 'video/mp4';
-                    video.appendChild(s);
-                }
-
-                lightboxBody.appendChild(video);
-                video.load();
-                video.play().catch(e => console.log('Autoplay handled:', e));
-            } else {
-                const img = document.createElement('img');
-                const itemImg = itemEl ? itemEl.querySelector('img') : null;
-                img.src = itemImg ? itemImg.src : d.img;
-                img.alt = d.title || 'Jewels by J';
-                lightboxBody.appendChild(img);
-            }
-
-            lightbox.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeLightbox() {
-            if (!lightbox || !lightbox.classList.contains('active')) return;
-            const video = lightboxBody.querySelector('video');
-            if (video) video.pause();
-            lightboxBody.innerHTML = '';
-            lightbox.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        document.querySelectorAll('.gallery-item').forEach(item => {
-            item.style.cursor = 'pointer';
-            item.addEventListener('click', () => {
-                const d = JSON.parse(item.dataset.detail);
-                openLightbox(d, item);
-            });
-        });
-
-        if (lightboxCloseBtn) lightboxCloseBtn.addEventListener('click', closeLightbox);
-        if (lightboxBackdrop) lightboxBackdrop.addEventListener('click', closeLightbox);
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeLightbox();
-        });
-
-        /* ════════════════════════════════════════
-           GALLERY FILTERS
-        ════════════════════════════════════════ */
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                const filter = btn.dataset.filter;
-                document.querySelectorAll('.gallery-item').forEach(item => {
-                    const cats = (item.dataset.category || '').split(' ');
-                    item.style.display =
-                        (filter === 'all' || cats.includes(filter)) ? '' : 'none';
-                });
-            });
-        });
-
-        /* ════════════════════════════════════════
-           WHATSAPP INQUIRY BUTTONS
-        ════════════════════════════════════════ */
-        document.querySelectorAll('.wa-inquire-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const product = btn.getAttribute('data-product');
-                const customMsg = btn.getAttribute('data-msg');
-                const msg = encodeURIComponent(customMsg || (product ? `Hi Jewels by J, I am interested in the ${product}.` : 'Hi Jewels by J!'));
-                window.open('https://wa.me/233500594879?text=' + msg, '_blank');
-            });
-        });
-
-        /* ════════════════════════════════════════
-           CUSTOMER EMAIL INQUIRY SUBMISSION
-           Sends customer inquiry directly to mensahjerrilyn@gmail.com
-        ════════════════════════════════════════ */
-        (function () {
-            const form = document.getElementById('contactForm');
-            const submitBtn = document.getElementById('contactSubmitBtn');
-            const submitLabel = document.getElementById('contactSubmitLabel');
-            const statusEl = document.getElementById('contactFormStatus');
-
-            if (form) {
-                form.addEventListener('submit', function (e) {
-                    e.preventDefault();
-
-                    const fromName = document.getElementById('fromName').value.trim();
-                    const fromEmail = document.getElementById('fromEmail').value.trim();
-                    const subject = document.getElementById('formSubject') ? document.getElementById('formSubject').value.trim() : 'Jewels by J Inquiry';
-                    const message = document.getElementById('messageBody').value.trim();
-
-                    if (!fromName || !fromEmail || !message) {
-                        statusEl.textContent = 'Please fill in all required fields.';
-                        statusEl.className = 'contact-form-status error';
-                        return;
-                    }
-
-                    submitBtn.disabled = true;
-                    submitLabel.textContent = 'Sending to mensahjerrilyn@gmail.com...';
-                    statusEl.className = 'contact-form-status';
-                    statusEl.textContent = '';
-
-                    fetch("https://formsubmit.co/ajax/mensahjerrilyn@gmail.com", {
-                        method: "POST",
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            name: fromName,
-                            email: fromEmail,
-                            _subject: `Jewels by J Inquiry: ${subject} (from ${fromName})`,
-                            message: message,
-                            _replyto: fromEmail
-                        })
-                    })
-                        .then(response => {
-                            return response.json().then(data => ({
-                                ok: response.ok,
-                                status: response.status,
-                                data: data
-                            }));
-                        })
-                        .then(({ ok, status, data }) => {
-                            if (data && (data.success === "true" || data.success === true)) {
-                                statusEl.textContent = `Thank you, ${fromName}! Your inquiry has been sent to mensahjerrilyn@gmail.com. We will reply to ${fromEmail} shortly.`;
-                                statusEl.className = 'contact-form-status success';
-                                form.reset();
-                            } else if (data && data.message && data.message.toLowerCase().includes('activate')) {
-                                statusEl.innerHTML = `<strong>Action Required:</strong> FormSubmit sent an activation link to <strong>mensahjerrilyn@gmail.com</strong>. Please check your inbox/spam folder and click <em>"Activate Form"</em> once to start receiving all customer messages.`;
-                                statusEl.className = 'contact-form-status error';
-                            } else {
-                                const msg = (data && data.message) ? data.message : "Unable to send at this moment.";
-                                statusEl.innerHTML = `${msg} <br><a href="mailto:mensahjerrilyn@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('From: ' + fromName + ' (' + fromEmail + ')\n\n' + message)}" style="color:#c9a96e; text-decoration:underline; font-weight:600;">Click here to send directly via your Email app</a>`;
-                                statusEl.className = 'contact-form-status error';
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Submission error:', error);
-                            const mailtoUrl = `mailto:mensahjerrilyn@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('From: ' + fromName + ' (' + fromEmail + ')\n\n' + message)}`;
-                            window.location.href = mailtoUrl;
-                            statusEl.innerHTML = `Opening your email app to send directly to <strong>mensahjerrilyn@gmail.com</strong>... <br><a href="${mailtoUrl}" style="color:#c9a96e; text-decoration:underline;">Click here if your mail app didn't open automatically</a>`;
-                            statusEl.className = 'contact-form-status success';
-                        })
-                        .finally(function () {
-                            submitBtn.disabled = false;
-                            submitLabel.textContent = 'Send Email to mensahjerrilyn@gmail.com';
-                        });
-                });
-            }
-        })();
-    </script>
+    <!-- Application Script -->
+    <script src="app.js"></script>
 </body>
 
 </html>
