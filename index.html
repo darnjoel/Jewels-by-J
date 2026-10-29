@@ -51,7 +51,7 @@
     <header class="site-header">
         <div class="container navbar-inner">
             <div class="nav-left">
-                <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle navigation menu">
+                <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle navigation menu" onclick="toggleMobileDrawer()">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -79,24 +79,40 @@
                 </ul>
             </nav>
 
-            <!-- Actions (Auth, Wishlist & Shopping Bag) -->
+            <!-- Actions (Search, Favorite, Cart, Sign In / Log In) -->
             <div class="nav-actions">
-                <button class="nav-action-btn" id="navSearchTrigger" aria-label="Search Catalog"
-                    onclick="navigateTo('shop'); document.getElementById('shopSearchInput')?.focus();">
+                <!-- 1. Search Button -->
+                <button class="nav-action-btn" id="navSearchTrigger" title="Search Jewelry Catalog" aria-label="Search Catalog" onclick="toggleHeaderSearch()">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
-                <button class="nav-action-btn" id="wishlistToggleBtn" aria-label="View Wishlist"
-                    onclick="navigateTo('shop');">
+
+                <!-- 2. Favorite / Wishlist Button -->
+                <button class="nav-action-btn" id="wishlistToggleBtn" title="My Favorites" aria-label="View Favorites" onclick="viewWishlist()">
                     <i class="fa-regular fa-heart"></i>
                     <span class="badge-count" id="wishlistBadgeCount" style="display:none;">0</span>
                 </button>
-                <button class="nav-action-btn" id="cartToggleBtn" aria-label="Open Shopping Bag">
+
+                <!-- 3. Cart / Shopping Bag Button -->
+                <button class="nav-action-btn" id="cartToggleBtn" title="Shopping Bag" aria-label="Open Shopping Bag" onclick="openCartDrawer()">
                     <i class="fa-solid fa-bag-shopping"></i>
                     <span class="badge-count" id="cartBadgeCount" style="display:none;">0</span>
                 </button>
-                <button class="nav-auth-btn" id="navAuthBtn" aria-label="Sign In or Log In" onclick="openAuthModal('login')">
+
+                <!-- 4. Sign In or Log In Button -->
+                <button class="nav-auth-btn" id="navAuthBtn" title="Sign In or Log In" aria-label="Sign In or Log In" onclick="openAuthModal()">
                     <i class="fa-regular fa-user"></i>
-                    <span class="auth-label" id="navAuthLabel">Sign In</span>
+                    <span class="auth-label" id="navAuthLabel">Sign In / Log In</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Slide-Down Quick Search Bar (The Strand Brand Style) -->
+        <div class="header-search-bar" id="headerSearchBar">
+            <div class="container header-search-inner">
+                <i class="fa-solid fa-magnifying-glass header-search-icon"></i>
+                <input type="text" id="headerSearchInput" placeholder="Search necklaces, bracelets, pendants, gift sets..." aria-label="Search catalog">
+                <button class="header-search-close" id="headerSearchClose" aria-label="Close search" onclick="toggleHeaderSearch(false)">
+                    <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
         </div>
@@ -136,7 +152,12 @@
                 <button class="btn btn-outline btn-sm" onclick="closeMobileDrawer(); openAuthModal('signup');">Sign Up</button>
             </div>
         </div>
+
         <ul class="drawer-menu">
+            <li><a href="#shop" class="drawer-menu-link" onclick="closeMobileDrawer(); toggleHeaderSearch(true);"><i class="fa-solid fa-magnifying-glass" style="margin-right:8px; color:var(--color-gold);"></i> Search Jewelry <i class="fa-solid fa-chevron-right"></i></a></li>
+            <li><a href="#shop" class="drawer-menu-link" onclick="closeMobileDrawer(); viewWishlist();"><i class="fa-regular fa-heart" style="margin-right:8px; color:var(--color-gold);"></i> My Favorites (<span id="drawerWishlistCount">0</span>) <i class="fa-solid fa-chevron-right"></i></a></li>
+            <li><a href="#cart" class="drawer-menu-link" onclick="closeMobileDrawer(); openCartDrawer();"><i class="fa-solid fa-bag-shopping" style="margin-right:8px; color:var(--color-gold);"></i> Shopping Bag (<span id="drawerCartCount">0</span>) <i class="fa-solid fa-chevron-right"></i></a></li>
+            <li style="height:1px; background:var(--color-border); margin:8px 0;"></li>
             <li><a href="#home" class="drawer-menu-link active" data-nav="home">Home <i class="fa-solid fa-chevron-right"></i></a></li>
             <li><a href="#shop" class="drawer-menu-link" data-nav="shop" data-category="all">Shop All Pieces <i class="fa-solid fa-chevron-right"></i></a></li>
             <li><a href="#shop" class="drawer-menu-link" data-nav="shop" data-category="necklaces">Nameplate Necklaces <i class="fa-solid fa-chevron-right"></i></a></li>
@@ -387,6 +408,12 @@
                                             <span class="category-count">2</span>
                                         </button>
                                     </li>
+                                    <li>
+                                        <button class="category-filter-btn" data-cat="favorites" id="sidebarFavoritesBtn">
+                                            <span><i class="fa-regular fa-heart" style="color:var(--color-gold); margin-right:6px;"></i> Saved Favorites</span>
+                                            <span class="category-count" id="sidebarWishlistCount">0</span>
+                                        </button>
+                                    </li>
                                 </ul>
                             </div>
 
@@ -423,6 +450,7 @@
                                         <option value="necklaces">Nameplates &amp; Necklaces</option>
                                         <option value="bracelets">Bracelets &amp; Bangles</option>
                                         <option value="giftsets">Gift Sets &amp; Keepsakes</option>
+                                        <option value="favorites">My Saved Favorites</option>
                                     </select>
 
                                     <!-- Sort Dropdown -->

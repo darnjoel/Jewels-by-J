@@ -367,7 +367,9 @@ let quickViewQuantity = 1;
 document.addEventListener("DOMContentLoaded", () => {
     initNavigation();
     initMobileDrawer();
+    initHeaderSearch();
     initShop();
+    initWishlist();
     initClientCam();
     initCartDrawer();
     initQuickViewModal();
@@ -431,18 +433,18 @@ function initMobileDrawer() {
     const closeBtn = document.getElementById("drawerCloseBtn");
     const backdrop = document.getElementById("drawerBackdrop");
 
-    if (hamburger) {
-        hamburger.addEventListener("click", () => {
-            const drawer = document.getElementById("mobileNavDrawer");
-            if (drawer && drawer.classList.contains("active")) {
-                closeMobileDrawer();
-            } else {
-                openMobileDrawer();
-            }
-        });
-    }
+    if (hamburger) hamburger.addEventListener("click", toggleMobileDrawer);
     if (closeBtn) closeBtn.addEventListener("click", closeMobileDrawer);
     if (backdrop) backdrop.addEventListener("click", closeMobileDrawer);
+}
+
+function toggleMobileDrawer() {
+    const drawer = document.getElementById("mobileNavDrawer");
+    if (drawer && drawer.classList.contains("active")) {
+        closeMobileDrawer();
+    } else {
+        openMobileDrawer();
+    }
 }
 
 function openMobileDrawer() {
@@ -455,6 +457,93 @@ function closeMobileDrawer() {
     document.getElementById("mobileNavDrawer")?.classList.remove("active");
     document.getElementById("drawerBackdrop")?.classList.remove("active");
     document.body.style.overflow = "";
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HEADER SEARCH BAR & WISHLIST NAVIGATION
+// ═══════════════════════════════════════════════════════════════════════════
+function toggleHeaderSearch(forceOpen) {
+    const searchBar = document.getElementById("headerSearchBar");
+    const searchInput = document.getElementById("headerSearchInput");
+    if (!searchBar) return;
+
+    const isOpen = searchBar.classList.contains("active");
+    const willOpen = typeof forceOpen === "boolean" ? forceOpen : !isOpen;
+
+    if (willOpen) {
+        searchBar.classList.add("active");
+        if (searchInput) {
+            setTimeout(() => {
+                searchInput.focus();
+                searchInput.select();
+            }, 80);
+        }
+    } else {
+        searchBar.classList.remove("active");
+    }
+}
+
+function initHeaderSearch() {
+    const searchTrigger = document.getElementById("navSearchTrigger");
+    const searchClose = document.getElementById("headerSearchClose");
+    const searchInput = document.getElementById("headerSearchInput");
+    const shopSearchInput = document.getElementById("shopSearchInput");
+
+    if (searchTrigger) {
+        searchTrigger.addEventListener("click", (e) => {
+            e.preventDefault();
+            toggleHeaderSearch();
+        });
+    }
+
+    if (searchClose) {
+        searchClose.addEventListener("click", (e) => {
+            e.preventDefault();
+            toggleHeaderSearch(false);
+        });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+            searchQuery = e.target.value.toLowerCase().trim();
+            if (shopSearchInput && shopSearchInput.value !== e.target.value) {
+                shopSearchInput.value = e.target.value;
+            }
+            const shopSec = document.getElementById("section-shop");
+            if (shopSec && !shopSec.classList.contains("active")) {
+                navigateTo("shop");
+            }
+            renderProducts();
+        });
+
+        searchInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                navigateTo("shop");
+                document.getElementById("productGrid")?.scrollIntoView({ behavior: "smooth" });
+            } else if (e.key === "Escape") {
+                toggleHeaderSearch(false);
+            }
+        });
+    }
+}
+
+function viewWishlist() {
+    navigateTo("shop");
+    setCategory("favorites");
+    const grid = document.getElementById("productGrid");
+    if (grid) {
+        grid.scrollIntoView({ behavior: "smooth" });
+    }
+}
+
+function initWishlist() {
+    const wishlistToggle = document.getElementById("wishlistToggleBtn");
+    if (wishlistToggle) {
+        wishlistToggle.addEventListener("click", (e) => {
+            e.preventDefault();
+            viewWishlist();
+        });
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -517,6 +606,7 @@ function setCategory(cat) {
         else if (cat === "necklaces") titleEl.textContent = "Nameplate & Initial Necklaces";
         else if (cat === "bracelets") titleEl.textContent = "Bespoke Bracelets & Bangles";
         else if (cat === "giftsets") titleEl.textContent = "Gift Sets & Keepsakes";
+        else if (cat === "favorites") titleEl.textContent = "My Saved Favorites";
         else titleEl.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
     }
 
@@ -530,7 +620,15 @@ function renderProducts() {
 
     // Filter
     let filtered = PRODUCTS.filter(p => {
-        const matchesCategory = (currentCategory === "all") || (p.category === currentCategory);
+        let matchesCategory = false;
+        if (currentCategory === "all") {
+            matchesCategory = true;
+        } else if (currentCategory === "favorites") {
+            matchesCategory = wishlist.includes(p.id);
+        } else {
+            matchesCategory = (p.category === currentCategory);
+        }
+
         const matchesSearch = !searchQuery ||
             p.title.toLowerCase().includes(searchQuery) ||
             p.metal.toLowerCase().includes(searchQuery) ||
@@ -555,14 +653,25 @@ function renderProducts() {
     }
 
     if (filtered.length === 0) {
-        grid.innerHTML = `
-            <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--color-text-muted);">
-                <i class="fa-solid fa-magnifying-glass" style="font-size: 2.2rem; color: var(--color-gold); margin-bottom: 12px; display: block;"></i>
-                <h3 style="font-size: 1.3rem; margin-bottom: 6px;">No jewelry pieces found</h3>
-                <p style="font-size: 0.9rem;">Try adjusting your search terms or selecting another category.</p>
-                <button class="btn btn-outline btn-sm" style="margin-top: 18px;" onclick="setCategory('all')">View All Pieces</button>
-            </div>
-        `;
+        if (currentCategory === "favorites") {
+            grid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--color-text-muted);">
+                    <i class="fa-regular fa-heart" style="font-size: 2.5rem; color: var(--color-gold); margin-bottom: 14px; display: block;"></i>
+                    <h3 style="font-size: 1.3rem; margin-bottom: 8px; color: var(--color-black); font-family: var(--font-heading);">No Favorites Saved Yet</h3>
+                    <p style="font-size: 0.95rem; max-width: 440px; margin: 0 auto 20px; line-height: 1.6;">Click the heart icon on any jewelry piece to save your favorite bespoke necklaces, bracelets, and keepsakes.</p>
+                    <button class="btn btn-primary btn-sm" onclick="setCategory('all')">Browse All Pieces</button>
+                </div>
+            `;
+        } else {
+            grid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--color-text-muted);">
+                    <i class="fa-solid fa-magnifying-glass" style="font-size: 2.2rem; color: var(--color-gold); margin-bottom: 12px; display: block;"></i>
+                    <h3 style="font-size: 1.3rem; margin-bottom: 6px; color: var(--color-black); font-family: var(--font-heading);">No jewelry pieces found</h3>
+                    <p style="font-size: 0.9rem;">Try adjusting your search terms or selecting another category.</p>
+                    <button class="btn btn-outline btn-sm" style="margin-top: 18px;" onclick="setCategory('all')">View All Pieces</button>
+                </div>
+            `;
+        }
         return;
     }
 
@@ -831,6 +940,10 @@ function updateCartUI() {
         badge.textContent = totalItems;
         badge.style.display = totalItems > 0 ? "flex" : "none";
     }
+    const drawerBadge = document.getElementById("drawerCartCount");
+    if (drawerBadge) {
+        drawerBadge.textContent = totalItems;
+    }
 }
 
 function renderCart() {
@@ -969,6 +1082,14 @@ function updateWishlistUI() {
     if (badge) {
         badge.textContent = wishlist.length;
         badge.style.display = wishlist.length > 0 ? "flex" : "none";
+    }
+    const drawerBadge = document.getElementById("drawerWishlistCount");
+    if (drawerBadge) {
+        drawerBadge.textContent = wishlist.length;
+    }
+    const sidebarBadge = document.getElementById("sidebarWishlistCount");
+    if (sidebarBadge) {
+        sidebarBadge.textContent = wishlist.length;
     }
 }
 
@@ -1225,8 +1346,8 @@ function openAuthModal(initialTab = "login") {
     const navTabs = document.getElementById("authNavTabs");
     if (!backdrop) return;
 
-    if (initialTab === "account" || (currentUser && initialTab !== "login" && initialTab !== "signup")) {
-        // Show account dashboard view
+    if (currentUser && initialTab !== "signup") {
+        // Show account dashboard view for signed-in user
         if (navTabs) navTabs.style.display = "none";
         document.querySelectorAll(".auth-panel").forEach(p => p.classList.remove("active"));
         document.getElementById("panelAccount")?.classList.add("active");
@@ -1234,7 +1355,7 @@ function openAuthModal(initialTab = "login") {
         // Show guest tab view
         if (navTabs) navTabs.style.display = "grid";
         document.getElementById("panelAccount")?.classList.remove("active");
-        switchAuthTab(initialTab);
+        switchAuthTab(initialTab || "login");
     }
 
     backdrop.classList.add("active");
@@ -1349,7 +1470,7 @@ function updateAuthUI() {
         // Guest mode
         if (navAuthBtn) {
             navAuthBtn.classList.remove("is-logged-in");
-            navAuthBtn.innerHTML = `<i class="fa-regular fa-user"></i> <span class="auth-label" id="navAuthLabel">Sign In</span>`;
+            navAuthBtn.innerHTML = `<i class="fa-regular fa-user"></i> <span class="auth-label" id="navAuthLabel">Sign In / Log In</span>`;
         }
 
         if (drawerAvatar) drawerAvatar.innerHTML = `<i class="fa-regular fa-user"></i>`;
