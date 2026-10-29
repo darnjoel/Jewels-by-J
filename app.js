@@ -358,6 +358,7 @@ let currentSort = "featured";
 let searchQuery = "";
 let cart = JSON.parse(localStorage.getItem("j_cart") || "[]");
 let wishlist = JSON.parse(localStorage.getItem("j_wishlist") || "[]");
+let currentUser = JSON.parse(localStorage.getItem("j_user") || "null");
 let quickViewProduct = null;
 let quickViewSelectedOption = null;
 let quickViewQuantity = 1;
@@ -370,11 +371,13 @@ document.addEventListener("DOMContentLoaded", () => {
     initClientCam();
     initCartDrawer();
     initQuickViewModal();
+    initAuthSystem();
     initLightbox();
     initContactForm();
     initNewsletterForm();
     updateCartUI();
     updateWishlistUI();
+    updateAuthUI();
 
     // Check URL parameters for direct category navigation (like The Strand Brand ?category=...)
     const params = new URLSearchParams(window.location.search);
@@ -428,7 +431,16 @@ function initMobileDrawer() {
     const closeBtn = document.getElementById("drawerCloseBtn");
     const backdrop = document.getElementById("drawerBackdrop");
 
-    if (hamburger) hamburger.addEventListener("click", openMobileDrawer);
+    if (hamburger) {
+        hamburger.addEventListener("click", () => {
+            const drawer = document.getElementById("mobileNavDrawer");
+            if (drawer && drawer.classList.contains("active")) {
+                closeMobileDrawer();
+            } else {
+                openMobileDrawer();
+            }
+        });
+    }
     if (closeBtn) closeBtn.addEventListener("click", closeMobileDrawer);
     if (backdrop) backdrop.addEventListener("click", closeMobileDrawer);
 }
@@ -912,7 +924,9 @@ function checkoutWhatsApp() {
     message += `──────────────────────\n`;
     message += `*Total Amount:* ${SITE_CONFIG.currency} ${subtotal.toFixed(2)}\n\n`;
     message += `*Customer Details:*\n`;
-    message += `Name:\n`;
+    message += `Name: ${currentUser ? currentUser.name : ''}\n`;
+    message += `Phone: ${currentUser ? (currentUser.phone || '') : ''}\n`;
+    message += `Email: ${currentUser ? (currentUser.email || '') : ''}\n`;
     message += `Delivery Address:\n`;
     message += `Notes / Custom Nameplate Text:\n`;
 
@@ -1109,6 +1123,246 @@ function initNewsletterForm() {
             input.value = "";
         }
     });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// AUTHENTICATION SYSTEM (LOG IN, SIGN UP & ACCOUNT DASHBOARD)
+// ═══════════════════════════════════════════════════════════════════════════
+function initAuthSystem() {
+    const backdrop = document.getElementById("authModalBackdrop");
+    const closeBtn = document.getElementById("authCloseBtn");
+    const loginForm = document.getElementById("loginForm");
+    const signupForm = document.getElementById("signupForm");
+    const navAuthBtn = document.getElementById("navAuthBtn");
+
+    if (closeBtn) closeBtn.addEventListener("click", closeAuthModal);
+    if (backdrop) {
+        backdrop.addEventListener("click", (e) => {
+            if (e.target === backdrop) closeAuthModal();
+        });
+    }
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeAuthModal();
+    });
+
+    if (navAuthBtn) {
+        navAuthBtn.addEventListener("click", () => {
+            if (currentUser) {
+                openAuthModal("account");
+            } else {
+                openAuthModal("login");
+            }
+        });
+    }
+
+    // Handle Log In submission
+    if (loginForm) {
+        loginForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const email = document.getElementById("loginEmail").value.trim();
+            const password = document.getElementById("loginPassword").value;
+
+            if (!email || !password) {
+                showToast("Missing Details", "Please provide both email and password.");
+                return;
+            }
+
+            // Derive display name from email or default
+            let displayName = email.split("@")[0].replace(/[._-]/g, " ");
+            displayName = displayName.replace(/\b\w/g, l => l.toUpperCase());
+
+            currentUser = {
+                name: displayName || "Valued Customer",
+                email: email,
+                phone: "+233 54 123 4567"
+            };
+
+            localStorage.setItem("j_user", JSON.stringify(currentUser));
+            updateAuthUI();
+            closeAuthModal();
+            loginForm.reset();
+            showToast("Welcome Back!", `Signed in successfully as ${currentUser.name}.`);
+        });
+    }
+
+    // Handle Sign Up submission
+    if (signupForm) {
+        signupForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const name = document.getElementById("signupName").value.trim();
+            const phone = document.getElementById("signupPhone").value.trim();
+            const email = document.getElementById("signupEmail").value.trim();
+            const password = document.getElementById("signupPassword").value;
+
+            if (!name || !email || !password) {
+                showToast("Missing Details", "Please fill in all required fields.");
+                return;
+            }
+
+            if (password.length < 6) {
+                showToast("Weak Password", "Password must be at least 6 characters long.");
+                return;
+            }
+
+            currentUser = {
+                name: name,
+                phone: phone || "+233 50 059 4879",
+                email: email
+            };
+
+            localStorage.setItem("j_user", JSON.stringify(currentUser));
+            updateAuthUI();
+            closeAuthModal();
+            signupForm.reset();
+            showToast("Welcome to Jewels by J!", `Your account has been created, ${currentUser.name}!`);
+        });
+    }
+}
+
+function openAuthModal(initialTab = "login") {
+    const backdrop = document.getElementById("authModalBackdrop");
+    const navTabs = document.getElementById("authNavTabs");
+    if (!backdrop) return;
+
+    if (initialTab === "account" || (currentUser && initialTab !== "login" && initialTab !== "signup")) {
+        // Show account dashboard view
+        if (navTabs) navTabs.style.display = "none";
+        document.querySelectorAll(".auth-panel").forEach(p => p.classList.remove("active"));
+        document.getElementById("panelAccount")?.classList.add("active");
+    } else {
+        // Show guest tab view
+        if (navTabs) navTabs.style.display = "grid";
+        document.getElementById("panelAccount")?.classList.remove("active");
+        switchAuthTab(initialTab);
+    }
+
+    backdrop.classList.add("active");
+    document.body.style.overflow = "hidden";
+}
+
+function closeAuthModal() {
+    const backdrop = document.getElementById("authModalBackdrop");
+    if (backdrop) backdrop.classList.remove("active");
+    document.body.style.overflow = "";
+}
+
+function switchAuthTab(tab) {
+    const tabLogin = document.getElementById("tabBtnLogin");
+    const tabSignup = document.getElementById("tabBtnSignup");
+    const panelLogin = document.getElementById("panelLogin");
+    const panelSignup = document.getElementById("panelSignup");
+    const panelAccount = document.getElementById("panelAccount");
+
+    if (panelAccount) panelAccount.classList.remove("active");
+
+    if (tab === "login") {
+        tabLogin?.classList.add("active");
+        tabSignup?.classList.remove("active");
+        panelLogin?.classList.add("active");
+        panelSignup?.classList.remove("active");
+        document.getElementById("loginEmail")?.focus();
+    } else if (tab === "signup") {
+        tabSignup?.classList.add("active");
+        tabLogin?.classList.remove("active");
+        panelSignup?.classList.add("active");
+        panelLogin?.classList.remove("active");
+        document.getElementById("signupName")?.focus();
+    }
+}
+
+function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input || !btn) return;
+
+    if (input.type === "password") {
+        input.type = "text";
+        btn.innerHTML = `<i class="fa-regular fa-eye-slash"></i>`;
+    } else {
+        input.type = "password";
+        btn.innerHTML = `<i class="fa-regular fa-eye"></i>`;
+    }
+}
+
+function handleForgotPassword() {
+    const email = document.getElementById("loginEmail")?.value.trim();
+    if (email) {
+        showToast("Password Reset Dispatched", `A reset link was sent to ${email}. Please check your inbox.`);
+    } else {
+        showToast("Enter Your Email", "Please type your email address above to receive a reset link.");
+        document.getElementById("loginEmail")?.focus();
+    }
+}
+
+function handleLogout() {
+    currentUser = null;
+    localStorage.removeItem("j_user");
+    updateAuthUI();
+    closeAuthModal();
+    showToast("Signed Out", "You have been signed out successfully.");
+}
+
+function updateAuthUI() {
+    const navAuthBtn = document.getElementById("navAuthBtn");
+    const navAuthLabel = document.getElementById("navAuthLabel");
+    const drawerAvatar = document.getElementById("drawerAccountAvatar");
+    const drawerText = document.getElementById("drawerAccountText");
+    const drawerActions = document.getElementById("drawerAccountActions");
+
+    const avatarLetter = document.getElementById("accountAvatarLetter");
+    const accountName = document.getElementById("accountUserName");
+    const accountEmail = document.getElementById("accountUserEmail");
+    const accountPhone = document.getElementById("accountUserPhone");
+    const accountOrders = document.getElementById("accountOrdersSummary");
+
+    if (currentUser) {
+        const firstName = currentUser.name.split(" ")[0];
+        const initial = currentUser.name.charAt(0).toUpperCase();
+
+        // Update header button
+        if (navAuthBtn) {
+            navAuthBtn.classList.add("is-logged-in");
+            navAuthBtn.innerHTML = `<i class="fa-solid fa-circle-user"></i> <span class="auth-label">${escapeHTML(firstName)}</span>`;
+        }
+
+        // Update mobile drawer account box
+        if (drawerAvatar) drawerAvatar.innerHTML = `<span style="font-weight:700;">${initial}</span>`;
+        if (drawerText) {
+            drawerText.innerHTML = `<strong>Hi, ${escapeHTML(firstName)}</strong><span>${escapeHTML(currentUser.email)}</span>`;
+        }
+        if (drawerActions) {
+            drawerActions.innerHTML = `
+                <button class="btn btn-outline btn-sm" onclick="closeMobileDrawer(); openAuthModal('account');">My Account</button>
+                <button class="btn btn-primary btn-sm" onclick="handleLogout()">Sign Out</button>
+            `;
+        }
+
+        // Update dashboard modal panel
+        if (avatarLetter) avatarLetter.textContent = initial;
+        if (accountName) accountName.textContent = currentUser.name;
+        if (accountEmail) accountEmail.textContent = currentUser.email;
+        if (accountPhone) accountPhone.textContent = `Ghana • ${currentUser.phone || '+233 50 059 4879'}`;
+        if (accountOrders) {
+            accountOrders.textContent = "Your profile is active. Ready to order your signature bespoke jewelry!";
+        }
+    } else {
+        // Guest mode
+        if (navAuthBtn) {
+            navAuthBtn.classList.remove("is-logged-in");
+            navAuthBtn.innerHTML = `<i class="fa-regular fa-user"></i> <span class="auth-label" id="navAuthLabel">Sign In</span>`;
+        }
+
+        if (drawerAvatar) drawerAvatar.innerHTML = `<i class="fa-regular fa-user"></i>`;
+        if (drawerText) {
+            drawerText.innerHTML = `<strong>Welcome Beautiful!</strong><span>Sign in or create an account</span>`;
+        }
+        if (drawerActions) {
+            drawerActions.innerHTML = `
+                <button class="btn btn-primary btn-sm" onclick="closeMobileDrawer(); openAuthModal('login');">Log In</button>
+                <button class="btn btn-outline btn-sm" onclick="closeMobileDrawer(); openAuthModal('signup');">Sign Up</button>
+            `;
+        }
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

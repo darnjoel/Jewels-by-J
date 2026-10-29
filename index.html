@@ -79,7 +79,7 @@
                 </ul>
             </nav>
 
-            <!-- Actions (Wishlist & Shopping Bag) -->
+            <!-- Actions (Auth, Wishlist & Shopping Bag) -->
             <div class="nav-actions">
                 <button class="nav-action-btn" id="navSearchTrigger" aria-label="Search Catalog"
                     onclick="navigateTo('shop'); document.getElementById('shopSearchInput')?.focus();">
@@ -93,6 +93,10 @@
                 <button class="nav-action-btn" id="cartToggleBtn" aria-label="Open Shopping Bag">
                     <i class="fa-solid fa-bag-shopping"></i>
                     <span class="badge-count" id="cartBadgeCount" style="display:none;">0</span>
+                </button>
+                <button class="nav-auth-btn" id="navAuthBtn" aria-label="Sign In or Log In" onclick="openAuthModal('login')">
+                    <i class="fa-regular fa-user"></i>
+                    <span class="auth-label" id="navAuthLabel">Sign In</span>
                 </button>
             </div>
         </div>
@@ -114,6 +118,23 @@
             <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close menu">
                 <i class="fa-solid fa-xmark"></i>
             </button>
+        </div>
+
+        <!-- Account / Sign In Box in Drawer -->
+        <div class="drawer-account-box" id="drawerAccountBox">
+            <div class="drawer-account-prompt">
+                <div class="drawer-account-avatar" id="drawerAccountAvatar">
+                    <i class="fa-regular fa-user"></i>
+                </div>
+                <div class="drawer-account-text" id="drawerAccountText">
+                    <strong>Welcome Beautiful!</strong>
+                    <span>Sign in or create an account</span>
+                </div>
+            </div>
+            <div class="drawer-account-actions" id="drawerAccountActions">
+                <button class="btn btn-primary btn-sm" onclick="closeMobileDrawer(); openAuthModal('login');">Log In</button>
+                <button class="btn btn-outline btn-sm" onclick="closeMobileDrawer(); openAuthModal('signup');">Sign Up</button>
+            </div>
         </div>
         <ul class="drawer-menu">
             <li><a href="#home" class="drawer-menu-link active" data-nav="home">Home <i class="fa-solid fa-chevron-right"></i></a></li>
@@ -694,6 +715,137 @@
             </button>
             <div class="lightbox-body" id="lightboxBody">
                 <!-- Video or image injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+       7B. AUTHENTICATION MODAL (LOG IN & SIGN UP)
+       ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="auth-modal-backdrop" id="authModalBackdrop">
+        <div class="auth-modal-card">
+            <button class="auth-close-btn" id="authCloseBtn" aria-label="Close authentication modal" onclick="closeAuthModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Auth Tabs (visible in guest mode) -->
+            <div class="auth-nav-tabs" id="authNavTabs">
+                <button class="auth-tab-btn active" id="tabBtnLogin" onclick="switchAuthTab('login')">
+                    Log In
+                </button>
+                <button class="auth-tab-btn" id="tabBtnSignup" onclick="switchAuthTab('signup')">
+                    Sign Up
+                </button>
+            </div>
+
+            <div class="auth-modal-body">
+                <!-- 1. Log In Panel -->
+                <div class="auth-panel active" id="panelLogin">
+                    <div class="auth-header-copy">
+                        <h3>Welcome Back</h3>
+                        <p>Sign in to track orders, manage favorites, and checkout faster.</p>
+                    </div>
+                    <form id="loginForm">
+                        <div class="auth-input-group">
+                            <label for="loginEmail">Email Address</label>
+                            <div class="auth-input-wrap">
+                                <input type="email" id="loginEmail" required placeholder="you@example.com" autocomplete="email">
+                            </div>
+                        </div>
+                        <div class="auth-input-group">
+                            <label for="loginPassword">Password</label>
+                            <div class="auth-input-wrap">
+                                <input type="password" id="loginPassword" required placeholder="Enter your password" autocomplete="current-password">
+                                <button type="button" class="password-toggle-btn" aria-label="Toggle password visibility" onclick="togglePasswordVisibility('loginPassword', this)">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="auth-options-row">
+                            <label class="auth-remember-label">
+                                <input type="checkbox" id="rememberMe"> Remember me
+                            </label>
+                            <a class="auth-forgot-link" onclick="handleForgotPassword()">Forgot password?</a>
+                        </div>
+                        <button type="submit" class="btn auth-submit-btn">
+                            Log In
+                        </button>
+                        <p class="auth-footer-prompt">
+                            Don't have an account? <a class="auth-switch-link" onclick="switchAuthTab('signup')">Sign Up</a>
+                        </p>
+                    </form>
+                </div>
+
+                <!-- 2. Sign Up Panel -->
+                <div class="auth-panel" id="panelSignup">
+                    <div class="auth-header-copy">
+                        <h3>Create Your Account</h3>
+                        <p>Join the Jewels by J family for bespoke updates &amp; exclusive drops.</p>
+                    </div>
+                    <form id="signupForm">
+                        <div class="auth-input-group">
+                            <label for="signupName">Full Name</label>
+                            <div class="auth-input-wrap">
+                                <input type="text" id="signupName" required placeholder="e.g. Ama Serwaa" autocomplete="name">
+                            </div>
+                        </div>
+                        <div class="auth-input-group">
+                            <label for="signupPhone">Phone Number (WhatsApp)</label>
+                            <div class="auth-input-wrap">
+                                <input type="tel" id="signupPhone" required placeholder="e.g. 054 123 4567" autocomplete="tel">
+                            </div>
+                        </div>
+                        <div class="auth-input-group">
+                            <label for="signupEmail">Email Address</label>
+                            <div class="auth-input-wrap">
+                                <input type="email" id="signupEmail" required placeholder="you@example.com" autocomplete="email">
+                            </div>
+                        </div>
+                        <div class="auth-input-group">
+                            <label for="signupPassword">Password</label>
+                            <div class="auth-input-wrap">
+                                <input type="password" id="signupPassword" required placeholder="Create a password (min. 6 chars)" autocomplete="new-password">
+                                <button type="button" class="password-toggle-btn" aria-label="Toggle password visibility" onclick="togglePasswordVisibility('signupPassword', this)">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn auth-submit-btn">
+                            Create Account
+                        </button>
+                        <p class="auth-footer-prompt">
+                            Already have an account? <a class="auth-switch-link" onclick="switchAuthTab('login')">Log In</a>
+                        </p>
+                    </form>
+                </div>
+
+                <!-- 3. Customer Account Dashboard Panel (Visible when logged in) -->
+                <div class="account-dashboard-panel" id="panelAccount">
+                    <div class="account-user-banner">
+                        <div class="account-avatar-large" id="accountAvatarLetter">A</div>
+                        <div class="account-info-meta">
+                            <h4 id="accountUserName">Ama Serwaa</h4>
+                            <p id="accountUserEmail">ama@example.com</p>
+                            <p id="accountUserPhone" style="color:var(--color-gold); font-size:0.76rem;">Ghana • +233 54 123 4567</p>
+                        </div>
+                    </div>
+                    <div class="account-detail-card">
+                        <div class="account-detail-label">Order History &amp; Activity</div>
+                        <div class="account-detail-value" id="accountOrdersSummary">No active orders right now. Ready to shop!</div>
+                    </div>
+                    <div class="account-detail-card">
+                        <div class="account-detail-label">Saved Delivery Location</div>
+                        <div class="account-detail-value">Accra, Greater Accra Region, Ghana</div>
+                    </div>
+                    <div class="account-actions-group">
+                        <button class="btn btn-outline btn-sm" onclick="closeAuthModal(); navigateTo('shop');">
+                            <i class="fa-solid fa-bag-shopping"></i> Shop Pieces
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="handleLogout()">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
