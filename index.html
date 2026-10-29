@@ -51,7 +51,7 @@
     <header class="site-header">
         <div class="container navbar-inner">
             <div class="nav-left">
-                <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle navigation menu" onclick="toggleMobileDrawer()">
+                <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle navigation menu" onclick="toggleMobileDrawer(event)">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -68,7 +68,7 @@
             <!-- Actions (Search, Favorite, Cart, Sign In / Log In) -->
             <div class="nav-actions">
                 <!-- 1. Search Button -->
-                <button class="nav-action-btn" id="navSearchTrigger" title="Search Jewelry Catalog" aria-label="Search Catalog" onclick="toggleHeaderSearch()">
+                <button class="nav-action-btn" id="navSearchTrigger" title="Search Jewelry Catalog" aria-label="Search Catalog" onclick="toggleHeaderSearch(undefined, event)">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
 

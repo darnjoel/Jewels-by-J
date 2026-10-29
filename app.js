@@ -436,12 +436,25 @@ function initMobileDrawer() {
     const closeBtn = document.getElementById("drawerCloseBtn");
     const backdrop = document.getElementById("drawerBackdrop");
 
-    if (hamburger) hamburger.addEventListener("click", toggleMobileDrawer);
+    if (hamburger && !hamburger.getAttribute("onclick")) {
+        hamburger.addEventListener("click", toggleMobileDrawer);
+    }
     if (closeBtn) closeBtn.addEventListener("click", closeMobileDrawer);
     if (backdrop) backdrop.addEventListener("click", closeMobileDrawer);
 }
 
-function toggleMobileDrawer() {
+let lastDrawerToggle = 0;
+function toggleMobileDrawer(e) {
+    if (e) {
+        if (typeof e.preventDefault === "function") e.preventDefault();
+        if (typeof e.stopPropagation === "function") e.stopPropagation();
+    }
+
+    // Debounce to prevent simultaneous dual-trigger from inline onclick + event listener
+    const now = Date.now();
+    if (now - lastDrawerToggle < 300) return;
+    lastDrawerToggle = now;
+
     const drawer = document.getElementById("mobileNavDrawer");
     if (drawer && drawer.classList.contains("active")) {
         closeMobileDrawer();
@@ -451,21 +464,35 @@ function toggleMobileDrawer() {
 }
 
 function openMobileDrawer() {
-    document.getElementById("mobileNavDrawer")?.classList.add("active");
-    document.getElementById("drawerBackdrop")?.classList.add("active");
+    const drawer = document.getElementById("mobileNavDrawer");
+    const backdrop = document.getElementById("drawerBackdrop");
+    if (drawer) drawer.classList.add("active");
+    if (backdrop) backdrop.classList.add("active");
     document.body.style.overflow = "hidden";
 }
 
 function closeMobileDrawer() {
-    document.getElementById("mobileNavDrawer")?.classList.remove("active");
-    document.getElementById("drawerBackdrop")?.classList.remove("active");
+    const drawer = document.getElementById("mobileNavDrawer");
+    const backdrop = document.getElementById("drawerBackdrop");
+    if (drawer) drawer.classList.remove("active");
+    if (backdrop) backdrop.classList.remove("active");
     document.body.style.overflow = "";
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // HEADER SEARCH BAR & WISHLIST NAVIGATION
 // ═══════════════════════════════════════════════════════════════════════════
-function toggleHeaderSearch(forceOpen) {
+let lastSearchToggle = 0;
+function toggleHeaderSearch(forceOpen, e) {
+    if (e) {
+        if (typeof e.preventDefault === "function") e.preventDefault();
+        if (typeof e.stopPropagation === "function") e.stopPropagation();
+    }
+
+    const now = Date.now();
+    if (typeof forceOpen !== "boolean" && now - lastSearchToggle < 300) return;
+    lastSearchToggle = now;
+
     const searchBar = document.getElementById("headerSearchBar");
     const searchInput = document.getElementById("headerSearchInput");
     if (!searchBar) return;
@@ -492,7 +519,7 @@ function initHeaderSearch() {
     const searchInput = document.getElementById("headerSearchInput");
     const shopSearchInput = document.getElementById("shopSearchInput");
 
-    if (searchTrigger) {
+    if (searchTrigger && !searchTrigger.getAttribute("onclick")) {
         searchTrigger.addEventListener("click", (e) => {
             e.preventDefault();
             toggleHeaderSearch();
