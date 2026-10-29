@@ -403,9 +403,12 @@ function navigateTo(sectionId) {
         window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    // Update active nav links
+    // Update active nav and drawer links
     document.querySelectorAll(".nav-link").forEach(link => {
         link.classList.toggle("active", link.dataset.section === sectionId);
+    });
+    document.querySelectorAll(".drawer-menu-link").forEach(link => {
+        link.classList.toggle("active", link.dataset.nav === sectionId);
     });
 
     // Pause any active videos when navigating away from Client Cam
