@@ -143,6 +143,7 @@
             <li><a href="#shop" class="drawer-menu-link" onclick="closeMobileDrawer(); toggleHeaderSearch(true);"><i class="fa-solid fa-magnifying-glass" style="margin-right:8px; color:var(--color-gold);"></i> Search Jewelry <i class="fa-solid fa-chevron-right"></i></a></li>
             <li><a href="#shop" class="drawer-menu-link" onclick="closeMobileDrawer(); viewWishlist();"><i class="fa-regular fa-heart" style="margin-right:8px; color:var(--color-gold);"></i> My Favorites (<span id="drawerWishlistCount">0</span>) <i class="fa-solid fa-chevron-right"></i></a></li>
             <li><a href="#cart" class="drawer-menu-link" onclick="closeMobileDrawer(); openCartDrawer();"><i class="fa-solid fa-bag-shopping" style="margin-right:8px; color:var(--color-gold);"></i> Shopping Bag (<span id="drawerCartCount">0</span>) <i class="fa-solid fa-chevron-right"></i></a></li>
+            <li><a href="#track" class="drawer-menu-link" data-nav="track"><i class="fa-solid fa-truck-fast" style="margin-right:8px; color:var(--color-gold);"></i> Track Your Order <i class="fa-solid fa-chevron-right"></i></a></li>
             <li style="height:1px; background:var(--color-border); margin:8px 0;"></li>
             <li><a href="#home" class="drawer-menu-link active" data-nav="home">Home <i class="fa-solid fa-chevron-right"></i></a></li>
             <li><a href="#shop" class="drawer-menu-link" data-nav="shop" data-category="all">Shop All Pieces <i class="fa-solid fa-chevron-right"></i></a></li>
@@ -615,6 +616,65 @@
             </div>
         </section>
 
+        <!-- ─────────────────────────────────────────────────────────────────
+           SECTION F: TRACK ORDER (THE STRAND BRAND ORDER TRACKING SYSTEM)
+           ───────────────────────────────────────────────────────────────── -->
+        <section id="section-track" class="page-section">
+            <div class="container track-order-container">
+                <div class="track-order-card">
+                    <div class="track-header text-center">
+                        <span class="shop-eyebrow"><i class="fa-solid fa-truck-fast"></i> Live Delivery Tracking</span>
+                        <h2 class="shop-title">Track Your Order</h2>
+                        <p class="track-intro">
+                            Enter your order number along with the email or phone number used at checkout to check your live delivery status.
+                        </p>
+                    </div>
+
+                    <!-- Track Order Form -->
+                    <form class="track-form" id="trackOrderForm">
+                        <div class="form-group">
+                            <label for="trackOrderNumber">Order Number / Tracking ID *</label>
+                            <input type="text" id="trackOrderNumber" required placeholder="e.g. JBJ-20261029-001" autocomplete="off">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="trackOrderContact">Email or Phone Number *</label>
+                            <input type="text" id="trackOrderContact" required placeholder="e.g. you@example.com or +233 50 059 4879" autocomplete="off">
+                        </div>
+
+                        <div class="track-sample-bar">
+                            <span class="track-sample-title"><i class="fa-solid fa-lightbulb"></i> Try a sample order:</span>
+                            <button type="button" class="sample-order-chip" onclick="fillDemoOrder('JBJ-20261029-001', 'client@jewelsbyj.com')">
+                                JBJ-20261029-001 (In Transit)
+                            </button>
+                            <button type="button" class="sample-order-chip" onclick="fillDemoOrder('JBJ-20261028-084', '0500594879')">
+                                JBJ-20261028-084 (Processing)
+                            </button>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block btn-track-submit" id="btnTrackSubmit">
+                            <i class="fa-solid fa-magnifying-glass"></i> Track Order
+                        </button>
+                    </form>
+
+                    <!-- Empty State / Not Found -->
+                    <div class="track-empty-state" id="trackEmptyState" style="display:none;">
+                        <i class="fa-solid fa-circle-question"></i>
+                        <h3>Order Not Found</h3>
+                        <p id="trackEmptyMessage">We couldn't find an order matching those details. Please double-check the order number and contact info.</p>
+                        <a href="https://wa.me/233500594879?text=Hi%20Jewels%20by%20J,%20I'm%20trying%20to%20track%20my%20order%20and%20need%20assistance." target="_blank" class="btn btn-outline btn-sm">
+                            <i class="fa-brands fa-whatsapp"></i> Chat with Concierge
+                        </a>
+                    </div>
+
+                    <!-- Tracking Result Card -->
+                    <div class="track-result-card" id="trackResultCard" style="display:none;">
+                        <!-- Rendered dynamically by app.js -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- ═══════════════════════════════════════════════════════════════════════
@@ -855,6 +915,9 @@
                         <button class="btn btn-outline btn-sm" onclick="closeAuthModal(); navigateTo('shop');">
                             <i class="fa-solid fa-bag-shopping"></i> Shop Pieces
                         </button>
+                        <button class="btn btn-outline btn-sm" onclick="closeAuthModal(); navigateTo('track');">
+                            <i class="fa-solid fa-truck-fast"></i> Track Order
+                        </button>
                         <button class="btn btn-primary btn-sm" onclick="handleLogout()">
                             <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
                         </button>
@@ -895,6 +958,7 @@
                 <ul class="footer-links-list">
                     <li><a href="#home" data-nav="home">Home</a></li>
                     <li><a href="#shop" data-nav="shop" data-category="all">Shop All Pieces</a></li>
+                    <li><a href="#track" data-nav="track">Track Your Order</a></li>
                     <li><a href="#cam" data-nav="cam">Client Cam (Videos)</a></li>
                     <li><a href="#about" data-nav="about">Our Story</a></li>
                     <li><a href="#contact" data-nav="contact">Private Inquiries</a></li>
