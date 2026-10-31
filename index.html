@@ -65,7 +65,12 @@
                 </a>
             </div>
 
-            <!-- Actions (Search, Favorite, Cart, Sign In / Log In) -->
+            <!-- Desktop Navigation Links (Admin remains on main header) -->
+            <nav class="nav-links" id="desktopNavLinks" aria-label="Main Navigation">
+                <a href="#admin" class="nav-link" data-nav="admin" title="Atelier Admin Portal"><i class="fa-solid fa-shield-halved" style="color:var(--color-gold); margin-right:4px;"></i> Atelier Admin</a>
+            </nav>
+
+            <!-- Actions (Search, Favorite, Cart, Sign In / Log In, Admin) -->
             <div class="nav-actions">
                 <!-- 1. Search Button -->
                 <button class="nav-action-btn" id="navSearchTrigger" title="Search Jewelry Catalog" aria-label="Search Catalog" onclick="toggleHeaderSearch(undefined, event)">
@@ -84,7 +89,13 @@
                     <span class="badge-count" id="cartBadgeCount" style="display:none;">0</span>
                 </button>
 
-                <!-- 4. Sign In or Log In Button -->
+                <!-- 4. Atelier Admin Portal Shortcut -->
+                <button class="nav-action-btn admin-quick-btn" id="navAdminTrigger" title="Atelier Admin Portal" aria-label="Admin Portal" onclick="navigateTo('admin')">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span class="admin-notify-dot" id="navAdminNotifyDot"></span>
+                </button>
+
+                <!-- 5. Sign In or Log In Button -->
                 <button class="nav-auth-btn" id="navAuthBtn" title="Sign In or Log In" aria-label="Sign In or Log In" onclick="openAuthModal()">
                     <i class="fa-regular fa-user"></i>
                     <span class="auth-label" id="navAuthLabel">Sign In / Log In</span>
@@ -147,6 +158,8 @@
             <li style="height:1px; background:var(--color-border); margin:8px 0;"></li>
             <li><a href="#home" class="drawer-menu-link active" data-nav="home">Home <i class="fa-solid fa-chevron-right"></i></a></li>
             <li><a href="#shop" class="drawer-menu-link" data-nav="shop" data-category="all">Shop All Pieces <i class="fa-solid fa-chevron-right"></i></a></li>
+            <li><a href="#customize" class="drawer-menu-link" data-nav="customize"><i class="fa-solid fa-wand-magic-sparkles" style="margin-right:8px; color:var(--color-gold);"></i> Custom Jewelry Studio <span class="menu-badge">Popular</span> <i class="fa-solid fa-chevron-right"></i></a></li>
+            <li><a href="#delivery" class="drawer-menu-link" data-nav="delivery"><i class="fa-solid fa-box-open" style="margin-right:8px; color:var(--color-gold);"></i> Delivery &amp; Fees <i class="fa-solid fa-chevron-right"></i></a></li>
             <li><a href="#shop" class="drawer-menu-link" data-nav="shop" data-category="necklaces">Nameplate Necklaces <i class="fa-solid fa-chevron-right"></i></a></li>
             <li><a href="#shop" class="drawer-menu-link" data-nav="shop" data-category="bracelets">Bracelets &amp; Bangles <i class="fa-solid fa-chevron-right"></i></a></li>
             <li><a href="#shop" class="drawer-menu-link" data-nav="shop" data-category="giftsets">Gift Sets &amp; Keepsakes <i class="fa-solid fa-chevron-right"></i></a></li>
@@ -675,6 +688,545 @@
             </div>
         </section>
 
+        <!-- ─────────────────────────────────────────────────────────────────
+           SECTION G: BESPOKE CUSTOMIZATION STUDIO (FEATURE #5)
+           ───────────────────────────────────────────────────────────────── -->
+        <section id="section-customize" class="page-section">
+            <div class="customizer-section">
+                <div class="container">
+                    <div class="shop-header">
+                        <span class="shop-eyebrow"><i class="fa-solid fa-wand-magic-sparkles"></i> Handcrafted Atelier in Accra</span>
+                        <h2 class="shop-title">Bespoke Jewelry Studio</h2>
+                        <p class="shop-subtitle">Design your personalized cursive nameplate, initial pendant, or statement piece in real-time</p>
+                    </div>
+
+                    <div class="customizer-grid">
+                        <!-- Left Column: Interactive Live Preview -->
+                        <div class="customizer-preview-box">
+                            <div class="customizer-preview-header">
+                                <span class="customizer-preview-tag">
+                                    <i class="fa-solid fa-gem"></i> Live Atelier Visualizer
+                                </span>
+                                <span class="badge badge-bestseller">Hand-Finished</span>
+                            </div>
+
+                            <div class="customizer-stage" id="customizerStage">
+                                <div class="customizer-chain-render chain-style-cable" id="customizerChainGraphic"></div>
+                                <div class="customizer-plate-wrap" id="customizerPlateWrap">
+                                    <span class="customizer-plate-text font-calligraphy metal-gold" id="customizerPlateText">Jerrilyn</span>
+                                    <span class="customizer-charm-render" id="customizerCharmIcon">🦋</span>
+                                </div>
+                            </div>
+
+                            <div class="customizer-preview-footer">
+                                <div class="customizer-specs-summary" id="customizerSpecsSummary">
+                                    <span>Metal: <strong id="specMetal">18K Gold Vermeil</strong></span>
+                                    <span>•</span>
+                                    <span>Font: <strong id="specFont">Calligraphy Script</strong></span>
+                                    <span>•</span>
+                                    <span>Chain: <strong id="specChain">Cable Chain (16")</strong></span>
+                                    <span>•</span>
+                                    <span>Charm: <strong id="specCharm">Butterfly</strong></span>
+                                </div>
+
+                                <div class="customizer-price-row">
+                                    <div>
+                                        <div class="customizer-price-lbl">Estimated Atelier Price</div>
+                                        <div class="customizer-price-val" id="customizerPriceDisplay">GH₵ 380.00</div>
+                                    </div>
+                                    <div style="font-size:0.75rem; color:var(--color-text-muted); text-align:right;">
+                                        <i class="fa-solid fa-clock"></i> 4–7 Days Crafting<br>Delivered Across Ghana
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Interactive Configuration Form -->
+                        <div class="customizer-controls">
+                            <!-- 1. Custom Text -->
+                            <div style="margin-bottom: 22px;">
+                                <div class="customizer-step-title">
+                                    <span><span class="step-num">1</span> Your Custom Name or Word</span>
+                                    <span style="font-size:0.75rem; color:var(--color-text-muted);"><span id="customCharCount">8</span>/12 chars</span>
+                                </div>
+                                <input type="text" class="customizer-input-field" id="customTextInput" value="Jerrilyn" maxlength="12" placeholder="e.g. Priscilla, Kofi, Queen...">
+                                <div class="customizer-quick-chips">
+                                    <span style="font-size:0.72rem; color:var(--color-text-muted); align-self:center;">Try:</span>
+                                    <button type="button" class="quick-chip-btn" onclick="setCustomText('Jerrilyn')">Jerrilyn</button>
+                                    <button type="button" class="quick-chip-btn" onclick="setCustomText('Queen')">Queen</button>
+                                    <button type="button" class="quick-chip-btn" onclick="setCustomText('Moesha')">Moesha</button>
+                                    <button type="button" class="quick-chip-btn" onclick="setCustomText('Akosua')">Akosua</button>
+                                    <button type="button" class="quick-chip-btn" onclick="setCustomText('Kofi')">Kofi</button>
+                                </div>
+                            </div>
+
+                            <!-- 2. Typography Style -->
+                            <div style="margin-bottom: 22px;">
+                                <div class="customizer-step-title">
+                                    <span><span class="step-num">2</span> Select Font / Calligraphy Style</span>
+                                </div>
+                                <div class="customizer-cards-group">
+                                    <div class="customizer-option-card active" data-font="calligraphy" onclick="setCustomFont('calligraphy', this)">
+                                        <div style="font-family:'Great Vibes', cursive; font-size:1.4rem;">Calligraphy</div>
+                                        <div class="customizer-option-title">Royal Script</div>
+                                        <div class="customizer-option-meta">Classic &amp; Flowing</div>
+                                    </div>
+                                    <div class="customizer-option-card" data-font="gothic" onclick="setCustomFont('gothic', this)">
+                                        <div style="font-family:'Cormorant Garamond', serif; font-weight:700; font-size:1.1rem; text-transform:uppercase;">GOTHIC</div>
+                                        <div class="customizer-option-title">Old English</div>
+                                        <div class="customizer-option-meta">Bold &amp; Regal</div>
+                                    </div>
+                                    <div class="customizer-option-card" data-font="serif" onclick="setCustomFont('serif', this)">
+                                        <div style="font-family:'Cormorant Garamond', serif; font-style:italic; font-size:1.2rem;">Modern Luxe</div>
+                                        <div class="customizer-option-title">Serif Italic</div>
+                                        <div class="customizer-option-meta">Editorial Elegance</div>
+                                    </div>
+                                    <div class="customizer-option-card" data-font="cursive" onclick="setCustomFont('cursive', this)">
+                                        <div style="font-family:'Inter', sans-serif; font-style:italic; font-weight:600; font-size:1.1rem;">Minimalist</div>
+                                        <div class="customizer-option-title">Chic Cursive</div>
+                                        <div class="customizer-option-meta">Clean &amp; Sleek</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3. Precious Metal -->
+                            <div style="margin-bottom: 22px;">
+                                <div class="customizer-step-title">
+                                    <span><span class="step-num">3</span> Choose Metal &amp; Finish</span>
+                                </div>
+                                <div class="customizer-cards-group">
+                                    <div class="customizer-option-card active" data-metal="gold" onclick="setCustomMetal('gold', this)">
+                                        <div class="metal-color-swatch swatch-gold"></div>
+                                        <div class="customizer-option-title">18K Gold Vermeil</div>
+                                        <div class="customizer-option-meta">Heavy Gold Layer</div>
+                                    </div>
+                                    <div class="customizer-option-card" data-metal="silver" onclick="setCustomMetal('silver', this)">
+                                        <div class="metal-color-swatch swatch-silver"></div>
+                                        <div class="customizer-option-title">925 Sterling Silver</div>
+                                        <div class="customizer-option-meta">Solid Mirror Polish</div>
+                                    </div>
+                                    <div class="customizer-option-card" data-metal="rosegold" onclick="setCustomMetal('rosegold', this)">
+                                        <div class="metal-color-swatch swatch-rosegold"></div>
+                                        <div class="customizer-option-title">Rose Gold Lustre</div>
+                                        <div class="customizer-option-meta">Warm Romantic Tone</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 4. Chain Style & Length -->
+                            <div style="margin-bottom: 22px;">
+                                <div class="customizer-step-title">
+                                    <span><span class="step-num">4</span> Chain Style &amp; Length</span>
+                                </div>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+                                    <div>
+                                        <label style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">Chain Style</label>
+                                        <select class="shop-select" id="customChainSelect" onchange="updateCustomizerChain(this.value)" style="width:100%;">
+                                            <option value="cable">Dainty Cable Chain (Included)</option>
+                                            <option value="figaro">Italian Figaro Chain (+GH₵ 30.00)</option>
+                                            <option value="cuban">Bold Cuban Curb Chain (+GH₵ 50.00)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">Chain Length</label>
+                                        <select class="shop-select" id="customLengthSelect" onchange="updateCustomizerLength(this.value)" style="width:100%;">
+                                            <option value="14\" (Choker)">14" (Choker Length)</option>
+                                            <option value="16\" (Standard)" selected>16" (Standard Collarbone)</option>
+                                            <option value="18\" (Princess)">18" (Mid-Chest Princess)</option>
+                                            <option value="20\" (Matinee)">20" (Statement Long)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 5. Accent Charm -->
+                            <div style="margin-bottom: 26px;">
+                                <div class="customizer-step-title">
+                                    <span><span class="step-num">5</span> Accent Charm Emblem</span>
+                                </div>
+                                <div class="customizer-cards-group" style="grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));">
+                                    <div class="customizer-option-card active" data-charm="butterfly" onclick="setCustomCharm('butterfly', '🦋', this)">
+                                        <div style="font-size:1.4rem;">🦋</div>
+                                        <div class="customizer-option-title">Butterfly</div>
+                                        <div class="customizer-option-meta">Signature</div>
+                                    </div>
+                                    <div class="customizer-option-card" data-charm="crown" onclick="setCustomCharm('crown', '👑', this)">
+                                        <div style="font-size:1.4rem;">👑</div>
+                                        <div class="customizer-option-title">Royal Crown</div>
+                                        <div class="customizer-option-meta">Regal</div>
+                                    </div>
+                                    <div class="customizer-option-card" data-charm="heart" onclick="setCustomCharm('heart', '🤍', this)">
+                                        <div style="font-size:1.4rem;">🤍</div>
+                                        <div class="customizer-option-title">Heart</div>
+                                        <div class="customizer-option-meta">Sweet Love</div>
+                                    </div>
+                                    <div class="customizer-option-card" data-charm="star" onclick="setCustomCharm('star', '✨', this)">
+                                        <div style="font-size:1.4rem;">✨</div>
+                                        <div class="customizer-option-title">Star Sparkle</div>
+                                        <div class="customizer-option-meta">Celestial</div>
+                                    </div>
+                                    <div class="customizer-option-card" data-charm="none" onclick="setCustomCharm('none', '', this)">
+                                        <div style="font-size:1.4rem; color:var(--color-text-subtle);"><i class="fa-solid fa-ban"></i></div>
+                                        <div class="customizer-option-title">No Charm</div>
+                                        <div class="customizer-option-meta">Clean Script</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Dual Actions (WhatsApp Request & Add to Cart) -->
+                            <div class="customizer-actions-stack">
+                                <button type="button" class="btn btn-whatsapp btn-block" style="padding:14px; font-size:1rem;" onclick="submitCustomizationViaWhatsApp()">
+                                    <i class="fa-brands fa-whatsapp" style="font-size:1.2rem;"></i> Submit Custom Request via WhatsApp
+                                </button>
+                                <button type="button" class="btn btn-primary btn-block" style="padding:14px; font-size:1rem;" onclick="addCustomPieceToCart()">
+                                    <i class="fa-solid fa-bag-shopping"></i> Add Custom Piece to Shopping Bag
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─────────────────────────────────────────────────────────────────
+           SECTION H: DELIVERY INFORMATION, LOCATIONS & CHARGES (FEATURE #7)
+           ───────────────────────────────────────────────────────────────── -->
+        <section id="section-delivery" class="page-section">
+            <div class="delivery-section">
+                <div class="container">
+                    <div class="shop-header">
+                        <span class="shop-eyebrow"><i class="fa-solid fa-truck-fast"></i> Fast &amp; Insured Dispatch Across Ghana</span>
+                        <h2 class="shop-title">Delivery Locations &amp; Charges</h2>
+                        <p class="shop-subtitle">Prompt delivery across Greater Accra and all 16 regions in Ghana</p>
+                    </div>
+
+                    <!-- Free Delivery Highlight Banner -->
+                    <div class="delivery-free-banner">
+                        <div class="delivery-free-text">
+                            <h3><i class="fa-solid fa-sparkles" style="color:var(--color-gold); margin-right:8px;"></i> Enjoy Free Delivery on Orders Over GH₵ 500</h3>
+                            <p>All ready-made or bespoke orders of GH₵ 500.00 and above qualify for 100% complimentary delivery across Ghana.</p>
+                        </div>
+                        <div class="delivery-free-badge">FREE DELIVERY UNLOCKED</div>
+                    </div>
+
+                    <!-- Key Delivery Promises -->
+                    <div class="trust-bar" style="margin-bottom: 40px; border-radius: var(--radius-md);">
+                        <div class="trust-grid">
+                            <div class="trust-item">
+                                <div class="trust-icon"><i class="fa-solid fa-box-archive"></i></div>
+                                <div>
+                                    <div class="trust-title">Heirloom Unboxing</div>
+                                    <div class="trust-sub">Signature pink velvet box, polishing cloth &amp; pouch</div>
+                                </div>
+                            </div>
+                            <div class="trust-item">
+                                <div class="trust-icon"><i class="fa-solid fa-clock"></i></div>
+                                <div>
+                                    <div class="trust-title">Ready-Made: 24h</div>
+                                    <div class="trust-sub">In-stock pieces dispatched within 24 hours</div>
+                                </div>
+                            </div>
+                            <div class="trust-item">
+                                <div class="trust-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                                <div>
+                                    <div class="trust-title">Custom: 4–7 Days</div>
+                                    <div class="trust-sub">Bespoke cursive nameplates hand-finished with love</div>
+                                </div>
+                            </div>
+                            <div class="trust-item">
+                                <div class="trust-icon"><i class="fa-solid fa-shield-check"></i></div>
+                                <div>
+                                    <div class="trust-title">100% Insured Delivery</div>
+                                    <div class="trust-sub">Real-time driver updates &amp; SMS tracking</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delivery Rates Grid -->
+                    <div class="delivery-cards-grid">
+                        <div class="delivery-rate-card">
+                            <div class="delivery-rate-badge">GH₵ 35.00</div>
+                            <h3 class="delivery-rate-title">Greater Accra (Central &amp; Metro)</h3>
+                            <div class="delivery-rate-timeline"><i class="fa-solid fa-clock"></i> 24 to 48 Hours</div>
+                            <p class="delivery-rate-sub">Osu, East Legon, Cantonments, Airport, Dzorwulu, Dansoman, Madina, Spintex, Achimota, Adenta, Dome, and surrounding metro areas.</p>
+                        </div>
+
+                        <div class="delivery-rate-card">
+                            <div class="delivery-rate-badge">GH₵ 55.00</div>
+                            <h3 class="delivery-rate-title">Accra Express / Same-Day</h3>
+                            <div class="delivery-rate-timeline"><i class="fa-solid fa-bolt"></i> Under 6 Hours</div>
+                            <p class="delivery-rate-sub">Priority direct express dispatch for orders placed before 12:00 PM within Greater Accra. Perfect for urgent anniversaries and birthday surprises.</p>
+                        </div>
+
+                        <div class="delivery-rate-card">
+                            <div class="delivery-rate-badge">GH₵ 45.00</div>
+                            <h3 class="delivery-rate-title">Tema, Kasoa &amp; Outskirts</h3>
+                            <div class="delivery-rate-timeline"><i class="fa-solid fa-clock"></i> 24 to 48 Hours</div>
+                            <p class="delivery-rate-sub">Tema Comm 1–25, Kasoa, Dawhenya, Prampram, Amasaman, Pokuase, and surrounding Greater Accra municipal borders.</p>
+                        </div>
+
+                        <div class="delivery-rate-card">
+                            <div class="delivery-rate-badge">GH₵ 50.00</div>
+                            <h3 class="delivery-rate-title">Kumasi &amp; Ashanti Region</h3>
+                            <div class="delivery-rate-timeline"><i class="fa-solid fa-clock"></i> 1 to 2 Business Days</div>
+                            <p class="delivery-rate-sub">Kumasi Central, KNUST, Ahodwo, Bantama, Obuasi, and Mampong via Express Intercity Parcel Service or direct courier agent.</p>
+                        </div>
+
+                        <div class="delivery-rate-card">
+                            <div class="delivery-rate-badge">GH₵ 55.00</div>
+                            <h3 class="delivery-rate-title">Central, Western, Eastern &amp; Volta</h3>
+                            <div class="delivery-rate-timeline"><i class="fa-solid fa-clock"></i> 2 to 3 Business Days</div>
+                            <p class="delivery-rate-sub">Takoradi, Cape Coast, Koforidua, Ho, Tarkwa, Akosombo, Winneba, and surrounding regional capitals via insured courier.</p>
+                        </div>
+
+                        <div class="delivery-rate-card">
+                            <div class="delivery-rate-badge">GH₵ 65.00</div>
+                            <h3 class="delivery-rate-title">Northern &amp; Upper Regions</h3>
+                            <div class="delivery-rate-timeline"><i class="fa-solid fa-clock"></i> 2 to 4 Business Days</div>
+                            <p class="delivery-rate-sub">Tamale, Sunyani, Techiman, Bolgatanga, Wa, Bawku, and Yendi via VIP Express or courier branch pickup.</p>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Delivery Calculator -->
+                    <div class="delivery-calc-card">
+                        <h3 style="font-size: 1.3rem; margin-bottom: 6px; text-align:center;"><i class="fa-solid fa-calculator" style="color:var(--color-gold); margin-right:8px;"></i> Live Delivery Fee &amp; Timeline Calculator</h3>
+                        <p style="font-size:0.85rem; color:var(--color-text-muted); text-align:center;">Select your destination to preview the exact delivery fee and expected arrival date</p>
+
+                        <div class="delivery-calc-grid">
+                            <div>
+                                <label style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">Select Region / City</label>
+                                <select class="shop-select" id="deliveryCalcSelect" onchange="calculateDeliveryFee(this.value)" style="width:100%;">
+                                    <option value="accra-std">Greater Accra Central (Standard: 24-48h)</option>
+                                    <option value="accra-exp">Greater Accra Express (Same-Day: &lt;6h)</option>
+                                    <option value="tema">Tema / Kasoa / Outskirts (24-48h)</option>
+                                    <option value="kumasi">Kumasi &amp; Ashanti Region (1-2 Days)</option>
+                                    <option value="regional">Central, Western, Eastern, Volta (2-3 Days)</option>
+                                    <option value="northern">Northern &amp; Upper Regions (2-4 Days)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">Item Type</label>
+                                <select class="shop-select" id="deliveryCalcItemType" onchange="calculateDeliveryFee()" style="width:100%;">
+                                    <option value="ready">Ready-Made Jewelry (Dispatched in 24h)</option>
+                                    <option value="custom">Bespoke Nameplate (4-7 Crafting Days)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="delivery-calc-result" id="deliveryCalcResult">
+                            <div>
+                                <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--color-text-muted); font-weight:700;">Delivery Charge</span>
+                                <div style="font-family:var(--font-heading); font-size:1.8rem; font-weight:700; color:var(--color-black);" id="calcResultFee">GH₵ 35.00</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--color-gold); font-weight:700;">Estimated Arrival</span>
+                                <div style="font-weight:600; font-size:0.95rem; color:var(--color-black);" id="calcResultArrival">Within 24 to 48 Hours</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─────────────────────────────────────────────────────────────────
+           SECTION I: ATELIER ADMIN PORTAL (FEATURE #8)
+           ───────────────────────────────────────────────────────────────── -->
+        <section id="section-admin" class="page-section">
+            <div class="admin-section">
+                <div class="container">
+                    <!-- PIN Lock Gate (Shown when not authenticated) -->
+                    <div class="admin-auth-card" id="adminAuthGate">
+                        <div class="admin-lock-icon">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <h2 style="font-size:1.4rem; margin-bottom:6px;">Atelier Admin Portal</h2>
+                        <p style="font-size:0.85rem; color:var(--color-text-muted); margin-bottom:20px;">
+                            Enter your 4-digit security PIN to access the product catalogue, order manager, and pricing controls.
+                        </p>
+
+                        <div class="admin-pin-display">
+                            <div class="pin-dot" id="pindot-1"></div>
+                            <div class="pin-dot" id="pindot-2"></div>
+                            <div class="pin-dot" id="pindot-3"></div>
+                            <div class="pin-dot" id="pindot-4"></div>
+                        </div>
+
+                        <div class="admin-keypad">
+                            <button class="keypad-btn" onclick="pressAdminKey('1')">1</button>
+                            <button class="keypad-btn" onclick="pressAdminKey('2')">2</button>
+                            <button class="keypad-btn" onclick="pressAdminKey('3')">3</button>
+                            <button class="keypad-btn" onclick="pressAdminKey('4')">4</button>
+                            <button class="keypad-btn" onclick="pressAdminKey('5')">5</button>
+                            <button class="keypad-btn" onclick="pressAdminKey('6')">6</button>
+                            <button class="keypad-btn" onclick="pressAdminKey('7')">7</button>
+                            <button class="keypad-btn" onclick="pressAdminKey('8')">8</button>
+                            <button class="keypad-btn" onclick="pressAdminKey('9')">9</button>
+                            <button class="keypad-btn" onclick="clearAdminKey()"><i class="fa-solid fa-arrow-left"></i></button>
+                            <button class="keypad-btn" onclick="pressAdminKey('0')">0</button>
+                            <button class="keypad-btn" onclick="submitAdminPIN()"><i class="fa-solid fa-check"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Unlocked Admin Dashboard -->
+                    <div class="admin-dashboard-wrap" id="adminDashboardView" style="display:none;">
+                        <!-- Top Bar -->
+                        <div class="admin-top-bar">
+                            <div class="admin-top-brand">
+                                <i class="fa-solid fa-crown" style="color:var(--color-gold);"></i>
+                                <span>JEWELS BY J ATELIER DASHBOARD</span>
+                            </div>
+                            <div class="admin-top-actions">
+                                <span style="font-size:0.82rem; color:var(--color-blush); display:flex; align-items:center; gap:6px;">
+                                    <span class="cam-live-pulse" style="background:#4caf50;"></span> Owner: Jerrilyn Mensah
+                                </span>
+                                <button class="btn btn-outline btn-sm" style="color:#fff; border-color:rgba(255,255,255,0.3);" onclick="lockAdminDashboard()">
+                                    <i class="fa-solid fa-lock"></i> Lock Dashboard
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Metric Counters -->
+                        <div class="admin-stats-grid">
+                            <div class="admin-stat-card">
+                                <div class="admin-stat-lbl">Total Store Revenue</div>
+                                <div class="admin-stat-num" id="adminStatRevenue">GH₵ 0.00</div>
+                            </div>
+                            <div class="admin-stat-card">
+                                <div class="admin-stat-lbl">Orders Placed</div>
+                                <div class="admin-stat-num" id="adminStatOrders">0</div>
+                            </div>
+                            <div class="admin-stat-card">
+                                <div class="admin-stat-lbl">Pending Deliveries</div>
+                                <div class="admin-stat-num" id="adminStatPending" style="color:#e65100;">0</div>
+                            </div>
+                            <div class="admin-stat-card">
+                                <div class="admin-stat-lbl">Active Products in Store</div>
+                                <div class="admin-stat-num" id="adminStatProducts">21</div>
+                            </div>
+                        </div>
+
+                        <!-- Admin Navigation Tabs -->
+                        <div class="admin-tabs-nav">
+                            <button class="admin-tab-btn active" id="admTabBtnProducts" onclick="switchAdminTab('products')">
+                                <i class="fa-solid fa-gem"></i> Manage Products (<span id="admTabProdCount">21</span>)
+                            </button>
+                            <button class="admin-tab-btn" id="admTabBtnOrders" onclick="switchAdminTab('orders')">
+                                <i class="fa-solid fa-truck-fast"></i> Customer Orders (<span id="admTabOrderCount">0</span>)
+                            </button>
+                            <button class="admin-tab-btn" id="admTabBtnSettings" onclick="switchAdminTab('settings')">
+                                <i class="fa-solid fa-gear"></i> Store Settings
+                            </button>
+                        </div>
+
+                        <!-- TAB 1: PRODUCT CATALOGUE MANAGEMENT -->
+                        <div class="admin-tab-content" id="admTabContentProducts">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+                                <div>
+                                    <h3 style="font-size:1.15rem; color:var(--color-black);">Products Catalogue</h3>
+                                    <p style="font-size:0.8rem; color:var(--color-text-muted);">Add new products, modify prices, upload pictures, and toggle stock availability without calling a developer.</p>
+                                </div>
+                                <div style="display:flex; gap:10px;">
+                                    <button class="btn btn-outline btn-sm" onclick="resetProductsToDefault()">
+                                        <i class="fa-solid fa-rotate-left"></i> Reset to Atelier Defaults
+                                    </button>
+                                    <button class="btn btn-primary btn-sm" onclick="openAddProductModal()">
+                                        <i class="fa-solid fa-plus"></i> Add New Product
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div style="overflow-x:auto;">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Image</th>
+                                            <th>Title</th>
+                                            <th>Category</th>
+                                            <th>Price (GH₵)</th>
+                                            <th>Original / Sale</th>
+                                            <th>Badge</th>
+                                            <th>Stock Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminProductsTableBody">
+                                        <!-- Dynamically populated by app.js -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- TAB 2: ORDER MANAGEMENT -->
+                        <div class="admin-tab-content" id="admTabContentOrders" style="display:none;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+                                <div>
+                                    <h3 style="font-size:1.15rem; color:var(--color-black);">Customer Orders &amp; Notifications</h3>
+                                    <p style="font-size:0.8rem; color:var(--color-text-muted);">View incoming orders from MoMo, Card, and WhatsApp. Update fulfillment statuses to keep customers notified.</p>
+                                </div>
+                                <div style="display:flex; gap:10px;">
+                                    <button class="btn btn-outline btn-sm" onclick="exportOrdersJSON()">
+                                        <i class="fa-solid fa-download"></i> Export Orders Backup
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div style="overflow-x:auto;">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Order ID</th>
+                                            <th>Date</th>
+                                            <th>Customer</th>
+                                            <th>Location</th>
+                                            <th>Items</th>
+                                            <th>Payment</th>
+                                            <th>Total</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminOrdersTableBody">
+                                        <!-- Dynamically populated by app.js -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- TAB 3: STORE SETTINGS -->
+                        <div class="admin-tab-content" id="admTabContentSettings" style="display:none;">
+                            <div style="max-width:540px;">
+                                <h3 style="font-size:1.15rem; margin-bottom:6px;">Atelier Store Configuration</h3>
+                                <p style="font-size:0.8rem; color:var(--color-text-muted); margin-bottom:20px;">Update contact details, courier parameters, and security PIN.</p>
+
+                                <form id="adminSettingsForm" onsubmit="saveAdminSettings(event)">
+                                    <div class="form-group" style="margin-bottom:14px;">
+                                        <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Store WhatsApp Number (Country code + phone)</label>
+                                        <input type="text" id="settingWhatsapp" class="customizer-input-field" value="233500594879" required>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom:14px;">
+                                        <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Store Notification Email</label>
+                                        <input type="email" id="settingEmail" class="customizer-input-field" value="mensahjerrilyn@gmail.com" required>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom:14px;">
+                                        <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Free Delivery Threshold (GH₵)</label>
+                                        <input type="number" id="settingFreeDelivery" class="customizer-input-field" value="500" required>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom:22px;">
+                                        <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Admin Access PIN (4 digits)</label>
+                                        <input type="password" id="settingAdminPIN" class="customizer-input-field" maxlength="4" value="2023" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-block">
+                                        <i class="fa-solid fa-floppy-disk"></i> Save Atelier Settings
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- ═══════════════════════════════════════════════════════════════════════
@@ -716,9 +1268,14 @@
                 <span>Estimated Total</span>
                 <span id="cartTotal">GH₵ 0.00</span>
             </div>
-            <button class="btn btn-whatsapp btn-block cart-checkout-btn" id="cartCheckoutBtn">
-                <i class="fa-brands fa-whatsapp" style="font-size:1.1rem;"></i> Order via WhatsApp
-            </button>
+            <div class="cart-actions-stack" style="display:flex; flex-direction:column; gap:8px;">
+                <button class="btn btn-primary btn-block cart-pay-online-btn" id="cartPayOnlineBtn" onclick="closeCartDrawer(); openCheckoutModal();" style="padding:14px; font-size:0.95rem;">
+                    <i class="fa-solid fa-lock"></i> Pay Online Directly (MoMo / Card)
+                </button>
+                <button class="btn btn-whatsapp btn-block cart-checkout-btn" id="cartCheckoutBtn">
+                    <i class="fa-brands fa-whatsapp" style="font-size:1.1rem;"></i> Order via WhatsApp
+                </button>
+            </div>
             <button class="cart-clear-btn" id="cartClearBtn">Empty Shopping Bag</button>
         </div>
     </aside>
@@ -928,6 +1485,390 @@
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════════════
+       7C. ONLINE CHECKOUT MODAL (GHANA MOMO & CARD PAYMENTS — FEATURES #2, #3, #4)
+       ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="checkout-modal-backdrop" id="checkoutModalBackdrop">
+        <div class="checkout-card">
+            <!-- Modal Header -->
+            <div class="checkout-header">
+                <div class="checkout-header-title">
+                    <i class="fa-solid fa-lock" style="color:var(--color-gold);"></i>
+                    <span>Secure Checkout</span>
+                </div>
+                <div class="checkout-stepper">
+                    <span class="checkout-step-pill active" id="checkoutStepIndicator1">1. Delivery</span>
+                    <span class="checkout-step-pill" id="checkoutStepIndicator2">2. Payment</span>
+                    <span class="checkout-step-pill" id="checkoutStepIndicator3">3. Done</span>
+                </div>
+                <button class="cart-close-btn" onclick="closeCheckoutModal()" aria-label="Close Checkout">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="checkout-body">
+                <!-- STEP 1: CUSTOMER & DELIVERY INFO -->
+                <div class="checkout-step-pane" id="checkoutPaneStep1">
+                    <div class="checkout-layout">
+                        <!-- Form Fields -->
+                        <form id="checkoutDeliveryForm" onsubmit="proceedToCheckoutPayment(event)">
+                            <h3 style="font-size:1.1rem; color:var(--color-black); margin-bottom:14px;">Contact &amp; Delivery Destination</h3>
+                            
+                            <div class="form-grid-2" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+                                <div class="form-field">
+                                    <label style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">Full Name *</label>
+                                    <input type="text" id="chkCustName" required placeholder="e.g. Ama Serwaa" class="customizer-input-field" style="padding:10px 14px; font-size:0.92rem;">
+                                </div>
+                                <div class="form-field">
+                                    <label style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">WhatsApp / Phone Number *</label>
+                                    <input type="tel" id="chkCustPhone" required placeholder="e.g. 050 059 4879" class="customizer-input-field" style="padding:10px 14px; font-size:0.92rem;">
+                                </div>
+                            </div>
+
+                            <div class="form-field" style="margin-bottom:12px;">
+                                <label style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">Email Address (For Order Receipt) *</label>
+                                <input type="email" id="chkCustEmail" required placeholder="e.g. client@example.com" class="customizer-input-field" style="padding:10px 14px; font-size:0.92rem;">
+                            </div>
+
+                            <div class="form-field" style="margin-bottom:12px;">
+                                <label style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">Delivery Region &amp; Charge *</label>
+                                <select class="shop-select" id="chkDeliveryRegion" onchange="updateCheckoutDeliveryFee(this.value)" style="width:100%; padding:10px 14px;">
+                                    <option value="accra-std" data-fee="35" data-timeline="24–48 Hours">Greater Accra Metro &amp; Central — GH₵ 35.00 (24–48h)</option>
+                                    <option value="accra-exp" data-fee="55" data-timeline="Under 6 Hours">Greater Accra Express (Same-Day) — GH₵ 55.00 (&lt;6h)</option>
+                                    <option value="tema" data-fee="45" data-timeline="24–48 Hours">Tema / Kasoa / Outskirts — GH₵ 45.00 (24–48h)</option>
+                                    <option value="kumasi" data-fee="50" data-timeline="1–2 Business Days">Kumasi &amp; Ashanti Region — GH₵ 50.00 (1–2 Days)</option>
+                                    <option value="regional" data-fee="55" data-timeline="2–3 Business Days">Central, Western, Eastern, Volta — GH₵ 55.00 (2–3 Days)</option>
+                                    <option value="northern" data-fee="65" data-timeline="2–4 Business Days">Northern, Upper &amp; Bono Regions — GH₵ 65.00 (2–4 Days)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-field" style="margin-bottom:12px;">
+                                <label style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">Delivery Address / Landmark / Digital Address *</label>
+                                <input type="text" id="chkDeliveryAddress" required placeholder="e.g. East Legon, near Melcom or GA-123-4567" class="customizer-input-field" style="padding:10px 14px; font-size:0.92rem;">
+                            </div>
+
+                            <div class="form-field" style="margin-bottom:16px;">
+                                <label style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">Custom Nameplate Text / Special Request (Optional)</label>
+                                <input type="text" id="chkCustomNotes" placeholder="e.g. Engrave 'Priscilla' on necklace, or gift message" class="customizer-input-field" style="padding:10px 14px; font-size:0.92rem;">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-block" style="padding:14px;">
+                                Continue to Payment <i class="fa-solid fa-arrow-right" style="margin-left:6px;"></i>
+                            </button>
+                        </form>
+
+                        <!-- Order Summary Sidebar in Checkout -->
+                        <div class="checkout-order-summary">
+                            <h4 class="checkout-summary-title">Order Summary</h4>
+                            <div class="checkout-items-mini-list" id="checkoutItemsMiniList">
+                                <!-- Populated dynamically by app.js -->
+                            </div>
+                            <div class="cart-summary-row" style="font-size:0.85rem; margin-bottom:6px;">
+                                <span>Bag Subtotal</span>
+                                <span id="chkSubtotalDisplay">GH₵ 0.00</span>
+                            </div>
+                            <div class="cart-summary-row" style="font-size:0.85rem; margin-bottom:6px;">
+                                <span>Delivery Fee</span>
+                                <span id="chkDeliveryDisplay">GH₵ 35.00</span>
+                            </div>
+                            <div class="cart-summary-row cart-summary-total" style="font-size:1.15rem; border-top:1px solid var(--color-border); padding-top:10px; margin-top:10px;">
+                                <span>Grand Total</span>
+                                <span id="chkGrandTotalDisplay">GH₵ 0.00</span>
+                            </div>
+                            <div style="font-size:0.72rem; color:var(--color-text-muted); text-align:center; margin-top:10px;">
+                                <i class="fa-solid fa-shield-halved" style="color:var(--color-gold);"></i> Verified &amp; Insured by Jewels by J Atelier
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2: PAYMENT (MOMO OR CARD) -->
+                <div class="checkout-step-pane" id="checkoutPaneStep2" style="display:none;">
+                    <div class="checkout-layout">
+                        <div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                                <h3 style="font-size:1.1rem; color:var(--color-black);">Choose Payment Method</h3>
+                                <button type="button" class="btn btn-outline btn-sm" onclick="backToCheckoutDelivery()" style="font-size:0.76rem; padding:4px 10px;">
+                                    <i class="fa-solid fa-arrow-left"></i> Edit Details
+                                </button>
+                            </div>
+
+                            <!-- Payment Tabs -->
+                            <div class="payment-tabs-nav">
+                                <button type="button" class="payment-tab-btn active" id="tabBtnMoMo" onclick="switchPaymentTab('momo')">
+                                    <i class="fa-solid fa-mobile-screen" style="color:#ffc000;"></i> Mobile Money (MoMo)
+                                </button>
+                                <button type="button" class="payment-tab-btn" id="tabBtnCard" onclick="switchPaymentTab('card')">
+                                    <i class="fa-brands fa-cc-visa"></i> Card (Visa / Mastercard)
+                                </button>
+                            </div>
+
+                            <!-- MoMo Payment Panel -->
+                            <div class="payment-panel active" id="payPanelMoMo">
+                                <div style="margin-bottom:14px;">
+                                    <label style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:6px; display:block;">Select Mobile Money Network *</label>
+                                    <div class="momo-providers-row">
+                                        <div class="momo-provider-chip provider-mtn active" id="momoChipMTN" onclick="selectMoMoProvider('mtn')">
+                                            <span class="momo-chip-icon" style="color:#ffc000;"><i class="fa-solid fa-circle-dot"></i></span>
+                                            <span class="momo-chip-name">MTN MoMo</span>
+                                        </div>
+                                        <div class="momo-provider-chip provider-telecel" id="momoChipTelecel" onclick="selectMoMoProvider('telecel')">
+                                            <span class="momo-chip-icon" style="color:#e50000;"><i class="fa-solid fa-wallet"></i></span>
+                                            <span class="momo-chip-name">Telecel Cash</span>
+                                        </div>
+                                        <div class="momo-provider-chip provider-at" id="momoChipAT" onclick="selectMoMoProvider('at')">
+                                            <span class="momo-chip-icon" style="color:#0056b3;"><i class="fa-solid fa-sim-card"></i></span>
+                                            <span class="momo-chip-name">AT Money</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-field" style="margin-bottom:12px;">
+                                    <label style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">Mobile Money Number *</label>
+                                    <input type="tel" id="chkMoMoNumber" required placeholder="e.g. 024 123 4567" class="customizer-input-field" style="padding:10px 14px; font-size:0.92rem;">
+                                </div>
+
+                                <!-- Voucher code for Telecel Cash -->
+                                <div class="form-field" id="telecelVoucherWrap" style="display:none; margin-bottom:12px;">
+                                    <label style="font-size:0.75rem; font-weight:600; color:#e50000; margin-bottom:4px; display:block;">Telecel Cash Voucher Code (Dial *110# to generate) *</label>
+                                    <input type="text" id="chkTelecelVoucher" placeholder="Enter 6-digit Telecel voucher" class="customizer-input-field" style="padding:10px 14px; font-size:0.92rem;">
+                                    <span style="font-size:0.72rem; color:var(--color-text-muted); margin-top:2px; display:block;">To generate a voucher on Telecel: Dial *110# &gt; Choose Generate Voucher &gt; Enter PIN.</span>
+                                </div>
+
+                                <div style="background:var(--color-cream); border:1px solid var(--color-border); border-radius:var(--radius-md); padding:12px; margin-bottom:18px; font-size:0.78rem; color:var(--color-text-muted); display:flex; gap:8px;">
+                                    <i class="fa-solid fa-circle-info" style="color:var(--color-gold); font-size:1.1rem; margin-top:2px;"></i>
+                                    <div>
+                                        <strong>Instant USSD Prompt:</strong> When you click Pay Now, an approval prompt will be sent directly to your phone. Enter your Mobile Money PIN to approve the transaction.
+                                    </div>
+                                </div>
+
+                                <button type="button" class="btn btn-primary btn-block" style="padding:14px; font-size:1rem;" onclick="processMoMoPayment()">
+                                    <i class="fa-solid fa-mobile-screen"></i> Pay <span id="momoPayBtnAmount">GH₵ 0.00</span> with MoMo
+                                </button>
+                            </div>
+
+                            <!-- Card Payment Panel -->
+                            <div class="payment-panel" id="payPanelCard" style="display:none;">
+                                <div class="form-field" style="margin-bottom:12px;">
+                                    <label style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">Name on Card *</label>
+                                    <input type="text" id="chkCardName" placeholder="e.g. Ama Mensah" class="customizer-input-field" style="padding:10px 14px; font-size:0.92rem;">
+                                </div>
+
+                                <div class="form-field" style="margin-bottom:12px;">
+                                    <label style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">Card Number *</label>
+                                    <div class="card-input-wrap">
+                                        <input type="text" id="chkCardNumber" maxlength="19" oninput="formatCardNumber(this)" placeholder="4000 1234 5678 9010" class="customizer-input-field" style="padding:10px 14px; font-size:0.92rem;">
+                                        <div class="card-brands-icons">
+                                            <i class="fa-brands fa-cc-visa" id="cardBrandVisa"></i>
+                                            <i class="fa-brands fa-cc-mastercard" id="cardBrandMastercard"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-grid-2" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+                                    <div class="form-field">
+                                        <label style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">Expiry Date (MM/YY) *</label>
+                                        <input type="text" id="chkCardExpiry" maxlength="5" oninput="formatCardExpiry(this)" placeholder="12/28" class="customizer-input-field" style="padding:10px 14px; font-size:0.92rem;">
+                                    </div>
+                                    <div class="form-field">
+                                        <label style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">CVV / Security Code *</label>
+                                        <input type="password" id="chkCardCVV" maxlength="4" placeholder="123" class="customizer-input-field" style="padding:10px 14px; font-size:0.92rem;">
+                                    </div>
+                                </div>
+
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+                                    <button type="button" class="btn btn-outline btn-sm" onclick="fillDemoCard()" style="font-size:0.74rem;">
+                                        <i class="fa-solid fa-wand-magic-sparkles"></i> Fill Demo Test Card
+                                    </button>
+                                    <span style="font-size:0.72rem; color:var(--color-text-muted);"><i class="fa-solid fa-lock"></i> 256-Bit SSL Encrypted</span>
+                                </div>
+
+                                <button type="button" class="btn btn-primary btn-block" style="padding:14px; font-size:1rem;" onclick="processCardPayment()">
+                                    <i class="fa-regular fa-credit-card"></i> Pay <span id="cardPayBtnAmount">GH₵ 0.00</span> with Card
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Mini Order Summary Review in Payment Step -->
+                        <div class="checkout-order-summary">
+                            <h4 class="checkout-summary-title">Payment Overview</h4>
+                            <div style="font-size:0.8rem; line-height:1.6; margin-bottom:12px;">
+                                <div style="color:var(--color-text-muted);">Delivering To:</div>
+                                <strong id="chkSummaryRecipientName">Ama Serwaa</strong>
+                                <div id="chkSummaryAddress" style="color:var(--color-text-muted); font-size:0.75rem;">Accra, Ghana</div>
+                                <div id="chkSummaryPhone" style="color:var(--color-gold); font-size:0.75rem;">+233 50 059 4879</div>
+                            </div>
+                            <div class="cart-summary-row" style="font-size:0.85rem; margin-bottom:6px;">
+                                <span>Subtotal</span>
+                                <span id="chkPaySubtotalDisplay">GH₵ 0.00</span>
+                            </div>
+                            <div class="cart-summary-row" style="font-size:0.85rem; margin-bottom:6px;">
+                                <span>Delivery Fee</span>
+                                <span id="chkPayDeliveryDisplay">GH₵ 35.00</span>
+                            </div>
+                            <div class="cart-summary-row cart-summary-total" style="font-size:1.15rem; border-top:1px solid var(--color-border); padding-top:10px; margin-top:10px;">
+                                <span>Total to Authorize</span>
+                                <span id="chkPayGrandTotalDisplay">GH₵ 0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- USSD MOMO SIMULATION SCREEN -->
+                <div class="checkout-ussd-simulator" id="checkoutPaneMoMoSimulation" style="display:none;">
+                    <div class="ussd-phone-graphic">
+                        <div class="ussd-pulse-ring"></div>
+                        <i class="fa-solid fa-mobile-screen"></i>
+                    </div>
+                    <h3 style="font-size:1.3rem; margin-bottom:6px; color:var(--color-black);">Authorizing Mobile Money</h3>
+                    <p style="font-size:0.88rem; color:var(--color-text-muted); max-width:440px; margin:0 auto 16px;">
+                        A payment prompt of <strong id="simPromptAmount" style="color:var(--color-black);">GH₵ 0.00</strong> was sent to your phone (<span id="simPromptPhone">024 XXX XXXX</span>).
+                    </p>
+                    <div style="background:var(--color-cream); border:1px solid var(--color-border); border-radius:var(--radius-md); padding:16px; max-width:380px; margin:0 auto 20px; font-size:0.82rem;">
+                        <span style="display:block; font-weight:700; color:var(--color-black); margin-bottom:4px;">Mobile Prompt:</span>
+                        <em>"Authorize payment of GH₵ <span id="simPromptAmountInner">0.00</span> to Jewels by J? Enter MM PIN to approve."</em>
+                    </div>
+                    <p style="font-size:0.78rem; color:var(--color-text-subtle); margin-bottom:18px;">
+                        Waiting for authorization... <span id="simCountdown">5</span>s
+                    </p>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="completeMoMoSimulation()" style="padding:10px 24px;">
+                        <i class="fa-solid fa-check"></i> I Have Entered My PIN
+                    </button>
+                </div>
+
+                <!-- STEP 3: ORDER SUCCESS / RECEIPT & OWNER NOTIFICATION -->
+                <div class="checkout-success-view" id="checkoutPaneStep3" style="display:none;">
+                    <div class="success-icon-box">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <h2 style="font-size:1.6rem; margin-bottom:4px; color:var(--color-black); font-family:var(--font-heading);">Payment Confirmed!</h2>
+                    <p style="font-size:0.9rem; color:var(--color-text-muted); max-width:460px; margin:0 auto 12px;">
+                        Thank you beautiful! Your order has been placed into production at the Jewels by J atelier.
+                    </p>
+                    <div class="order-id-display">
+                        Order Tracking ID: <span id="successOrderIdDisplay">JBJ-20261031-001</span>
+                    </div>
+
+                    <!-- Owner notification alert card -->
+                    <div class="order-notify-badge" style="max-width:500px; margin:0 auto 24px;">
+                        <i class="fa-brands fa-whatsapp" style="font-size:1.8rem; color:#25d366;"></i>
+                        <div>
+                            <strong>Order Notification Ready:</strong>
+                            <p style="margin:2px 0 0; font-size:0.75rem;">Click below to forward your complete order receipt directly to Jerrilyn's WhatsApp for instant VIP concierge confirmation!</p>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+                        <button type="button" class="btn btn-whatsapp" id="btnNotifyAtelierWhatsApp" style="padding:12px 24px;">
+                            <i class="fa-brands fa-whatsapp"></i> Notify Atelier on WhatsApp
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="closeCheckoutModal(); navigateTo('track');" style="padding:12px 24px;">
+                            <i class="fa-solid fa-truck-fast"></i> Track Delivery Status
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+       7D. ADMIN ADD / EDIT PRODUCT MODAL (FEATURE #8)
+       ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="auth-modal-backdrop" id="adminProductModalBackdrop">
+        <div class="auth-modal-card" style="max-width:640px;">
+            <button class="auth-close-btn" onclick="closeAdminProductModal()" aria-label="Close modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div style="padding:28px 24px;">
+                <h3 style="font-size:1.3rem; margin-bottom:4px; color:var(--color-black); font-family:var(--font-heading);" id="adminProdModalTitle">Add New Product</h3>
+                <p style="font-size:0.8rem; color:var(--color-text-muted); margin-bottom:20px;">Upload pictures, adjust prices, and assign categories directly to your live store.</p>
+
+                <form id="adminProductForm" onsubmit="saveAdminProduct(event)">
+                    <input type="hidden" id="admProdId" value="">
+
+                    <div class="form-grid-2" style="display:grid; grid-template-columns:1.2fr 0.8fr; gap:12px; margin-bottom:12px;">
+                        <div>
+                            <label style="font-size:0.75rem; font-weight:600; display:block; margin-bottom:4px;">Product Title *</label>
+                            <input type="text" id="admProdTitle" required placeholder="e.g. Priscilla Royal Butterfly Anklet" class="customizer-input-field" style="padding:10px 14px; font-size:0.9rem;">
+                        </div>
+                        <div>
+                            <label style="font-size:0.75rem; font-weight:600; display:block; margin-bottom:4px;">Category *</label>
+                            <select id="admProdCategory" class="shop-select" style="width:100%; padding:10px 14px;">
+                                <option value="necklaces">Nameplate Necklaces</option>
+                                <option value="bracelets">Bracelets &amp; Bangles</option>
+                                <option value="giftsets">Gift Sets &amp; Keepsakes</option>
+                                <option value="pendants">Initial Pendants</option>
+                                <option value="custom">Bespoke &amp; Custom</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+                        <div>
+                            <label style="font-size:0.75rem; font-weight:600; display:block; margin-bottom:4px;">Selling Price (GH₵) *</label>
+                            <input type="number" step="0.01" id="admProdPrice" required placeholder="380.00" class="customizer-input-field" style="padding:10px 14px; font-size:0.9rem;">
+                        </div>
+                        <div>
+                            <label style="font-size:0.75rem; font-weight:600; display:block; margin-bottom:4px;">Original Price (GH₵, optional for sale slash)</label>
+                            <input type="number" step="0.01" id="admProdOriginalPrice" placeholder="420.00" class="customizer-input-field" style="padding:10px 14px; font-size:0.9rem;">
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+                        <div>
+                            <label style="font-size:0.75rem; font-weight:600; display:block; margin-bottom:4px;">Metal &amp; Material Description</label>
+                            <input type="text" id="admProdMetal" placeholder="e.g. 18k Gold Plated / Cable Chain" class="customizer-input-field" style="padding:10px 14px; font-size:0.9rem;">
+                        </div>
+                        <div>
+                            <label style="font-size:0.75rem; font-weight:600; display:block; margin-bottom:4px;">Badge</label>
+                            <select id="admProdBadge" class="shop-select" style="width:100%; padding:10px 14px;">
+                                <option value="">None</option>
+                                <option value="Bestseller">Bestseller</option>
+                                <option value="New">New Drop</option>
+                                <option value="Sale">Sale</option>
+                                <option value="Popular">Popular</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-field" style="margin-bottom:12px;">
+                        <label style="font-size:0.75rem; font-weight:600; display:block; margin-bottom:4px;">Available Sizes / Options (Comma separated)</label>
+                        <input type="text" id="admProdOptions" placeholder="e.g. 16&quot;, 18&quot;, 20&quot;" class="customizer-input-field" style="padding:10px 14px; font-size:0.9rem;">
+                    </div>
+
+                    <!-- Picture Upload (Native File Reader + URL Fallback) -->
+                    <div class="form-field" style="margin-bottom:14px;">
+                        <label style="font-size:0.75rem; font-weight:600; display:block; margin-bottom:4px;">Product Picture Upload *</label>
+                        <div class="image-upload-box" onclick="document.getElementById('admProdFileInput').click()">
+                            <i class="fa-solid fa-cloud-arrow-up" style="font-size:1.8rem; color:var(--color-gold); margin-bottom:6px; display:block;"></i>
+                            <span style="font-size:0.85rem; font-weight:600; color:var(--color-black); display:block;">Click to choose photo from your phone or laptop</span>
+                            <span style="font-size:0.72rem; color:var(--color-text-muted);">Supports JPG, PNG, WEBP — Instant upload</span>
+                            <input type="file" id="admProdFileInput" accept="image/*" style="display:none;" onchange="handleAdminImageUpload(event)">
+                            <img id="admProdImgPreview" class="image-upload-preview" alt="Preview">
+                        </div>
+                        <input type="hidden" id="admProdImgData" value="">
+                        <div style="margin-top:6px; font-size:0.75rem; color:var(--color-text-subtle);">
+                            Or enter an image path / URL: <input type="text" id="admProdImgUrl" placeholder="images/jerrilyn.jpg" class="customizer-input-field" style="padding:6px 10px; font-size:0.8rem; margin-top:4px;">
+                        </div>
+                    </div>
+
+                    <div class="form-field" style="margin-bottom:18px;">
+                        <label style="font-size:0.75rem; font-weight:600; display:block; margin-bottom:4px;">Product Description *</label>
+                        <textarea id="admProdDesc" required rows="3" placeholder="Describe the craftsmanship, materials, and styling suggestions..." class="customizer-input-field" style="padding:10px 14px; font-size:0.9rem;"></textarea>
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end; gap:10px;">
+                        <button type="button" class="btn btn-outline btn-sm" onclick="closeAdminProductModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="fa-solid fa-check"></i> Save Product
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
        8. SITE FOOTER (STRAND BRAND BLUSH WINE SIGNATURE)
        ═══════════════════════════════════════════════════════════════════════ -->
     <footer class="site-footer">
@@ -958,10 +1899,13 @@
                 <ul class="footer-links-list">
                     <li><a href="#home" data-nav="home">Home</a></li>
                     <li><a href="#shop" data-nav="shop" data-category="all">Shop All Pieces</a></li>
+                    <li><a href="#customize" data-nav="customize"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--color-gold);"></i> Custom Jewelry Studio</a></li>
+                    <li><a href="#delivery" data-nav="delivery">Delivery &amp; Charges</a></li>
                     <li><a href="#track" data-nav="track">Track Your Order</a></li>
                     <li><a href="#cam" data-nav="cam">Client Cam (Videos)</a></li>
                     <li><a href="#about" data-nav="about">Our Story</a></li>
                     <li><a href="#contact" data-nav="contact">Private Inquiries</a></li>
+                    <li><a href="#admin" data-nav="admin"><i class="fa-solid fa-shield-halved" style="color:var(--color-gold);"></i> Atelier Admin Portal</a></li>
                 </ul>
             </div>
 
