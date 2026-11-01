@@ -68,9 +68,9 @@
 
             <!-- Desktop Navigation Links (Admin remains on main header) -->
             <nav class="nav-links" id="desktopNavLinks" aria-label="Main Navigation">
-                <a href="#admin" class="nav-link" data-nav="admin" title="Atelier Admin Portal"><i
+                <a href="#admin" class="nav-link" data-nav="admin" title="Admin Portal"><i
                         class="fa-solid fa-shield-halved" style="color:var(--color-gold); margin-right:4px;"></i>
-                    Atelier Admin</a>
+                    Admin Portal</a>
             </nav>
 
             <!-- Actions (Search, Favorite, Cart, Sign In / Log In, Admin) -->
@@ -429,7 +429,7 @@
                 <div class="container">
                     <!-- Shop Heading -->
                     <div class="shop-header">
-                        <span class="shop-eyebrow">Atelier Collection</span>
+                        <span class="shop-eyebrow">Collection</span>
                         <h2 class="shop-title" id="shopCurrentTitle">All Pieces</h2>
                         <p class="shop-subtitle">Find a piece that speaks to your story</p>
                     </div>
@@ -698,7 +698,7 @@
         </section>
 
         <!-- ─────────────────────────────────────────────────────────────────
-           SECTION F: TRACK ORDER (THE STRAND BRAND ORDER TRACKING SYSTEM)
+           SECTION F: TRACK ORDER (LIVE PARCEL & STUDIO TRACKING SYSTEM)
            ───────────────────────────────────────────────────────────────── -->
         <section id="section-track" class="page-section">
             <div class="container track-order-container">
@@ -707,53 +707,85 @@
                         <span class="shop-eyebrow"><i class="fa-solid fa-truck-fast"></i> Live Delivery Tracking</span>
                         <h2 class="shop-title">Track Your Order</h2>
                         <p class="track-intro">
-                            Enter your order number along with the email or phone number used at checkout to check your
-                            live delivery status.
+                            Enter your Order ID (Tracking Number) below to view real-time production status, express rider dispatch updates, and delivery timelines.
                         </p>
                     </div>
 
                     <!-- Track Order Form -->
                     <form class="track-form" id="trackOrderForm">
-                        <div class="form-group">
-                            <label for="trackOrderNumber">Order Number / Tracking ID *</label>
-                            <input type="text" id="trackOrderNumber" required placeholder="e.g. JBJ-20261029-001"
-                                autocomplete="off">
+                        <div class="track-inputs-grid">
+                            <div class="form-group">
+                                <label for="trackOrderNumber">
+                                    <i class="fa-solid fa-barcode" style="color:var(--color-gold); margin-right:4px;"></i> Order ID / Tracking Number *
+                                </label>
+                                <div class="track-input-wrapper">
+                                    <input type="text" id="trackOrderNumber" required placeholder="e.g. JBJ-20261029-001"
+                                        autocomplete="off" spellcheck="false">
+                                    <button type="button" class="track-input-clear-btn" id="btnClearTrackNum"
+                                        title="Clear input" onclick="clearTrackInput()" style="display:none;">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="trackOrderContact">
+                                    <i class="fa-solid fa-user-check" style="color:var(--color-gold); margin-right:4px;"></i> Phone or Email <span class="label-optional">(Optional verification)</span>
+                                </label>
+                                <div class="track-input-wrapper">
+                                    <input type="text" id="trackOrderContact"
+                                        placeholder="e.g. 0500594879 or client@jewelsbyj.com" autocomplete="off" spellcheck="false">
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="trackOrderContact">Email or Phone Number *</label>
-                            <input type="text" id="trackOrderContact" required
-                                placeholder="e.g. you@example.com or +233 50 059 4879" autocomplete="off">
-                        </div>
-
+                        <!-- Sample / Test Orders Bar -->
                         <div class="track-sample-bar">
-                            <span class="track-sample-title"><i class="fa-solid fa-lightbulb"></i> Try a sample
-                                order:</span>
-                            <button type="button" class="sample-order-chip"
-                                onclick="fillDemoOrder('JBJ-20261029-001', 'client@jewelsbyj.com')">
-                                JBJ-20261029-001 (In Transit)
-                            </button>
-                            <button type="button" class="sample-order-chip"
-                                onclick="fillDemoOrder('JBJ-20261028-084', '0500594879')">
-                                JBJ-20261028-084 (Processing)
-                            </button>
+                            <span class="track-sample-title"><i class="fa-solid fa-bolt-lightning" style="color:var(--color-gold);"></i> Sample orders:</span>
+                            <div class="track-sample-chips">
+                                <button type="button" class="sample-order-chip"
+                                    onclick="fillDemoOrder('JBJ-20261029-001', 'client@jewelsbyj.com')">
+                                    <span class="chip-status-dot transit"></span>
+                                    <span class="chip-order-code">JBJ-20261029-001</span>
+                                    <span class="chip-status-tag">In Transit</span>
+                                </button>
+                                <button type="button" class="sample-order-chip"
+                                    onclick="fillDemoOrder('JBJ-20261028-084', '0500594879')">
+                                    <span class="chip-status-dot crafting"></span>
+                                    <span class="chip-order-code">JBJ-20261028-084</span>
+                                    <span class="chip-status-tag">Studio Crafting</span>
+                                </button>
+                            </div>
                         </div>
 
                         <button type="submit" class="btn btn-primary btn-block btn-track-submit" id="btnTrackSubmit">
-                            <i class="fa-solid fa-magnifying-glass"></i> Track Order
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <span id="btnTrackSubmitText">Track My Order</span>
                         </button>
                     </form>
 
+                    <!-- Quick Track for Logged-In Customer / Recent Orders -->
+                    <div id="trackRecentOrdersWrap" class="track-recent-orders" style="display:none;">
+                        <h4 class="track-recent-title"><i class="fa-solid fa-clock-rotate-left"></i> Your Recent Orders</h4>
+                        <div class="track-recent-list" id="trackRecentOrdersList"></div>
+                    </div>
+
                     <!-- Empty State / Not Found -->
                     <div class="track-empty-state" id="trackEmptyState" style="display:none;">
-                        <i class="fa-solid fa-circle-question"></i>
-                        <h3>Order Not Found</h3>
-                        <p id="trackEmptyMessage">We couldn't find an order matching those details. Please double-check
-                            the order number and contact info.</p>
-                        <a href="https://wa.me/233500594879?text=Hi%20Jewels%20by%20J,%20I'm%20trying%20to%20track%20my%20order%20and%20need%20assistance."
-                            target="_blank" class="btn btn-outline btn-sm">
-                            <i class="fa-brands fa-whatsapp"></i> Chat with Concierge
-                        </a>
+                        <div class="track-empty-icon">
+                            <i class="fa-solid fa-magnifying-glass-location"></i>
+                        </div>
+                        <h3>Order Not Located</h3>
+                        <p id="trackEmptyMessage">We couldn't find an order matching the entered tracking ID. Please verify your order number (e.g. <strong>JBJ-20261029-001</strong>) and contact details.</p>
+                        <div class="track-empty-actions">
+                            <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('trackOrderNumber').focus();">
+                                <i class="fa-solid fa-rotate-right"></i> Try Again
+                            </button>
+                            <a href="https://wa.me/233500594879?text=Hi%20Jewels%20by%20J,%20I'm%20trying%20to%20track%20my%20order%20and%20need%20assistance."
+                                target="_blank" class="btn btn-whatsapp btn-sm">
+                                <i class="fa-brands fa-whatsapp"></i> Chat with Concierge
+                            </a>
+                        </div>
                     </div>
 
                     <!-- Tracking Result Card -->
@@ -1175,7 +1207,7 @@
         </section>
 
         <!-- ─────────────────────────────────────────────────────────────────
-           SECTION I: ATELIER ADMIN PORTAL (FEATURE #8)
+           SECTION I: ADMIN PORTAL & DASHBOARD (FEATURE #8)
            ───────────────────────────────────────────────────────────────── -->
         <section id="section-admin" class="page-section">
             <div class="admin-section">
@@ -1185,7 +1217,7 @@
                         <div class="admin-lock-icon">
                             <i class="fa-solid fa-shield-halved"></i>
                         </div>
-                        <h2 style="font-size:1.4rem; margin-bottom:6px;">Atelier Admin Portal</h2>
+                        <h2 style="font-size:1.4rem; margin-bottom:6px;">Admin Portal</h2>
                         <p style="font-size:0.85rem; color:var(--color-text-muted); margin-bottom:20px;">
                             Enter your 4-digit security PIN to access the product catalogue, order manager, and pricing
                             controls.
@@ -1222,7 +1254,7 @@
                         <div class="admin-top-bar">
                             <div class="admin-top-brand">
                                 <i class="fa-solid fa-crown" style="color:var(--color-gold);"></i>
-                                <span>JEWELS BY J ATELIER DASHBOARD</span>
+                                <span>JEWELS BY J ADMIN DASHBOARD</span>
                             </div>
                             <div class="admin-top-actions">
                                 <span
@@ -1285,7 +1317,7 @@
                                 </div>
                                 <div style="display:flex; gap:10px;">
                                     <button class="btn btn-outline btn-sm" onclick="resetProductsToDefault()">
-                                        <i class="fa-solid fa-rotate-left"></i> Reset to Atelier Defaults
+                                        <i class="fa-solid fa-rotate-left"></i> Reset to Store Defaults
                                     </button>
                                     <button class="btn btn-primary btn-sm" onclick="openAddProductModal()">
                                         <i class="fa-solid fa-plus"></i> Add New Product
@@ -1357,7 +1389,7 @@
                         <!-- TAB 3: STORE SETTINGS -->
                         <div class="admin-tab-content" id="admTabContentSettings" style="display:none;">
                             <div style="max-width:540px;">
-                                <h3 style="font-size:1.15rem; margin-bottom:6px;">Atelier Store Configuration</h3>
+                                <h3 style="font-size:1.15rem; margin-bottom:6px;">Admin Store Configuration</h3>
                                 <p style="font-size:0.8rem; color:var(--color-text-muted); margin-bottom:20px;">Update
                                     contact details, courier parameters, and security PIN.</p>
 
@@ -1391,7 +1423,7 @@
                                             maxlength="4" value="2023" required>
                                     </div>
                                     <button type="submit" class="btn btn-primary btn-block">
-                                        <i class="fa-solid fa-floppy-disk"></i> Save Atelier Settings
+                                        <i class="fa-solid fa-floppy-disk"></i> Save Admin Settings
                                     </button>
                                 </form>
                             </div>
@@ -2029,7 +2061,7 @@
                         style="font-size:1.6rem; margin-bottom:4px; color:var(--color-black); font-family:var(--font-heading);">
                         Payment Confirmed!</h2>
                     <p style="font-size:0.9rem; color:var(--color-text-muted); max-width:460px; margin:0 auto 12px;">
-                        Thank you beautiful! Your order has been placed into production at the Jewels by J atelier.
+                        Thank you beautiful! Your order has been placed into production at Jewels by J.
                     </p>
                     <div class="order-id-display">
                         Order Tracking ID: <span id="successOrderIdDisplay">JBJ-20261031-001</span>
@@ -2048,10 +2080,10 @@
                     <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
                         <button type="button" class="btn btn-whatsapp" id="btnNotifyAtelierWhatsApp"
                             style="padding:12px 24px;">
-                            <i class="fa-brands fa-whatsapp"></i> Notify Atelier on WhatsApp
+                            <i class="fa-brands fa-whatsapp"></i> Notify Us on WhatsApp
                         </button>
                         <button type="button" class="btn btn-outline"
-                            onclick="closeCheckoutModal(); navigateTo('track');" style="padding:12px 24px;">
+                            onclick="trackSpecificOrder(lastPlacedOrderId || '', '');" style="padding:12px 24px;">
                             <i class="fa-solid fa-truck-fast"></i> Track Delivery Status
                         </button>
                     </div>
@@ -2231,7 +2263,7 @@
                     <li><a href="#about" data-nav="about">Our Story</a></li>
                     <li><a href="#contact" data-nav="contact">Private Inquiries</a></li>
                     <li><a href="#admin" data-nav="admin"><i class="fa-solid fa-shield-halved"
-                                style="color:var(--color-gold);"></i> Atelier Admin Portal</a></li>
+                                style="color:var(--color-gold);"></i> Admin Portal</a></li>
                 </ul>
             </div>
 

@@ -13,7 +13,7 @@ const SITE_CONFIG = {
     freeDeliveryThreshold: 500
 };
 
-// ── Complete Initial Atelier Product Catalog ──
+// ── Complete Initial Product Catalog ──
 const INITIAL_PRODUCTS = [
     {
         id: "p1",
@@ -361,7 +361,7 @@ if (!storeProducts || !storeProducts.length) {
 // For backwards compatibility across all catalog & cart lookups
 let PRODUCTS = storeProducts;
 
-// ── Atelier Orders State (Feature #6 & #8) ──
+// ── Store Orders State (Feature #6 & #8) ──
 let storeOrders = JSON.parse(localStorage.getItem("j_orders") || "null");
 if (!storeOrders) {
     storeOrders = [
@@ -405,7 +405,7 @@ if (!storeOrders) {
             paymentMethod: "Visa Card",
             paymentRef: "CARD-AUTH-88219",
             notes: "Engrave 'Selorm' in bold block capital",
-            status: "Crafting in Atelier",
+            status: "Crafting in Studio",
             statusCode: "crafting",
             timeline: "In hand-polishing and silver engraving. Dispatches Thursday"
         }
@@ -438,6 +438,7 @@ let currentUser = JSON.parse(localStorage.getItem("j_user") || "null");
 let quickViewProduct = null;
 let quickViewSelectedOption = null;
 let quickViewQuantity = 1;
+let lastPlacedOrderId = null;
 
 // Bespoke Customizer Studio State (Feature #5)
 let customDesign = {
@@ -534,6 +535,10 @@ function navigateTo(sectionId) {
     // Pause any active videos when navigating away from Client Cam
     if (sectionId !== "cam") {
         document.querySelectorAll("#section-cam video").forEach(v => v.pause());
+    }
+
+    if (sectionId === "track") {
+        renderTrackRecentOrders();
     }
 
     closeMobileDrawer();
@@ -2291,6 +2296,7 @@ function finalizeOrderPlacement(paymentMethodName, paymentRef) {
     };
 
     // Save order
+    lastPlacedOrderId = orderId;
     storeOrders.unshift(newOrder);
     localStorage.setItem("j_orders", JSON.stringify(storeOrders));
 
@@ -2388,55 +2394,180 @@ function sendEmailOrderNotification(order) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ORDER TRACKING SYSTEM (THE STRAND BRAND PARCEL TRACKER)
+// ORDER TRACKING SYSTEM (LIVE PARCEL & STUDIO TRACKER)
 // ═══════════════════════════════════════════════════════════════════════════
 function initTrackOrder() {
     const form = document.getElementById("trackOrderForm");
-    if (!form) return;
+    const numInput = document.getElementById("trackOrderNumber");
+    const clearBtn = document.getElementById("btnClearTrackNum");
 
-    form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const orderNum = document.getElementById("trackOrderNumber")?.value.trim().toUpperCase();
-        const contact = document.getElementById("trackOrderContact")?.value.trim().toLowerCase().replace(/[\s+-]/g, "");
-
-        if (!orderNum || !contact) return;
-
-        // Search storeOrders
-        const found = storeOrders.find(ord => {
-            const matchesId = ord.id.toUpperCase() === orderNum;
-            const ordContactClean = (ord.customerEmail + " " + ord.customerPhone).toLowerCase().replace(/[\s+-]/g, "");
-            const matchesContact = ordContactClean.includes(contact) || contact.includes(ord.customerPhone.replace(/[\s+-]/g, ""));
-            return matchesId && matchesContact;
+    if (numInput && clearBtn) {
+        numInput.addEventListener("input", () => {
+            clearBtn.style.display = numInput.value ? "flex" : "none";
         });
+    }
 
-        const emptyState = document.getElementById("trackEmptyState");
-        const resultCard = document.getElementById("trackResultCard");
+    if (form) {
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const orderNum = document.getElementById("trackOrderNumber")?.value.trim().toUpperCase();
+            const contact = document.getElementById("trackOrderContact")?.value.trim().toLowerCase().replace(/[\s+-]/g, "");
 
-        if (found) {
-            if (emptyState) emptyState.style.display = "none";
-            renderOrderTrackingResult(found);
-            if (resultCard) {
-                resultCard.style.display = "block";
-                resultCard.scrollIntoView({ behavior: "smooth" });
+            if (!orderNum && !contact) {
+                showToast("Enter Details", "Please provide your Order ID or contact phone/email to track.");
+                return;
             }
-        } else {
-            if (resultCard) resultCard.style.display = "none";
-            if (emptyState) emptyState.style.display = "block";
-        }
-    });
+
+            const submitBtn = document.getElementById("btnTrackSubmit");
+            const submitText = document.getElementById("btnTrackSubmitText");
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                if (submitText) submitText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locating Order...';
+            }
+
+            setTimeout(() => {
+                let found = null;
+
+                if (orderNum) {
+                    found = storeOrders.find(ord => {
+                        const matchesId = ord.id.toUpperCase() === orderNum;
+                        if (!contact) return matchesId;
+                        const ordContactClean = (ord.customerEmail + " " + ord.customerPhone).toLowerCase().replace(/[\s+-]/g, "");
+                        const matchesContact = ordContactClean.includes(contact) || contact.includes(ord.customerPhone.replace(/[\s+-]/g, ""));
+                        return matchesId && matchesContact;
+                    });
+                } else if (contact) {
+                    // Search by contact if order number was not supplied
+                    found = storeOrders.find(ord => {
+                        const ordContactClean = (ord.customerEmail + " " + ord.customerPhone).toLowerCase().replace(/[\s+-]/g, "");
+                        return ordContactClean.includes(contact) || contact.includes(ord.customerPhone.replace(/[\s+-]/g, ""));
+                    });
+                }
+
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    if (submitText) submitText.textContent = "Track My Order";
+                }
+
+                const emptyState = document.getElementById("trackEmptyState");
+                const resultCard = document.getElementById("trackResultCard");
+
+                if (found) {
+                    if (emptyState) emptyState.style.display = "none";
+                    renderOrderTrackingResult(found);
+                    if (resultCard) {
+                        resultCard.style.display = "block";
+                        resultCard.scrollIntoView({ behavior: "smooth" });
+                    }
+                } else {
+                    if (resultCard) resultCard.style.display = "none";
+                    if (emptyState) {
+                        const msgEl = document.getElementById("trackEmptyMessage");
+                        if (msgEl) {
+                            msgEl.innerHTML = `We couldn't locate an order matching <strong>${escapeHTML(orderNum || contact)}</strong>. Please verify your order number and contact information.`;
+                        }
+                        emptyState.style.display = "block";
+                        emptyState.scrollIntoView({ behavior: "smooth" });
+                    }
+                }
+            }, 260);
+        });
+    }
+
+    renderTrackRecentOrders();
+}
+
+function clearTrackInput() {
+    const numInput = document.getElementById("trackOrderNumber");
+    const clearBtn = document.getElementById("btnClearTrackNum");
+    if (numInput) {
+        numInput.value = "";
+        numInput.focus();
+    }
+    if (clearBtn) clearBtn.style.display = "none";
 }
 
 function fillDemoOrder(orderId, contact) {
     const numInput = document.getElementById("trackOrderNumber");
     const contactInput = document.getElementById("trackOrderContact");
+    const clearBtn = document.getElementById("btnClearTrackNum");
+
     if (numInput) numInput.value = orderId;
-    if (contactInput) contactInput.value = contact;
+    if (contactInput) contactInput.value = contact || "";
+    if (clearBtn) clearBtn.style.display = "flex";
 
     const form = document.getElementById("trackOrderForm");
     if (form) {
-        const submitEvent = new Event("submit", { cancelable: true });
-        form.dispatchEvent(submitEvent);
+        form.dispatchEvent(new Event("submit", { cancelable: true }));
     }
+}
+
+function trackSpecificOrder(orderId, contact) {
+    closeCheckoutModal();
+    navigateTo("track");
+    setTimeout(() => {
+        fillDemoOrder(orderId, contact || "");
+    }, 100);
+}
+
+function copyTrackOrderId(orderId) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(orderId).then(() => {
+            showToast("Tracking ID Copied", `Order ID #${orderId} copied to clipboard.`);
+        }).catch(() => {
+            showToast("Copied", `Order ID: ${orderId}`);
+        });
+    } else {
+        showToast("Copied", `Order ID: ${orderId}`);
+    }
+}
+
+function resetTrackView() {
+    clearTrackInput();
+    const contactInput = document.getElementById("trackOrderContact");
+    if (contactInput) contactInput.value = "";
+    const resultCard = document.getElementById("trackResultCard");
+    const emptyState = document.getElementById("trackEmptyState");
+    if (resultCard) resultCard.style.display = "none";
+    if (emptyState) emptyState.style.display = "none";
+    const container = document.querySelector(".track-order-card");
+    if (container) container.scrollIntoView({ behavior: "smooth" });
+    const numInput = document.getElementById("trackOrderNumber");
+    if (numInput) numInput.focus();
+}
+
+function renderTrackRecentOrders() {
+    const wrap = document.getElementById("trackRecentOrdersWrap");
+    const list = document.getElementById("trackRecentOrdersList");
+    if (!wrap || !list) return;
+
+    let matching = [];
+    if (currentUser) {
+        matching = storeOrders.filter(ord => {
+            const ordContact = (ord.customerEmail + " " + ord.customerPhone).toLowerCase();
+            return (currentUser.email && ordContact.includes(currentUser.email.toLowerCase())) ||
+                   (currentUser.phone && ordContact.includes(currentUser.phone.toLowerCase()));
+        });
+    }
+
+    if (lastPlacedOrderId && !matching.some(o => o.id === lastPlacedOrderId)) {
+        const lastOrd = storeOrders.find(o => o.id === lastPlacedOrderId);
+        if (lastOrd) matching.unshift(lastOrd);
+    }
+
+    if (matching.length === 0) {
+        wrap.style.display = "none";
+        return;
+    }
+
+    wrap.style.display = "block";
+    list.innerHTML = matching.slice(0, 3).map(ord => `
+        <button type="button" class="track-recent-pill" onclick="trackSpecificOrder('${ord.id}', '${ord.customerEmail || ord.customerPhone}')">
+            <span class="chip-status-dot ${ord.statusCode || 'confirmed'}"></span>
+            <strong>${escapeHTML(ord.id)}</strong>
+            <span style="color:var(--color-text-muted); font-size:0.75rem;">(${escapeHTML(ord.status)})</span>
+        </button>
+    `).join("");
 }
 
 function renderOrderTrackingResult(order) {
@@ -2444,11 +2575,11 @@ function renderOrderTrackingResult(order) {
     if (!card) return;
 
     const steps = [
-        { code: "placed", label: "Order Placed", icon: "fa-cart-shopping" },
-        { code: "confirmed", label: "Payment Confirmed", icon: "fa-shield-check" },
-        { code: "crafting", label: "Atelier Crafting", icon: "fa-wand-magic-sparkles" },
-        { code: "transit", label: "In Transit / Out for Delivery", icon: "fa-truck-fast" },
-        { code: "delivered", label: "Delivered", icon: "fa-house-circle-check" }
+        { code: "placed", label: "Order Placed", icon: "fa-receipt", desc: "Order details received in store system" },
+        { code: "confirmed", label: "Payment Confirmed", icon: "fa-shield-check", desc: "Transaction authorized & verified" },
+        { code: "crafting", label: "Studio Crafting", icon: "fa-wand-magic-sparkles", desc: "Jewelry hand-shaped, engraved & polished" },
+        { code: "transit", label: "Out for Delivery", icon: "fa-truck-fast", desc: "Dispatched with express delivery rider" },
+        { code: "delivered", label: "Delivered", icon: "fa-house-circle-check", desc: "Delivered directly to customer hands" }
     ];
 
     let activeIndex = 1;
@@ -2458,58 +2589,149 @@ function renderOrderTrackingResult(order) {
     else if (order.statusCode === "transit") activeIndex = 3;
     else if (order.statusCode === "delivered") activeIndex = 4;
 
+    const progressPercent = Math.min(100, Math.max(0, (activeIndex / 4) * 80));
+
+    // Formatted items summary
+    const itemsHtml = (order.items && order.items.length > 0) ? order.items.map(it => `
+        <div class="track-item-row">
+            <div class="track-item-main">
+                <img src="${it.img || 'images/logo.jpg'}" alt="${escapeHTML(it.title)}" class="track-item-img" onerror="this.src='images/logo.jpg'">
+                <div class="track-item-info">
+                    <strong>${escapeHTML(it.title)}</strong>
+                    <span>${it.option ? 'Option: ' + escapeHTML(it.option) + ' • ' : ''}Qty: ${it.qty}</span>
+                </div>
+            </div>
+            <div class="track-item-price">
+                ${SITE_CONFIG.currency} ${(it.price * it.qty).toFixed(2)}
+            </div>
+        </div>
+    `).join("") : `<p style="font-size:0.85rem; color:var(--color-text-muted);">Custom Bespoke Order</p>`;
+
     card.innerHTML = `
-        <div style="background:#fff; border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:28px; box-shadow:var(--shadow-md); margin-top:24px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--color-border); padding-bottom:16px; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+        <div class="track-result-wrapper">
+            <!-- Result Top Header -->
+            <div class="track-result-header">
                 <div>
-                    <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--color-gold); font-weight:700;">Live Tracking Order</span>
-                    <h3 style="font-size:1.4rem; color:var(--color-black); font-family:monospace; margin-top:2px;">${escapeHTML(order.id)}</h3>
+                    <span class="track-result-title-sub">Verified Parcel Tracking</span>
+                    <div class="track-id-badge-row">
+                        <span class="track-id-display">${escapeHTML(order.id)}</span>
+                        <button type="button" class="track-copy-btn" onclick="copyTrackOrderId('${order.id}')" title="Copy Tracking ID">
+                            <i class="fa-regular fa-copy"></i> Copy ID
+                        </button>
+                    </div>
+                    <div class="track-date-text">
+                        <i class="fa-regular fa-calendar" style="margin-right:4px;"></i> Ordered on ${escapeHTML(order.date || 'Recent')}
+                    </div>
                 </div>
                 <div>
                     <span class="status-pill status-${order.statusCode || 'confirmed'}">${escapeHTML(order.status)}</span>
                 </div>
             </div>
 
-            <!-- Stepper Progress Bar -->
-            <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:6px; margin:24px 0 32px; text-align:center;">
-                ${steps.map((st, idx) => `
-                    <div style="position:relative;">
-                        <div style="width:36px; height:36px; border-radius:50%; margin:0 auto 8px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; background:${idx <= activeIndex ? 'var(--color-black)' : 'var(--color-surface-soft)'}; color:${idx <= activeIndex ? 'var(--color-gold)' : 'var(--color-text-subtle)'}; border:1.5px solid ${idx <= activeIndex ? 'var(--color-gold)' : 'var(--color-border)'};">
-                            <i class="fa-solid ${st.icon}"></i>
-                        </div>
-                        <span style="font-size:0.72rem; font-weight:${idx <= activeIndex ? '700' : '500'}; color:${idx <= activeIndex ? 'var(--color-black)' : 'var(--color-text-subtle)'}; display:block;">
-                            ${st.label}
-                        </span>
+            <!-- Stepper Progress Timeline -->
+            <div class="track-stepper-box">
+                <div class="track-stepper">
+                    <div class="track-stepper-bar-bg"></div>
+                    <div class="track-stepper-bar-fill" style="width:${progressPercent}%;"></div>
+                    ${steps.map((st, idx) => {
+                        const isCompleted = idx < activeIndex;
+                        const isActive = idx === activeIndex;
+                        const circleClass = isCompleted ? 'completed' : (isActive ? 'active' : '');
+                        return `
+                            <div class="track-step-item ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}">
+                                <div class="track-step-circle ${circleClass}">
+                                    <i class="fa-solid ${isCompleted ? 'fa-check' : st.icon}"></i>
+                                </div>
+                                <span class="track-step-name">${st.label}</span>
+                            </div>
+                        `;
+                    }).join("")}
+                </div>
+            </div>
+
+            <!-- Timeline Banner -->
+            <div class="track-timeline-banner">
+                <i class="fa-solid fa-truck-ramp-box track-timeline-icon"></i>
+                <div class="track-timeline-text">
+                    <strong>Courier &amp; Studio Status</strong>
+                    <span>${escapeHTML(order.timeline || 'Pieces in active preparation for courier handover')}</span>
+                </div>
+            </div>
+
+            <!-- Two-Column Delivery & Payment Info -->
+            <div class="track-info-grid">
+                <div class="track-info-card">
+                    <div class="track-info-lbl">
+                        <i class="fa-solid fa-location-dot"></i> Delivery Destination
                     </div>
-                `).join("")}
+                    <strong>${escapeHTML(order.customerName)}</strong>
+                    <p>${escapeHTML(order.address)}</p>
+                    <p style="color:var(--color-gold); font-weight:600; font-size:0.8rem; margin-top:4px;">
+                        <i class="fa-solid fa-phone" style="font-size:0.75rem;"></i> ${escapeHTML(order.customerPhone)}
+                    </p>
+                    <p style="font-size:0.75rem; color:var(--color-text-subtle); margin-top:2px;">
+                        Region: ${escapeHTML(order.regionName || 'Ghana Express')}
+                    </p>
+                </div>
+
+                <div class="track-info-card">
+                    <div class="track-info-lbl">
+                        <i class="fa-solid fa-credit-card"></i> Payment &amp; Logistics
+                    </div>
+                    <strong>${escapeHTML(order.paymentMethod || 'Mobile Money')}</strong>
+                    <p>Reference: <code style="font-family:monospace; background:var(--color-surface-soft); padding:2px 6px; border-radius:4px;">${escapeHTML(order.paymentRef || 'CONFIRMED')}</code></p>
+                    <p style="margin-top:4px; font-weight:700; color:var(--color-black);">
+                        Total Paid: ${SITE_CONFIG.currency} ${Number(order.total).toFixed(2)}
+                    </p>
+                    ${order.notes && order.notes !== "None" ? `
+                        <p style="font-size:0.75rem; color:var(--color-text-muted); margin-top:4px; font-style:italic;">
+                            <i class="fa-solid fa-pencil" style="color:var(--color-gold);"></i> Note: ${escapeHTML(order.notes)}
+                        </p>
+                    ` : ''}
+                </div>
             </div>
 
-            <!-- Details Grid -->
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; background:var(--color-surface-soft); padding:20px; border-radius:var(--radius-md); font-size:0.85rem; margin-bottom:20px;">
-                <div>
-                    <div style="color:var(--color-text-muted); font-size:0.75rem; text-transform:uppercase; font-weight:700; margin-bottom:4px;">Delivery Destination</div>
-                    <strong>${escapeHTML(order.customerName)}</strong><br>
-                    <span>${escapeHTML(order.address)}</span><br>
-                    <span style="color:var(--color-gold); font-size:0.8rem;">${escapeHTML(order.customerPhone)}</span>
+            <!-- Items Summary Breakdown -->
+            <div class="track-items-box">
+                <div class="track-items-header">
+                    <span><i class="fa-solid fa-box-open" style="color:var(--color-gold); margin-right:6px;"></i> Package Contents (${(order.items || []).length} item${(order.items || []).length === 1 ? '' : 's'})</span>
                 </div>
-                <div>
-                    <div style="color:var(--color-text-muted); font-size:0.75rem; text-transform:uppercase; font-weight:700; margin-bottom:4px;">Courier Timeline &amp; Payment</div>
-                    <div><i class="fa-solid fa-clock" style="color:var(--color-gold);"></i> ${escapeHTML(order.timeline || 'In progress')}</div>
-                    <div><i class="fa-solid fa-credit-card" style="color:var(--color-gold);"></i> Paid via ${escapeHTML(order.paymentMethod)} (${SITE_CONFIG.currency} ${Number(order.total).toFixed(2)})</div>
+                <div class="track-items-list">
+                    ${itemsHtml}
+                </div>
+                <div style="margin-top:16px; padding-top:12px; border-top:1px solid var(--color-border-light);">
+                    <div class="track-summary-row">
+                        <span>Items Subtotal</span>
+                        <span>${SITE_CONFIG.currency} ${Number(order.subtotal || order.total).toFixed(2)}</span>
+                    </div>
+                    <div class="track-summary-row">
+                        <span>Delivery Fee (${escapeHTML(order.regionName || 'Standard')})</span>
+                        <span>${Number(order.deliveryFee) === 0 ? 'FREE' : `${SITE_CONFIG.currency} ${Number(order.deliveryFee || 0).toFixed(2)}`}</span>
+                    </div>
+                    <div class="track-summary-row total">
+                        <span>Grand Total</span>
+                        <span style="color:var(--color-black);">${SITE_CONFIG.currency} ${Number(order.total).toFixed(2)}</span>
+                    </div>
                 </div>
             </div>
 
-            <div style="text-align:center;">
-                <a href="https://wa.me/${storeSettings.whatsappNumber || SITE_CONFIG.whatsappNumber}?text=Hi%20Jewels%20by%20J,%20I'm%20inquiring%20about%20my%20order%20${encodeURIComponent(order.id)}" target="_blank" class="btn btn-whatsapp btn-sm">
-                    <i class="fa-brands fa-whatsapp"></i> Chat with Concierge About This Order
-                </a>
+            <!-- Actions Footer -->
+            <div class="track-actions-bar">
+                <button type="button" class="btn btn-outline btn-sm" onclick="resetTrackView()">
+                    <i class="fa-solid fa-magnifying-glass"></i> Track Another Order
+                </button>
+                <div class="track-actions-right">
+                    <a href="https://wa.me/${storeSettings.whatsappNumber || SITE_CONFIG.whatsappNumber}?text=Hi%20Jewels%20by%20J,%20I'm%20inquiring%20about%20my%20order%20${encodeURIComponent(order.id)}" target="_blank" class="btn btn-whatsapp btn-sm">
+                        <i class="fa-brands fa-whatsapp"></i> Chat with Concierge
+                    </a>
+                </div>
             </div>
         </div>
     `;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// FEATURE 8: ATELIER ADMIN PORTAL (PRODUCTS & ORDERS MANAGEMENT)
+// FEATURE 8: ADMIN PORTAL & DASHBOARD (PRODUCTS & ORDERS MANAGEMENT)
 // ═══════════════════════════════════════════════════════════════════════════
 function initAdminPortal() {
     renderAdminDashboardStats();
@@ -2582,7 +2804,7 @@ function unlockAdminDashboard() {
     renderAdminDashboardStats();
     renderAdminProducts();
     renderAdminOrders();
-    showToast("Welcome Jerrilyn", "Atelier Dashboard unlocked.");
+    showToast("Welcome Jerrilyn", "Admin Dashboard unlocked.");
 }
 
 function lockAdminDashboard() {
@@ -2638,7 +2860,7 @@ function renderAdminProducts() {
             </td>
             <td>
                 <strong style="color:var(--color-black);">${escapeHTML(p.title)}</strong><br>
-                <span style="font-size:0.75rem; color:var(--color-text-muted);">${escapeHTML(p.metal || 'Atelier Fine')}</span>
+                <span style="font-size:0.75rem; color:var(--color-text-muted);">${escapeHTML(p.metal || 'Fine Handcrafted')}</span>
             </td>
             <td>
                 <span style="font-size:0.8rem; text-transform:capitalize;">${escapeHTML(p.categoryName || p.category)}</span>
@@ -2675,7 +2897,7 @@ function openAddProductModal() {
     const form = document.getElementById("adminProductForm");
     const preview = document.getElementById("admProdImgPreview");
 
-    if (titleEl) titleEl.textContent = "Add New Atelier Product";
+    if (titleEl) titleEl.textContent = "Add New Product";
     if (form) form.reset();
     document.getElementById("admProdId").value = "";
     document.getElementById("admProdImgData").value = "";
@@ -2749,7 +2971,7 @@ function saveAdminProduct(event) {
     const price = parseFloat(document.getElementById("admProdPrice").value);
     const origPriceVal = document.getElementById("admProdOriginalPrice").value.trim();
     const originalPrice = origPriceVal ? parseFloat(origPriceVal) : null;
-    const metal = document.getElementById("admProdMetal").value.trim() || "Atelier Handcrafted";
+    const metal = document.getElementById("admProdMetal").value.trim() || "Handcrafted Fine Jewelry";
     const badge = document.getElementById("admProdBadge").value;
     const optionsRaw = document.getElementById("admProdOptions").value.trim();
     const description = document.getElementById("admProdDesc").value.trim();
@@ -2834,7 +3056,7 @@ function deleteAdminProduct(productId) {
 }
 
 function resetProductsToDefault() {
-    if (confirm("Reset store catalogue back to the original 21 atelier pieces? Custom added products will be restored to defaults.")) {
+    if (confirm("Reset store catalogue back to the original 21 default pieces? Custom added products will be restored to defaults.")) {
         storeProducts = INITIAL_PRODUCTS.slice();
         PRODUCTS = storeProducts;
         localStorage.setItem("j_products", JSON.stringify(storeProducts));
@@ -2842,7 +3064,7 @@ function resetProductsToDefault() {
         renderProducts();
         renderAdminProducts();
         renderAdminDashboardStats();
-        showToast("Catalogue Restored", "Store reset to atelier factory drops.");
+        showToast("Catalogue Restored", "Store reset to default catalog.");
     }
 }
 
@@ -2889,7 +3111,7 @@ function renderAdminOrders() {
             <td>
                 <select class="shop-select" onchange="updateOrderStatus('${ord.id}', this.value)" style="padding:4px 8px; font-size:0.75rem;">
                     <option value="confirmed" ${ord.statusCode === 'confirmed' ? 'selected' : ''}>Confirmed / Paid</option>
-                    <option value="crafting" ${ord.statusCode === 'crafting' ? 'selected' : ''}>Crafting in Atelier</option>
+                    <option value="crafting" ${ord.statusCode === 'crafting' ? 'selected' : ''}>Studio Crafting</option>
                     <option value="transit" ${ord.statusCode === 'transit' ? 'selected' : ''}>In Transit</option>
                     <option value="delivered" ${ord.statusCode === 'delivered' ? 'selected' : ''}>Delivered</option>
                 </select>
@@ -2909,7 +3131,7 @@ function updateOrderStatus(orderId, newStatusCode) {
 
     const statusNames = {
         confirmed: "Payment Confirmed",
-        crafting: "Crafting in Atelier",
+        crafting: "Studio Crafting",
         transit: "In Transit / Out for Delivery",
         delivered: "Delivered"
     };
@@ -2931,7 +3153,7 @@ function whatsappCustomerOrder(orderId) {
     let phoneClean = ord.customerPhone.replace(/[\s+-]/g, "");
     if (phoneClean.startsWith("0")) phoneClean = "233" + phoneClean.slice(1);
 
-    const msg = `Hello ${ord.customerName}! ✨ This is Jerrilyn from Jewels by J atelier regarding your order #${ord.id}. Your order status is currently: *${ord.status}*. We are making sure your pieces are flawless! Delivery address: ${ord.address}. Let us know if you need anything!`;
+    const msg = `Hello ${ord.customerName}! ✨ This is Jerrilyn from Jewels by J regarding your order #${ord.id}. Your order status is currently: *${ord.status}*. We are making sure your pieces are flawless! Delivery address: ${ord.address}. Let us know if you need anything!`;
     window.open(`https://wa.me/${phoneClean}?text=${encodeURIComponent(msg)}`, "_blank");
 }
 
@@ -2954,5 +3176,5 @@ function saveAdminSettings(event) {
     storeSettings.adminPIN = document.getElementById("settingAdminPIN").value.trim() || "2023";
 
     localStorage.setItem("j_settings", JSON.stringify(storeSettings));
-    showToast("Settings Saved", "Atelier contact and security settings updated.");
+    showToast("Settings Saved", "Store contact and security settings updated.");
 }

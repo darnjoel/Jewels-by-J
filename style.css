@@ -3638,7 +3638,7 @@ button {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   FEATURE 8: ATELIER ADMIN PORTAL (PRODUCTS & ORDERS MANAGER)
+   FEATURE 8: ADMIN PORTAL & DASHBOARD (PRODUCTS & ORDERS MANAGER)
    ═══════════════════════════════════════════════════════════════════════════ */
 .admin-section {
     padding: 40px 0 90px;
@@ -3895,5 +3895,615 @@ button {
         flex-direction: column;
         gap: 16px;
         text-align: center;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FEATURE 6: LIVE ORDER TRACKING SYSTEM (LUXURY PARCEL & STUDIO TRACKER)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.track-order-container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 50px 20px 90px;
+}
+.track-order-card {
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 42px 38px;
+    position: relative;
+    overflow: hidden;
+}
+.track-order-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-gold), var(--color-wine), var(--color-gold));
+}
+.track-header {
+    margin-bottom: 30px;
+}
+.track-intro {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    max-width: 580px;
+    margin: 8px auto 0;
+    line-height: 1.5;
+}
+.track-form {
+    margin-bottom: 24px;
+}
+.track-inputs-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+.track-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.track-input-wrapper input {
+    width: 100%;
+    padding: 13px 16px;
+    font-size: 0.92rem;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-soft);
+    color: var(--color-black);
+    transition: var(--transition-fast);
+    font-family: inherit;
+}
+.track-input-wrapper input:focus {
+    outline: none;
+    background: #fff;
+    border-color: var(--color-gold);
+    box-shadow: 0 0 0 3px var(--color-gold-glow);
+}
+.track-input-clear-btn {
+    position: absolute;
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: var(--color-text-subtle);
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+}
+.track-input-clear-btn:hover {
+    color: var(--color-black);
+}
+.label-optional {
+    font-size: 0.72rem;
+    color: var(--color-text-subtle);
+    font-weight: 400;
+}
+.track-sample-bar {
+    background: var(--color-blush-soft);
+    border: 1px dashed var(--color-wine);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.track-sample-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-black);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.track-sample-chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.sample-order-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    padding: 6px 14px;
+    font-size: 0.78rem;
+    color: var(--color-black);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+}
+.sample-order-chip:hover {
+    border-color: var(--color-gold);
+    background: var(--color-cream);
+    transform: translateY(-1px);
+}
+.chip-order-code {
+    font-family: monospace;
+    font-weight: 700;
+}
+.chip-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.chip-status-dot.transit {
+    background: #1976d2;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}
+.chip-status-dot.crafting {
+    background: #7b1fa2;
+    box-shadow: 0 0 0 2px rgba(123, 31, 162, 0.2);
+}
+.chip-status-tag {
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+}
+.btn-track-submit {
+    height: 48px;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 14px rgba(185, 141, 79, 0.25);
+    transition: var(--transition-base);
+}
+.btn-track-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(185, 141, 79, 0.35);
+}
+
+/* Recent Orders Quick-Selector */
+.track-recent-orders {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--color-border-light);
+}
+.track-recent-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.track-recent-list {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.track-recent-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--color-surface-soft);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 8px 14px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+.track-recent-pill:hover {
+    border-color: var(--color-gold);
+    background: #fff;
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+}
+
+/* Empty State */
+.track-empty-state {
+    margin-top: 28px;
+    text-align: center;
+    padding: 36px 20px;
+    background: var(--color-surface-soft);
+    border-radius: var(--radius-md);
+    border: 1px dashed var(--color-border);
+    animation: fadeIn 0.3s ease;
+}
+.track-empty-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #fff3e0;
+    color: #e65100;
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+}
+.track-empty-state h3 {
+    font-size: 1.25rem;
+    color: var(--color-black);
+    margin-bottom: 8px;
+}
+.track-empty-state p {
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+    max-width: 440px;
+    margin: 0 auto 20px;
+    line-height: 1.5;
+}
+.track-empty-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Result Card Component */
+.track-result-wrapper {
+    margin-top: 32px;
+    background: #ffffff;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    animation: fadeIn 0.35s ease;
+}
+.track-result-header {
+    background: linear-gradient(135deg, #181514 0%, #2a2220 100%);
+    color: #fff;
+    padding: 24px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+.track-result-title-sub {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-gold-light);
+    font-weight: 700;
+}
+.track-id-badge-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 4px;
+}
+.track-id-display {
+    font-family: monospace;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.05em;
+}
+.track-copy-btn {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #fff;
+    padding: 5px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.track-copy-btn:hover {
+    background: var(--color-gold);
+    border-color: var(--color-gold);
+    color: #fff;
+}
+.track-date-text {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.65);
+    margin-top: 4px;
+}
+
+/* Stepper Visual Timeline */
+.track-stepper-box {
+    padding: 32px 28px 24px;
+    background: #fff;
+    border-bottom: 1px solid var(--color-border);
+}
+.track-stepper {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    position: relative;
+    margin-bottom: 10px;
+}
+.track-stepper-bar-bg {
+    position: absolute;
+    top: 20px;
+    left: 10%;
+    right: 10%;
+    height: 3px;
+    background: var(--color-border);
+    z-index: 1;
+}
+.track-stepper-bar-fill {
+    position: absolute;
+    top: 20px;
+    left: 10%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-black), var(--color-gold));
+    z-index: 2;
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.track-step-item {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    padding: 0 4px;
+}
+.track-step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    background: #fff;
+    border: 2px solid var(--color-border);
+    color: var(--color-text-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    transition: var(--transition-base);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+.track-step-circle.completed {
+    background: var(--color-black);
+    border-color: var(--color-black);
+    color: var(--color-gold);
+}
+.track-step-circle.active {
+    background: var(--color-black);
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+    box-shadow: 0 0 0 4px var(--color-gold-glow);
+    animation: pulseRing 2s infinite;
+}
+.track-step-name {
+    font-size: 0.74rem;
+    font-weight: 500;
+    color: var(--color-text-subtle);
+    display: block;
+    line-height: 1.3;
+}
+.track-step-item.active .track-step-name,
+.track-step-item.completed .track-step-name {
+    font-weight: 700;
+    color: var(--color-black);
+}
+
+/* Dispatch Timeline Highlight Banner */
+.track-timeline-banner {
+    margin: 20px 28px 0;
+    background: var(--color-blush-soft);
+    border-left: 4px solid var(--color-gold);
+    padding: 14px 18px;
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.track-timeline-icon {
+    font-size: 1.5rem;
+    color: var(--color-gold);
+    flex-shrink: 0;
+}
+.track-timeline-text strong {
+    display: block;
+    font-size: 0.88rem;
+    color: var(--color-black);
+    margin-bottom: 2px;
+}
+.track-timeline-text span {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+}
+
+/* Tracking Details & Destination Grid */
+.track-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 24px 28px;
+    background: var(--color-surface-soft);
+    border-bottom: 1px solid var(--color-border);
+}
+.track-info-card {
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+}
+.track-info-lbl {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    color: var(--color-gold);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.track-info-card strong {
+    font-size: 0.92rem;
+    color: var(--color-black);
+    display: block;
+    margin-bottom: 3px;
+}
+.track-info-card p {
+    font-size: 0.84rem;
+    color: var(--color-text-muted);
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Ordered Items Package Breakdown */
+.track-items-box {
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--color-border);
+}
+.track-items-header {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    color: var(--color-black);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.track-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.track-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 10px 14px;
+    background: var(--color-surface-soft);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+}
+.track-item-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.track-item-img {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    border: 1px solid var(--color-border);
+    flex-shrink: 0;
+}
+.track-item-info strong {
+    font-size: 0.88rem;
+    color: var(--color-black);
+    display: block;
+}
+.track-item-info span {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+}
+.track-item-price {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--color-black);
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* Pricing Breakdown */
+.track-summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    padding: 4px 0;
+}
+.track-summary-row.total {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-black);
+    border-top: 1px dashed var(--color-border);
+    margin-top: 8px;
+    padding-top: 10px;
+}
+
+/* Actions Footer Bar */
+.track-actions-bar {
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: #fff;
+}
+.track-actions-right {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Responsive Rules for Order Tracker */
+@media (max-width: 768px) {
+    .track-order-card {
+        padding: 26px 18px;
+    }
+    .track-inputs-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .track-sample-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .track-stepper {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        text-align: left;
+    }
+    .track-stepper-bar-bg,
+    .track-stepper-bar-fill {
+        display: none;
+    }
+    .track-step-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        text-align: left;
+    }
+    .track-step-circle {
+        margin: 0;
+        flex-shrink: 0;
+    }
+    .track-info-grid {
+        grid-template-columns: 1fr;
+        padding: 16px;
+    }
+    .track-items-box,
+    .track-timeline-banner,
+    .track-actions-bar,
+    .track-stepper-box {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+    .track-actions-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .track-actions-right {
+        flex-direction: column;
+    }
+    .track-actions-right .btn {
+        width: 100%;
     }
 }
