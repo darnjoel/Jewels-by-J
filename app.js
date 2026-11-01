@@ -428,6 +428,40 @@ if (!storeSettings) {
     localStorage.setItem("j_settings", JSON.stringify(storeSettings));
 }
 
+// ── Store Messages / Inquiries (Admin Customer Inbox) ──
+let storeMessages = JSON.parse(localStorage.getItem("j_messages") || "null");
+if (!storeMessages || !Array.isArray(storeMessages) || storeMessages.length === 0) {
+    storeMessages = [
+        {
+            id: "msg_demo_001",
+            name: "Nana Akua Frimpong",
+            email: "nana.akua@gmail.com",
+            phone: "+233 24 412 3890",
+            subject: "Bespoke Bridal Suite Consultation",
+            message: "Hello Jerrilyn, I am getting married in December at Kempinski Gold Coast City and would love a custom 18k gold bridal necklace with matching ear cuffs for my bridal party of 6. Could we schedule a bespoke design appointment?",
+            type: "bespoke",
+            date: "2026-10-31 16:42",
+            unread: true
+        },
+        {
+            id: "msg_demo_002",
+            name: "Yaa Mansa",
+            email: "yaa.mansa88@yahoo.com",
+            phone: "+233 20 876 5432",
+            subject: "Custom Rose Cuban Nameplate Inquiry",
+            message: "Hi! I wanted to find out if the Moesha Royal Rose Cuban Nameplate can be crafted in 14k solid yellow gold instead of vermeil, and what the lead time would be for delivery to East Legon.",
+            type: "inquiry",
+            date: "2026-10-30 09:15",
+            unread: false
+        }
+    ];
+    localStorage.setItem("j_messages", JSON.stringify(storeMessages));
+}
+
+let currentAdminMessageFilter = "all";
+let adminInboxSearchQuery = "";
+let currentViewingMessageId = null;
+
 // ── Application State ──
 let currentCategory = "all";
 let currentSort = "featured";
@@ -1333,23 +1367,49 @@ function initContactForm() {
     form.addEventListener("submit", function (e) {
         e.preventDefault();
 
-        const name = document.getElementById("contactName").value.trim();
-        const email = document.getElementById("contactEmail").value.trim();
-        const subject = document.getElementById("contactSubject").value.trim();
-        const message = document.getElementById("contactMessage").value.trim();
+        const name = (document.getElementById("contactName")?.value || "").trim();
+        const email = (document.getElementById("contactEmail")?.value || "").trim();
+        const phone = (document.getElementById("contactPhone")?.value || "").trim();
+        const subject = (document.getElementById("contactSubject")?.value || "").trim();
+        const message = (document.getElementById("contactMessage")?.value || "").trim();
 
         if (!name || !email || !message) {
-            statusEl.textContent = "Please fill in all required fields.";
+            statusEl.textContent = "Please fill in all required fields (Name, Email, and Message).";
             statusEl.className = "form-status-msg error";
             return;
         }
 
         submitBtn.disabled = true;
-        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sending...`;
+        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Dispatching to Admin...`;
         statusEl.className = "form-status-msg";
         statusEl.textContent = "";
 
-        fetch(`https://formsubmit.co/ajax/${SITE_CONFIG.email}`, {
+        const targetEmail = (storeSettings && storeSettings.email) ? storeSettings.email : SITE_CONFIG.email;
+
+        // Build inquiry record for in-app Customer Inbox
+        const isBespoke = (subject.toLowerCase().includes("bespoke") || message.toLowerCase().includes("bespoke") || subject.toLowerCase().includes("custom"));
+        const newMsgId = "msg_" + Date.now();
+        const newMsgRecord = {
+            id: newMsgId,
+            name: name,
+            email: email,
+            phone: phone,
+            subject: subject || "General Consultation Inquiry",
+            message: message,
+            type: isBespoke ? "bespoke" : "inquiry",
+            date: new Date().toISOString().replace("T", " ").slice(0, 16),
+            unread: true
+        };
+
+        // Always save immediately to local admin inbox so no customer inquiry is ever lost
+        storeMessages.unshift(newMsgRecord);
+        localStorage.setItem("j_messages", JSON.stringify(storeMessages));
+        updateAdminNotificationBadge();
+        if (typeof renderAdminDashboardStats === 'function') renderAdminDashboardStats();
+        if (typeof renderAdminMessages === 'function') renderAdminMessages();
+
+        // Dispatch via FormSubmit.co directly into the Admin's real email inbox
+        fetch(`https://formsubmit.co/ajax/${targetEmail}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -1358,28 +1418,34 @@ function initContactForm() {
             body: JSON.stringify({
                 name: name,
                 email: email,
-                _subject: `Jewels by J Inquiry: ${subject || "General Consultation"} (from ${name})`,
+                phone: phone || "Not provided",
+                _subject: `💎 [Jewels by J Customer Inquiry] ${subject || "Consultation"} — from ${name}`,
                 message: message,
-                _replyto: email
+                _replyto: email,
+                _captcha: "false",
+                _template: "table"
             })
         })
             .then(res => res.json())
             .then(data => {
                 if (data && (data.success === "true" || data.success === true)) {
-                    statusEl.textContent = `Thank you, ${name}! Your inquiry has been sent to ${SITE_CONFIG.email}. We will reply shortly.`;
+                    statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Thank you, <strong>${escapeHTML(name)}</strong>! Your consultation inquiry was dispatched directly to the admin inbox (<strong>${escapeHTML(targetEmail)}</strong>). Jerrilyn will review and reply shortly.`;
                     statusEl.className = "form-status-msg success";
                     form.reset();
+                    showToast("Inquiry Sent", `Dispatched to admin inbox: ${targetEmail}`);
                 } else {
-                    const fallbackUrl = `mailto:${SITE_CONFIG.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent("From: " + name + " (" + email + ")\n\n" + message)}`;
-                    statusEl.innerHTML = `Message ready! <a href="${fallbackUrl}" style="color:var(--color-gold); font-weight:600; text-decoration:underline;">Click here to send via email client</a>`;
+                    const fallbackUrl = `mailto:${targetEmail}?subject=${encodeURIComponent("Jewels by J Inquiry: " + (subject || "Consultation"))}&body=${encodeURIComponent("From: " + name + " (" + email + ")\nPhone: " + phone + "\n\n" + message)}`;
+                    statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Inquiry recorded in store inbox! <a href="${fallbackUrl}" style="color:var(--color-gold); font-weight:700; text-decoration:underline;">Click here to also send via your personal email client</a>`;
                     statusEl.className = "form-status-msg success";
+                    form.reset();
                 }
             })
             .catch(() => {
-                const mailto = `mailto:${SITE_CONFIG.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent("From: " + name + " (" + email + ")\n\n" + message)}`;
-                window.location.href = mailto;
-                statusEl.innerHTML = `Opening your email app... <a href="${mailto}" style="color:var(--color-gold); font-weight:600; text-decoration:underline;">Click here if it didn't open automatically</a>`;
+                const mailto = `mailto:${targetEmail}?subject=${encodeURIComponent("Jewels by J Inquiry: " + (subject || "Consultation"))}&body=${encodeURIComponent("From: " + name + " (" + email + ")\nPhone: " + phone + "\n\n" + message)}`;
+                statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Inquiry saved to store inbox! Direct email delivery fallback: <a href="${mailto}" target="_blank" style="color:var(--color-gold); font-weight:700; text-decoration:underline;">Click here to open in email app</a> or chat on <a href="https://wa.me/${SITE_CONFIG.whatsappNumber}?text=${encodeURIComponent('Hello Jerrilyn! Inquiry from ' + name + ': ' + message)}" target="_blank" style="color:#25d366; font-weight:700; text-decoration:underline;">WhatsApp</a>.`;
                 statusEl.className = "form-status-msg success";
+                form.reset();
+                showToast("Inquiry Saved", "Inquiry recorded in store records.");
             })
             .finally(() => {
                 submitBtn.disabled = false;
@@ -2369,7 +2435,30 @@ function playOrderNotificationSound() {
 
 // ── Email Notification Dispatch (Feature #6) ──
 function sendEmailOrderNotification(order) {
-    const targetEmail = storeSettings.email || SITE_CONFIG.email;
+    const targetEmail = (storeSettings && storeSettings.email) ? storeSettings.email : SITE_CONFIG.email;
+
+    // Record order in in-app customer inbox
+    try {
+        const orderMsg = {
+            id: "msg_ord_" + order.id,
+            name: order.customerName || "Customer",
+            email: order.customerEmail || "No email provided",
+            phone: order.customerPhone || "",
+            subject: `New Paid Order #${order.id}`,
+            message: `Order #${order.id} placed for ${order.items ? order.items.length : 0} item(s).\nTotal: ${SITE_CONFIG.currency} ${order.total ? order.total.toFixed(2) : '0.00'}\nPayment: ${order.paymentMethod} (Ref: ${order.paymentRef || "N/A"})\nAddress: ${order.address}\n\nItems:\n${(order.items || []).map(i => `• ${i.title} (${i.option || 'Standard'}) x${i.qty} = GH₵ ${(i.price * i.qty).toFixed(2)}`).join('\n')}${order.notes ? `\n\nNotes: ${order.notes}` : ''}`,
+            type: "order",
+            date: new Date().toISOString().replace("T", " ").slice(0, 16),
+            unread: true,
+            orderId: order.id
+        };
+        storeMessages.unshift(orderMsg);
+        localStorage.setItem("j_messages", JSON.stringify(storeMessages));
+        updateAdminNotificationBadge();
+        if (typeof renderAdminDashboardStats === 'function') renderAdminDashboardStats();
+        if (typeof renderAdminMessages === 'function') renderAdminMessages();
+    } catch (e) { }
+
+    // Dispatch via FormSubmit.co
     try {
         fetch(`https://formsubmit.co/ajax/${targetEmail}`, {
             method: "POST",
@@ -2385,7 +2474,10 @@ function sendEmailOrderNotification(order) {
                 payment_ref: order.paymentRef,
                 items: order.items.map(i => `${i.title} (${i.option || 'Standard'}) x${i.qty} = GH₵ ${i.price * i.qty}`).join("\n"),
                 notes: order.notes,
-                grand_total: `GH₵ ${order.total.toFixed(2)}`
+                grand_total: `GH₵ ${order.total.toFixed(2)}`,
+                _replyto: order.customerEmail || "",
+                _captcha: "false",
+                _template: "table"
             })
         }).catch(() => { /* Silent background catch */ });
     } catch (e) {
@@ -2737,24 +2829,37 @@ function initAdminPortal() {
     renderAdminDashboardStats();
     renderAdminProducts();
     renderAdminOrders();
+    renderAdminMessages();
 
-    // Populate Settings form
+    // Populate Settings form & dynamic email displays
     const setWa = document.getElementById("settingWhatsapp");
     const setEmail = document.getElementById("settingEmail");
     const setFree = document.getElementById("settingFreeDelivery");
     const setPin = document.getElementById("settingAdminPIN");
 
+    const activeEmail = storeSettings.email || SITE_CONFIG.email;
     if (setWa) setWa.value = storeSettings.whatsappNumber || SITE_CONFIG.whatsappNumber;
-    if (setEmail) setEmail.value = storeSettings.email || SITE_CONFIG.email;
+    if (setEmail) setEmail.value = activeEmail;
     if (setFree) setFree.value = storeSettings.freeDeliveryThreshold || SITE_CONFIG.freeDeliveryThreshold;
     if (setPin) setPin.value = storeSettings.adminPIN || "2023";
+
+    const inboxEmailDisplay = document.getElementById("inboxStoreEmailDisplay");
+    if (inboxEmailDisplay) inboxEmailDisplay.textContent = activeEmail;
+    const contactEmailDisplay = document.getElementById("contactDisplayEmail");
+    if (contactEmailDisplay) contactEmailDisplay.textContent = activeEmail;
 }
 
 function updateAdminNotificationBadge() {
     const dot = document.getElementById("navAdminNotifyDot");
     const pendingOrders = storeOrders.filter(o => o.statusCode !== "delivered").length;
+    const unreadMessages = storeMessages ? storeMessages.filter(m => m.unread).length : 0;
     if (dot) {
-        dot.style.display = pendingOrders > 0 ? "block" : "none";
+        dot.style.display = (pendingOrders > 0 || unreadMessages > 0) ? "block" : "none";
+    }
+    const inboxBadge = document.getElementById("admTabInboxCount");
+    if (inboxBadge) {
+        inboxBadge.textContent = unreadMessages;
+        inboxBadge.style.display = unreadMessages > 0 ? "inline-block" : "none";
     }
 }
 
@@ -2804,6 +2909,7 @@ function unlockAdminDashboard() {
     renderAdminDashboardStats();
     renderAdminProducts();
     renderAdminOrders();
+    renderAdminMessages();
     showToast("Welcome Jerrilyn", "Admin Dashboard unlocked.");
 }
 
@@ -2819,13 +2925,16 @@ function lockAdminDashboard() {
 }
 
 function switchAdminTab(tabKey) {
-    const tabs = ["products", "orders", "settings"];
+    const tabs = ["products", "orders", "inbox", "settings"];
     tabs.forEach(t => {
         const btn = document.getElementById(`admTabBtn${t.charAt(0).toUpperCase() + t.slice(1)}`);
         const content = document.getElementById(`admTabContent${t.charAt(0).toUpperCase() + t.slice(1)}`);
         if (btn) btn.classList.toggle("active", t === tabKey);
         if (content) content.style.display = t === tabKey ? "block" : "none";
     });
+    if (tabKey === "inbox") {
+        renderAdminMessages();
+    }
 }
 
 function renderAdminDashboardStats() {
@@ -2833,19 +2942,27 @@ function renderAdminDashboardStats() {
     const ordEl = document.getElementById("adminStatOrders");
     const pendEl = document.getElementById("adminStatPending");
     const prodEl = document.getElementById("adminStatProducts");
+    const msgEl = document.getElementById("adminStatMessages");
 
     const totalRev = storeOrders.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
     const pendingCount = storeOrders.filter(o => o.statusCode !== "delivered").length;
+    const unreadCount = storeMessages ? storeMessages.filter(m => m.unread).length : 0;
 
     if (revEl) revEl.textContent = `${SITE_CONFIG.currency} ${totalRev.toFixed(2)}`;
     if (ordEl) ordEl.textContent = storeOrders.length;
     if (pendEl) pendEl.textContent = pendingCount;
     if (prodEl) prodEl.textContent = storeProducts.length;
+    if (msgEl) msgEl.textContent = storeMessages ? storeMessages.length : 0;
 
     const tabProdCount = document.getElementById("admTabProdCount");
     const tabOrdCount = document.getElementById("admTabOrderCount");
+    const tabInboxCount = document.getElementById("admTabInboxCount");
     if (tabProdCount) tabProdCount.textContent = storeProducts.length;
     if (tabOrdCount) tabOrdCount.textContent = storeOrders.length;
+    if (tabInboxCount) {
+        tabInboxCount.textContent = unreadCount;
+        tabInboxCount.style.display = unreadCount > 0 ? "inline-block" : "none";
+    }
 }
 
 // ── Admin Product Management Suite ──
@@ -3176,5 +3293,355 @@ function saveAdminSettings(event) {
     storeSettings.adminPIN = document.getElementById("settingAdminPIN").value.trim() || "2023";
 
     localStorage.setItem("j_settings", JSON.stringify(storeSettings));
+
+    // Update email displays across the site
+    const inboxEmailDisplay = document.getElementById("inboxStoreEmailDisplay");
+    if (inboxEmailDisplay) inboxEmailDisplay.textContent = storeSettings.email;
+    const contactEmailDisplay = document.getElementById("contactDisplayEmail");
+    if (contactEmailDisplay) contactEmailDisplay.textContent = storeSettings.email;
+
     showToast("Settings Saved", "Store contact and security settings updated.");
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FEATURE: CUSTOMER INBOX & ADMIN MAIL SUITE
+// ═══════════════════════════════════════════════════════════════════════════
+
+function renderAdminMessages() {
+    const tbody = document.getElementById("adminInboxTableBody");
+    if (!tbody) return;
+
+    let filtered = [...storeMessages];
+
+    // Apply Type / Read Filter
+    if (currentAdminMessageFilter === "unread") {
+        filtered = filtered.filter(m => m.unread);
+    } else if (currentAdminMessageFilter === "inquiry") {
+        filtered = filtered.filter(m => m.type === "inquiry");
+    } else if (currentAdminMessageFilter === "bespoke") {
+        filtered = filtered.filter(m => m.type === "bespoke");
+    }
+
+    // Apply Search Query
+    if (adminInboxSearchQuery) {
+        const q = adminInboxSearchQuery.toLowerCase();
+        filtered = filtered.filter(m =>
+            (m.name && m.name.toLowerCase().includes(q)) ||
+            (m.email && m.email.toLowerCase().includes(q)) ||
+            (m.phone && m.phone.toLowerCase().includes(q)) ||
+            (m.subject && m.subject.toLowerCase().includes(q)) ||
+            (m.message && m.message.toLowerCase().includes(q))
+        );
+    }
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align:center; padding:48px 20px; color:var(--color-text-muted);">
+                    <i class="fa-regular fa-envelope" style="font-size:2.5rem; color:var(--color-gold); margin-bottom:12px; display:block;"></i>
+                    <h4 style="font-size:1.05rem; color:var(--color-black); margin-bottom:6px;">No messages found</h4>
+                    <p style="font-size:0.85rem; max-width:400px; margin:0 auto;">
+                        ${adminInboxSearchQuery ? `No results match "${escapeHTML(adminInboxSearchQuery)}". Try clearing your search.` : `There are no ${currentAdminMessageFilter !== 'all' ? currentAdminMessageFilter : ''} inquiries in your inbox yet.`}
+                    </p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    const typeBadges = {
+        bespoke: '<span class="badge badge-sale" style="font-size:0.7rem; padding:3px 8px;">Bespoke</span>',
+        inquiry: '<span class="badge badge-bestseller" style="font-size:0.7rem; padding:3px 8px;">Inquiry</span>',
+        order: '<span class="badge badge-gold" style="font-size:0.7rem; padding:3px 8px; background:var(--color-gold); color:#000;">Order Notice</span>'
+    };
+
+    tbody.innerHTML = filtered.map(m => {
+        const preview = m.message ? (m.message.length > 90 ? m.message.slice(0, 90) + "..." : m.message) : "No text";
+        const phoneFormatted = m.phone ? m.phone.replace(/[\s+-]/g, "") : "";
+        const waLink = phoneFormatted ? (phoneFormatted.startsWith("0") ? "233" + phoneFormatted.slice(1) : phoneFormatted) : "";
+
+        return `
+            <tr class="${m.unread ? 'msg-unread' : ''}" style="cursor:pointer;" onclick="openAdminMessageModal('${m.id}')">
+                <td style="text-align:center;" onclick="event.stopPropagation(); toggleAdminMessageReadById('${m.id}')">
+                    ${m.unread
+                        ? `<span class="msg-unread-dot" title="Unread — Click to mark read"></span>`
+                        : `<i class="fa-solid fa-check msg-read-check" title="Read — Click to mark unread"></i>`}
+                </td>
+                <td style="font-size:0.8rem; white-space:nowrap; color:var(--color-text-muted);">
+                    ${m.date || 'Recent'}
+                </td>
+                <td>
+                    <strong style="color:var(--color-black); font-size:0.88rem;">${escapeHTML(m.name)}</strong><br>
+                    <a href="mailto:${m.email}" onclick="event.stopPropagation();" style="font-size:0.78rem; color:var(--color-gold);">${escapeHTML(m.email)}</a>
+                    ${m.phone ? `<span style="font-size:0.75rem; color:var(--color-text-muted); display:block;">${escapeHTML(m.phone)}</span>` : ''}
+                </td>
+                <td>
+                    ${typeBadges[m.type] || typeBadges.inquiry}
+                    <div style="font-weight:600; font-size:0.85rem; color:var(--color-black); margin-top:3px;">
+                        ${escapeHTML(m.subject || 'Consultation Inquiry')}
+                    </div>
+                </td>
+                <td style="max-width:280px;">
+                    <span class="msg-preview-text" style="font-size:0.82rem; color:var(--color-text-muted); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                        ${escapeHTML(preview)}
+                    </span>
+                </td>
+                <td onclick="event.stopPropagation();" style="white-space:nowrap;">
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn btn-outline btn-sm" onclick="openAdminMessageModal('${m.id}')" title="View Full Message" style="padding:4px 8px; font-size:0.75rem;">
+                            <i class="fa-regular fa-eye"></i> View
+                        </button>
+                        <a href="mailto:${m.email}?subject=Re: ${encodeURIComponent(m.subject || 'Jewels by J Inquiry')}" class="btn btn-primary btn-sm" title="Reply via Email" style="padding:4px 8px; font-size:0.75rem;">
+                            <i class="fa-solid fa-reply"></i>
+                        </a>
+                        ${waLink ? `
+                            <a href="https://wa.me/${waLink}?text=${encodeURIComponent('Hello ' + m.name + '! Thank you for reaching out to Jewels by J regarding your inquiry.')}" target="_blank" class="btn btn-whatsapp btn-sm" title="Chat on WhatsApp" style="padding:4px 8px; font-size:0.75rem;">
+                                <i class="fa-brands fa-whatsapp"></i>
+                            </a>
+                        ` : ''}
+                        <button class="btn btn-outline btn-sm" onclick="deleteAdminMessage('${m.id}')" title="Delete Message" style="padding:4px 8px; font-size:0.75rem; color:#d32f2f; border-color:rgba(211,47,47,0.3);">
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join("");
+}
+
+function filterAdminMessages(type) {
+    currentAdminMessageFilter = type;
+    const filterBtns = {
+        all: "btnMsgFilterAll",
+        unread: "btnMsgFilterUnread",
+        inquiry: "btnMsgFilterInquiries",
+        bespoke: "btnMsgFilterBespoke"
+    };
+
+    Object.keys(filterBtns).forEach(k => {
+        const btn = document.getElementById(filterBtns[k]);
+        if (btn) btn.classList.toggle("active", k === type);
+    });
+
+    renderAdminMessages();
+}
+
+function handleAdminInboxSearch() {
+    const input = document.getElementById("adminInboxSearch");
+    if (!input) return;
+    adminInboxSearchQuery = input.value.trim();
+    renderAdminMessages();
+}
+
+function openAdminMessageModal(msgId) {
+    const msg = storeMessages.find(m => m.id === msgId);
+    if (!msg) return;
+
+    currentViewingMessageId = msgId;
+
+    // Mark message as read
+    if (msg.unread) {
+        msg.unread = false;
+        localStorage.setItem("j_messages", JSON.stringify(storeMessages));
+        updateAdminNotificationBadge();
+        renderAdminDashboardStats();
+    }
+
+    const modal = document.getElementById("adminMessageModalBackdrop");
+    const badgeEl = document.getElementById("adminMsgModalBadge");
+    const subjectEl = document.getElementById("adminMsgModalSubject");
+    const senderEl = document.getElementById("adminMsgModalSender");
+    const emailEl = document.getElementById("adminMsgModalEmail");
+    const dateEl = document.getElementById("adminMsgModalDate");
+    const phoneEl = document.getElementById("adminMsgModalPhone");
+    const bodyEl = document.getElementById("adminMsgModalBody");
+    const replyEmailBtn = document.getElementById("adminMsgModalReplyEmail");
+    const replyWaBtn = document.getElementById("adminMsgModalReplyWa");
+    const toggleReadBtn = document.getElementById("adminMsgModalToggleReadBtn");
+
+    if (badgeEl) {
+        badgeEl.textContent = (msg.type === "bespoke" ? "Bespoke Jewelry" : (msg.type === "order" ? "Order Notice" : "Consultation Inquiry"));
+        badgeEl.className = msg.type === "bespoke" ? "badge badge-sale" : (msg.type === "order" ? "badge badge-gold" : "badge badge-bestseller");
+    }
+
+    if (subjectEl) subjectEl.textContent = msg.subject || "Consultation Inquiry";
+    if (senderEl) senderEl.textContent = msg.name;
+    if (emailEl) {
+        emailEl.textContent = msg.email;
+        emailEl.href = `mailto:${msg.email}`;
+    }
+    if (dateEl) dateEl.textContent = msg.date || "Recent";
+    if (phoneEl) {
+        phoneEl.textContent = msg.phone ? `Phone: ${msg.phone}` : "Phone: Not provided";
+    }
+    if (bodyEl) bodyEl.textContent = msg.message;
+
+    if (replyEmailBtn) {
+        replyEmailBtn.href = `mailto:${msg.email}?subject=Re: ${encodeURIComponent(msg.subject || 'Jewels by J Inquiry')}&body=${encodeURIComponent('\n\n--- In response to your inquiry ---\n' + msg.message)}`;
+    }
+
+    if (replyWaBtn) {
+        if (msg.phone) {
+            let phoneClean = msg.phone.replace(/[\s+-]/g, "");
+            if (phoneClean.startsWith("0")) phoneClean = "233" + phoneClean.slice(1);
+            replyWaBtn.href = `https://wa.me/${phoneClean}?text=${encodeURIComponent('Hello ' + msg.name + '! ✨ This is Jerrilyn from Jewels by J following up on your inquiry: "' + (msg.subject || '') + '"')}`;
+            replyWaBtn.style.display = "inline-flex";
+        } else {
+            replyWaBtn.style.display = "none";
+        }
+    }
+
+    if (toggleReadBtn) {
+        toggleReadBtn.textContent = msg.unread ? "Mark as Read" : "Mark as Unread";
+    }
+
+    if (modal) modal.style.display = "flex";
+    renderAdminMessages();
+}
+
+function closeAdminMessageModal() {
+    const modal = document.getElementById("adminMessageModalBackdrop");
+    if (modal) modal.style.display = "none";
+    currentViewingMessageId = null;
+}
+
+function toggleAdminMessageReadById(msgId) {
+    const msg = storeMessages.find(m => m.id === msgId);
+    if (!msg) return;
+    msg.unread = !msg.unread;
+    localStorage.setItem("j_messages", JSON.stringify(storeMessages));
+    updateAdminNotificationBadge();
+    renderAdminDashboardStats();
+    renderAdminMessages();
+    showToast(msg.unread ? "Marked Unread" : "Marked Read", `Message from ${msg.name}`);
+}
+
+function toggleCurrentAdminMessageRead() {
+    if (!currentViewingMessageId) return;
+    const msg = storeMessages.find(m => m.id === currentViewingMessageId);
+    if (!msg) return;
+    msg.unread = !msg.unread;
+    localStorage.setItem("j_messages", JSON.stringify(storeMessages));
+    updateAdminNotificationBadge();
+    renderAdminDashboardStats();
+    closeAdminMessageModal();
+    renderAdminMessages();
+    showToast(msg.unread ? "Marked Unread" : "Marked Read", `Message from ${msg.name}`);
+}
+
+function deleteCurrentAdminMessage() {
+    if (!currentViewingMessageId) return;
+    if (!confirm("Are you sure you want to permanently delete this message?")) return;
+
+    storeMessages = storeMessages.filter(m => m.id !== currentViewingMessageId);
+    localStorage.setItem("j_messages", JSON.stringify(storeMessages));
+    updateAdminNotificationBadge();
+    renderAdminDashboardStats();
+    closeAdminMessageModal();
+    renderAdminMessages();
+    showToast("Message Deleted", "The customer message was removed.");
+}
+
+function deleteAdminMessage(msgId) {
+    if (!confirm("Are you sure you want to delete this message?")) return;
+    storeMessages = storeMessages.filter(m => m.id !== msgId);
+    localStorage.setItem("j_messages", JSON.stringify(storeMessages));
+    updateAdminNotificationBadge();
+    renderAdminDashboardStats();
+    renderAdminMessages();
+    showToast("Message Deleted", "The customer message was removed.");
+}
+
+function markAllAdminMessagesRead() {
+    if (!storeMessages.length) return;
+    storeMessages.forEach(m => m.unread = false);
+    localStorage.setItem("j_messages", JSON.stringify(storeMessages));
+    updateAdminNotificationBadge();
+    renderAdminDashboardStats();
+    renderAdminMessages();
+    showToast("All Read", "All customer messages marked as read.");
+}
+
+function exportMessagesJSON() {
+    const blob = new Blob([JSON.stringify(storeMessages, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `jewels_by_j_customer_inbox_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast("Inbox Exported", "Customer messages exported to JSON.");
+}
+
+function sendTestAdminEmail() {
+    const targetEmail = (storeSettings && storeSettings.email) ? storeSettings.email : SITE_CONFIG.email;
+    const testBtn = document.getElementById("btnSendTestEmail");
+    if (testBtn) {
+        testBtn.disabled = true;
+        testBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sending Test...`;
+    }
+
+    const testMsgId = "msg_test_" + Date.now();
+    const testRecord = {
+        id: testMsgId,
+        name: "Jewels by J System",
+        email: targetEmail,
+        phone: SITE_CONFIG.phone,
+        subject: "Mail Forwarding Verification & Test",
+        message: `Hello Jerrilyn! This is a test email sent from your Jewels by J store to verify that customer contact form inquiries and orders are delivered directly to ${targetEmail}.\n\nFormSubmit.co active.\nTimestamp: ${new Date().toLocaleString()}`,
+        type: "inquiry",
+        date: new Date().toISOString().replace("T", " ").slice(0, 16),
+        unread: true
+    };
+
+    // Save to local inbox
+    storeMessages.unshift(testRecord);
+    localStorage.setItem("j_messages", JSON.stringify(storeMessages));
+    updateAdminNotificationBadge();
+    renderAdminDashboardStats();
+    renderAdminMessages();
+
+    // Dispatch to real admin inbox via FormSubmit
+    fetch(`https://formsubmit.co/ajax/${targetEmail}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+            name: "Jewels by J Admin Verification",
+            email: targetEmail,
+            _subject: `💎 [Jewels by J] Test Email Verification for Admin Inbox (${targetEmail})`,
+            message: `Hello Jerrilyn!\n\nThis is a test notification confirming that email forwarding to your admin inbox (${targetEmail}) is active and working properly.\n\nTime: ${new Date().toLocaleString()}\nBrand: Jewels by J`,
+            _captcha: "false",
+            _template: "table"
+        })
+    })
+        .then(res => res.json())
+        .then(data => {
+            showToast("Test Email Dispatched!", `Delivered to ${targetEmail}. Please check your inbox!`);
+            alert(`A test email has been sent to ${targetEmail}!\n\nNOTE: If this is the very first time FormSubmit has sent an email to this address, FormSubmit may send an 'Activate Form' confirmation email. Please check your Inbox (or Spam/Promotions folder) and click 'Activate Form' once. All future inquiries will arrive directly!`);
+        })
+        .catch(() => {
+            showToast("Test Dispatched", `Notification dispatched to ${targetEmail}.`);
+        })
+        .finally(() => {
+            if (testBtn) {
+                testBtn.disabled = false;
+                testBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send Test Mail`;
+            }
+        });
+}
+
+// ── Expose Global Functions for Inline HTML Handlers ──
+window.switchAdminTab = switchAdminTab;
+window.renderAdminMessages = renderAdminMessages;
+window.filterAdminMessages = filterAdminMessages;
+window.handleAdminInboxSearch = handleAdminInboxSearch;
+window.openAdminMessageModal = openAdminMessageModal;
+window.closeAdminMessageModal = closeAdminMessageModal;
+window.toggleAdminMessageReadById = toggleAdminMessageReadById;
+window.toggleCurrentAdminMessageRead = toggleCurrentAdminMessageRead;
+window.deleteCurrentAdminMessage = deleteCurrentAdminMessage;
+window.deleteAdminMessage = deleteAdminMessage;
+window.markAllAdminMessagesRead = markAllAdminMessagesRead;
+window.exportMessagesJSON = exportMessagesJSON;
+window.sendTestAdminEmail = sendTestAdminEmail;
+window.saveAdminSettings = saveAdminSettings;

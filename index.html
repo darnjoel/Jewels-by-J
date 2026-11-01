@@ -645,7 +645,7 @@
                             <div class="contact-card-icon">
                                 <i class="fa-solid fa-location-dot"></i>
                             </div>
-                            <h3 class="contact-card-title">Atelier Location</h3>
+                            <h3 class="contact-card-title">Accra Studio Location</h3>
                             <p class="contact-card-desc">Accra, Ghana<br>Fast nationwide delivery</p>
                         </div>
 
@@ -662,8 +662,7 @@
                     <div class="contact-form-box">
                         <h3 class="contact-form-title">Send a Private Inquiry</h3>
                         <p class="contact-form-sub">
-                            Have a custom design idea or specific question? Leave a note and we will reply promptly to
-                            your email.
+                            Have a custom design idea, sizing question, or bespoke inquiry? Leave a message and it will be delivered directly to the admin's inbox.
                         </p>
 
                         <form id="customerContactForm">
@@ -677,19 +676,29 @@
                                     <input type="email" id="contactEmail" required placeholder="e.g. ama@example.com">
                                 </div>
                             </div>
-                            <div class="form-field">
-                                <label for="contactSubject">Piece of Interest / Subject *</label>
-                                <input type="text" id="contactSubject" required
-                                    placeholder="e.g. Moesha Royal Rose Cuban Nameplate or Custom Ring">
+                            <div class="form-grid-2">
+                                <div class="form-field">
+                                    <label for="contactPhone">Phone / WhatsApp Number (Optional)</label>
+                                    <input type="text" id="contactPhone" placeholder="e.g. +233 50 059 4879">
+                                </div>
+                                <div class="form-field">
+                                    <label for="contactSubject">Subject / Piece of Interest *</label>
+                                    <input type="text" id="contactSubject" required
+                                        placeholder="e.g. Moesha Royal Rose Cuban Nameplate or Custom Ring">
+                                </div>
                             </div>
                             <div class="form-field">
                                 <label for="contactMessage">Your Message *</label>
-                                <textarea id="contactMessage" required
+                                <textarea id="contactMessage" required rows="4"
                                     placeholder="Write your custom text requirements, chain length preferences, or questions here..."></textarea>
                             </div>
                             <button type="submit" class="btn btn-primary btn-block" id="contactSubmitBtn">
-                                <i class="fa-solid fa-paper-plane"></i> Send Consultation Inquiry
+                                <i class="fa-solid fa-paper-plane"></i> Send to Admin Inbox
                             </button>
+                            <span style="font-size:0.75rem; color:var(--color-text-subtle); display:block; text-align:center; margin-top:10px;">
+                                <i class="fa-solid fa-envelope-circle-check" style="color:var(--color-gold); margin-right:4px;"></i>
+                                Dispatches directly to store owner email (<span id="contactDisplayEmail">mensahjerrilyn@gmail.com</span>) &amp; logged in Admin Portal.
+                            </span>
                             <p class="form-status-msg" id="contactFormStatus"></p>
                         </form>
                     </div>
@@ -1284,9 +1293,9 @@
                                 <div class="admin-stat-lbl">Pending Deliveries</div>
                                 <div class="admin-stat-num" id="adminStatPending" style="color:#e65100;">0</div>
                             </div>
-                            <div class="admin-stat-card">
-                                <div class="admin-stat-lbl">Active Products in Store</div>
-                                <div class="admin-stat-num" id="adminStatProducts">21</div>
+                            <div class="admin-stat-card" onclick="switchAdminTab('inbox')" style="cursor:pointer;" title="Click to view Customer Inbox">
+                                <div class="admin-stat-lbl">Customer Inquiries</div>
+                                <div class="admin-stat-num" id="adminStatMessages" style="color:var(--color-gold);">0</div>
                             </div>
                         </div>
 
@@ -1299,6 +1308,9 @@
                             <button class="admin-tab-btn" id="admTabBtnOrders" onclick="switchAdminTab('orders')">
                                 <i class="fa-solid fa-truck-fast"></i> Customer Orders (<span
                                     id="admTabOrderCount">0</span>)
+                            </button>
+                            <button class="admin-tab-btn" id="admTabBtnInbox" onclick="switchAdminTab('inbox')">
+                                <i class="fa-solid fa-inbox"></i> Customer Inbox (<span id="admTabInboxCount" class="badge-count-inline">0</span>)
                             </button>
                             <button class="admin-tab-btn" id="admTabBtnSettings" onclick="switchAdminTab('settings')">
                                 <i class="fa-solid fa-gear"></i> Store Settings
@@ -1386,7 +1398,80 @@
                             </div>
                         </div>
 
-                        <!-- TAB 3: STORE SETTINGS -->
+                        <!-- TAB 3: CUSTOMER INBOX (FEATURE: ADMIN MESSAGES) -->
+                        <div class="admin-tab-content" id="admTabContentInbox" style="display:none;">
+                            <div
+                                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+                                <div>
+                                    <h3 style="font-size:1.15rem; color:var(--color-black);">Customer Inquiries &amp; Mailbox</h3>
+                                    <p style="font-size:0.8rem; color:var(--color-text-muted);">
+                                        Customer consultation messages and bespoke requests sent to your store email (<strong id="inboxStoreEmailDisplay">mensahjerrilyn@gmail.com</strong>).
+                                    </p>
+                                </div>
+                                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                                    <button class="btn btn-outline btn-sm" onclick="markAllAdminMessagesRead()">
+                                        <i class="fa-solid fa-envelope-open-text"></i> Mark All as Read
+                                    </button>
+                                    <button class="btn btn-outline btn-sm" onclick="sendTestAdminEmail()">
+                                        <i class="fa-solid fa-paper-plane"></i> Send Test Mail
+                                    </button>
+                                    <button class="btn btn-outline btn-sm" onclick="exportMessagesJSON()">
+                                        <i class="fa-solid fa-download"></i> Export Messages
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Filter & Search Toolbar -->
+                            <div class="admin-inbox-toolbar"
+                                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+                                <div class="admin-inbox-filter-group" style="display:flex; gap:8px; flex-wrap:wrap;">
+                                    <button class="btn btn-outline btn-sm admin-inbox-filter active" id="btnMsgFilterAll"
+                                        onclick="filterAdminMessages('all')">All Messages</button>
+                                    <button class="btn btn-outline btn-sm admin-inbox-filter" id="btnMsgFilterUnread"
+                                        onclick="filterAdminMessages('unread')">Unread</button>
+                                    <button class="btn btn-outline btn-sm admin-inbox-filter" id="btnMsgFilterInquiries"
+                                        onclick="filterAdminMessages('inquiry')">Inquiries</button>
+                                    <button class="btn btn-outline btn-sm admin-inbox-filter" id="btnMsgFilterBespoke"
+                                        onclick="filterAdminMessages('bespoke')">Bespoke</button>
+                                </div>
+                                <div style="position:relative; width:260px;">
+                                    <input type="text" id="adminInboxSearch" placeholder="Search sender, email, subject..."
+                                        class="customizer-input-field"
+                                        style="padding:8px 12px 8px 32px; font-size:0.82rem;"
+                                        oninput="handleAdminInboxSearch()">
+                                    <i class="fa-solid fa-magnifying-glass"
+                                        style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--color-text-subtle); font-size:0.8rem;"></i>
+                                </div>
+                            </div>
+
+                            <!-- Inbox Messages Table -->
+                            <div style="overflow-x:auto;">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:40px;">Status</th>
+                                            <th>Date &amp; Time</th>
+                                            <th>Sender &amp; Contact</th>
+                                            <th>Subject</th>
+                                            <th>Message Preview</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminInboxTableBody">
+                                        <!-- Dynamically populated by app.js -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Empty Inbox State -->
+                            <div id="adminInboxEmptyState" style="display:none; text-align:center; padding:40px 20px;">
+                                <i class="fa-regular fa-folder-open"
+                                    style="font-size:2rem; color:var(--color-text-subtle); margin-bottom:10px; display:block;"></i>
+                                <p style="font-size:0.9rem; color:var(--color-text-muted);">No messages found matching your filter.</p>
+                            </div>
+                        </div>
+
+                        <!-- TAB 4: STORE SETTINGS -->
                         <div class="admin-tab-content" id="admTabContentSettings" style="display:none;">
                             <div style="max-width:540px;">
                                 <h3 style="font-size:1.15rem; margin-bottom:6px;">Admin Store Configuration</h3>
@@ -1404,9 +1489,18 @@
                                     <div class="form-group" style="margin-bottom:14px;">
                                         <label
                                             style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Store
-                                            Notification Email</label>
-                                        <input type="email" id="settingEmail" class="customizer-input-field"
-                                            value="mensahjerrilyn@gmail.com" required>
+                                            Notification Email (Admin Inbox)</label>
+                                        <div style="display:flex; gap:8px;">
+                                            <input type="email" id="settingEmail" class="customizer-input-field"
+                                                value="mensahjerrilyn@gmail.com" required>
+                                            <button type="button" class="btn btn-outline btn-sm" onclick="sendTestAdminEmail()"
+                                                id="btnSendTestEmail" style="white-space:nowrap;">
+                                                <i class="fa-solid fa-paper-plane"></i> Send Test Mail
+                                            </button>
+                                        </div>
+                                        <span style="font-size:0.75rem; color:var(--color-text-muted); display:block; margin-top:4px;">
+                                            All customer inquiries sent from the website and paid order notices are delivered to this inbox.
+                                        </span>
                                     </div>
                                     <div class="form-group" style="margin-bottom:14px;">
                                         <label
@@ -2217,6 +2311,64 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Message View Modal -->
+    <div class="modal-backdrop" id="adminMessageModalBackdrop" style="display:none;">
+        <div class="modal-card" style="max-width:560px;">
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--color-border); padding-bottom:14px; margin-bottom:18px;">
+                <div>
+                    <span class="badge badge-bestseller" id="adminMsgModalBadge">Inquiry</span>
+                    <h3 style="font-size:1.2rem; color:var(--color-black); margin-top:4px;" id="adminMsgModalSubject">
+                        Message Subject</h3>
+                </div>
+                <button type="button" class="modal-close-btn" onclick="closeAdminMessageModal()">&times;</button>
+            </div>
+            <div
+                style="background:var(--color-surface-soft); padding:14px; border-radius:var(--radius-md); font-size:0.85rem; margin-bottom:18px;">
+                <div class="form-grid-2" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div>
+                        <span
+                            style="font-size:0.72rem; color:var(--color-text-muted); text-transform:uppercase; font-weight:700; display:block;">From:</span>
+                        <strong id="adminMsgModalSender" style="display:block; color:var(--color-black);">Customer Name</strong>
+                        <span id="adminMsgModalEmail" style="color:var(--color-gold); font-size:0.8rem;">email@example.com</span>
+                    </div>
+                    <div>
+                        <span
+                            style="font-size:0.72rem; color:var(--color-text-muted); text-transform:uppercase; font-weight:700; display:block;">Received:</span>
+                        <div id="adminMsgModalDate" style="color:var(--color-black); font-size:0.8rem;">Date</div>
+                        <div id="adminMsgModalPhone" style="color:var(--color-text-muted); font-size:0.8rem;">Phone</div>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-bottom:24px;">
+                <span
+                    style="font-size:0.75rem; color:var(--color-text-muted); text-transform:uppercase; font-weight:700; display:block; margin-bottom:6px;">Message
+                    Body:</span>
+                <div id="adminMsgModalBody"
+                    style="background:#fff; border:1px solid var(--color-border); border-radius:var(--radius-md); padding:16px; font-size:0.9rem; line-height:1.6; color:var(--color-black); white-space:pre-wrap; min-height:90px;">
+                </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <button type="button" class="btn btn-outline btn-sm" onclick="deleteCurrentAdminMessage()"
+                    style="color:#d32f2f; border-color:rgba(211,47,47,0.3);">
+                    <i class="fa-regular fa-trash-can"></i> Delete
+                </button>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-outline btn-sm" id="adminMsgModalToggleReadBtn"
+                        onclick="toggleCurrentAdminMessageRead()">
+                        Mark as Unread
+                    </button>
+                    <a href="#" id="adminMsgModalReplyEmail" class="btn btn-primary btn-sm">
+                        <i class="fa-solid fa-reply"></i> Reply via Email
+                    </a>
+                    <a href="#" id="adminMsgModalReplyWa" target="_blank" class="btn btn-whatsapp btn-sm">
+                        <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
+                    </a>
+                </div>
             </div>
         </div>
     </div>

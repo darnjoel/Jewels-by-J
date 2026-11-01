@@ -4507,3 +4507,70 @@ button {
         width: 100%;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ADMIN INBOX & MESSAGING SUITE
+   ═══════════════════════════════════════════════════════════════════════════ */
+.badge-count-inline {
+    background: var(--color-gold);
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 2px 7px;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+    margin-left: 4px;
+}
+.admin-inbox-toolbar {
+    margin-bottom: 16px;
+}
+.admin-inbox-filter-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.admin-inbox-filter {
+    font-size: 0.8rem;
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    border-color: var(--color-border);
+    color: var(--color-text-muted);
+}
+.admin-inbox-filter.active {
+    background: var(--color-black);
+    color: #fff;
+    border-color: var(--color-black);
+}
+.msg-unread-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #1976d2;
+    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.25);
+    display: inline-block;
+    animation: pulseDot 2s infinite;
+}
+@keyframes pulseDot {
+    0% { transform: scale(0.95); opacity: 0.8; }
+    50% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(0.95); opacity: 0.8; }
+}
+.msg-read-check {
+    color: var(--color-text-subtle);
+    font-size: 0.8rem;
+}
+.admin-table tr.msg-unread td {
+    background: #fffbf9;
+    font-weight: 500;
+}
+.admin-table tr.msg-unread:hover td {
+    background: #fdf5f2;
+}
+.msg-preview-text {
+    max-width: 280px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    display: block;
+}
