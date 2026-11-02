@@ -1,6 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    JEWELS BY J — E-COMMERCE APPLICATION JAVASCRIPT
    Inspired by The Strand Brand Architecture & Features
+   (Email system updated: central sender, activation-safe, auto-reply, spam trap)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 // ── Configuration ──
@@ -9,6 +10,14 @@ const SITE_CONFIG = {
     phone: "+233 50 059 4879",
     whatsappNumber: "233500594879",
     email: "mensahjerrilyn@gmail.com",
+    // ── EmailJS settings (https://dashboard.emailjs.com) ──
+    // Paste your own values here. The public key is safe to expose in browser code.
+    emailjs: {
+        publicKey: "YOUR_PUBLIC_KEY",            // Account > General > Public Key
+        serviceId: "YOUR_SERVICE_ID",            // Email Services > your Gmail service
+        adminTemplateId: "YOUR_ADMIN_TEMPLATE_ID",       // template that emails YOU
+        autoReplyTemplateId: "YOUR_AUTOREPLY_TEMPLATE_ID" // template that emails the CUSTOMER (optional)
+    },
     currency: "GH₵",
     freeDeliveryThreshold: 500
 };
@@ -544,6 +553,94 @@ document.addEventListener("DOMContentLoaded", () => {
         navigateTo("shop");
     }
 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CENTRAL EMAIL SENDER (EmailJS)
+// One place for every outgoing email: contact form, orders, test mail.
+// Uses the EmailJS REST API directly, so no extra <script> tag is needed.
+// ═══════════════════════════════════════════════════════════════════════════
+function getAdminEmail() {
+    return (storeSettings && storeSettings.email) || SITE_CONFIG.email;
+}
+
+function isEmailJSConfigured() {
+    const c = SITE_CONFIG.emailjs || {};
+    return c.publicKey && c.serviceId && c.adminTemplateId &&
+        !String(c.publicKey).startsWith("YOUR_") &&
+        !String(c.serviceId).startsWith("YOUR_") &&
+        !String(c.adminTemplateId).startsWith("YOUR_");
+}
+
+async function emailJSSend(templateId, templateParams) {
+    const c = SITE_CONFIG.emailjs;
+    const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            service_id: c.serviceId,
+            template_id: templateId,
+            user_id: c.publicKey,
+            template_params: templateParams
+        })
+    });
+    const text = await res.text();
+    return { ok: res.ok, message: text };
+}
+
+// subject: email subject line
+// fields:  key/value details (name, email, phone, message, order info...)
+// extra:   { _autoresponse: "text" } sends a confirmation email to fields.email
+async function sendStoreEmail(subject, fields = {}, extra = {}) {
+    if (!isEmailJSConfigured()) {
+        console.warn("EmailJS is not configured. Fill in SITE_CONFIG.emailjs.");
+        return { ok: false, message: "EmailJS keys not set in SITE_CONFIG.emailjs" };
+    }
+
+    // Turn all fields into a readable block for the email body
+    const details = Object.entries(fields)
+        .filter(([, v]) => v !== undefined && v !== null && String(v).trim() !== "")
+        .map(([k, v]) => `${k.replace(/_/g, " ").toUpperCase()}: ${v}`)
+        .join("\n");
+
+    const params = {
+        to_email: getAdminEmail(),
+        subject: subject,
+        from_name: fields.name || "Website Visitor",
+        from_email: fields.email || "",
+        reply_to: fields.email || getAdminEmail(),
+        phone: fields.phone || "",
+        message: fields.message || "",
+        details: details,
+        brand: SITE_CONFIG.brandName
+    };
+
+    try {
+        const result = await emailJSSend(SITE_CONFIG.emailjs.adminTemplateId, params);
+        if (!result.ok) {
+            console.warn("EmailJS admin email failed:", result.message);
+            return { ok: false, message: result.message };
+        }
+
+        // Optional confirmation email to the customer
+        const replyTemplate = SITE_CONFIG.emailjs.autoReplyTemplateId;
+        if (extra._autoresponse && fields.email && replyTemplate && !String(replyTemplate).startsWith("YOUR_")) {
+            emailJSSend(replyTemplate, {
+                to_email: fields.email,
+                to_name: fields.name || "there",
+                message: extra._autoresponse,
+                subject: `Thank you from ${SITE_CONFIG.brandName}`,
+                reply_to: getAdminEmail(),
+                brand: SITE_CONFIG.brandName
+            }).then(r => { if (!r.ok) console.warn("EmailJS auto-reply failed:", r.message); })
+              .catch(err => console.warn("EmailJS auto-reply error:", err));
+        }
+
+        return { ok: true, message: "sent" };
+    } catch (err) {
+        console.warn("EmailJS network error:", err);
+        return { ok: false, message: "network error: " + err.message };
+    }
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SPA NAVIGATION
@@ -1355,7 +1452,7 @@ function closeLightbox() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// CONTACT FORM SUBMISSION
+// CONTACT FORM SUBMISSION (uses central email sender)
 // ═══════════════════════════════════════════════════════════════════════════
 function initContactForm() {
     const form = document.getElementById("customerContactForm");
@@ -1366,6 +1463,10 @@ function initContactForm() {
 
     form.addEventListener("submit", function (e) {
         e.preventDefault();
+
+        // Honeypot: if a hidden field named "_honey" exists in the form and a bot filled it, silently stop.
+        const honey = form.querySelector('[name="_honey"]');
+        if (honey && honey.value) return;
 
         const name = (document.getElementById("contactName")?.value || "").trim();
         const email = (document.getElementById("contactEmail")?.value || "").trim();
@@ -1380,17 +1481,16 @@ function initContactForm() {
         }
 
         submitBtn.disabled = true;
-        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Dispatching to Admin...`;
+        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sending...`;
         statusEl.className = "form-status-msg";
         statusEl.textContent = "";
 
-        const targetEmail = (storeSettings && storeSettings.email) ? storeSettings.email : SITE_CONFIG.email;
+        const targetEmail = getAdminEmail();
 
         // Build inquiry record for in-app Customer Inbox
         const isBespoke = (subject.toLowerCase().includes("bespoke") || message.toLowerCase().includes("bespoke") || subject.toLowerCase().includes("custom"));
-        const newMsgId = "msg_" + Date.now();
         const newMsgRecord = {
-            id: newMsgId,
+            id: "msg_" + Date.now(),
             name: name,
             email: email,
             phone: phone,
@@ -1401,56 +1501,44 @@ function initContactForm() {
             unread: true
         };
 
-        // Always save immediately to local admin inbox so no customer inquiry is ever lost
+        // Save to local inbox (only visible on this device)
         storeMessages.unshift(newMsgRecord);
         localStorage.setItem("j_messages", JSON.stringify(storeMessages));
         updateAdminNotificationBadge();
-        if (typeof renderAdminDashboardStats === 'function') renderAdminDashboardStats();
-        if (typeof renderAdminMessages === 'function') renderAdminMessages();
+        if (typeof renderAdminDashboardStats === "function") renderAdminDashboardStats();
+        if (typeof renderAdminMessages === "function") renderAdminMessages();
 
-        // Dispatch via FormSubmit.co directly into the Admin's real email inbox
-        fetch(`https://formsubmit.co/ajax/${targetEmail}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            body: JSON.stringify({
+        sendStoreEmail(
+            `💎 [Jewels by J Inquiry] ${subject || "Consultation"} — ${name}`,
+            {
                 name: name,
-                email: email,
+                email: email, // FormSubmit uses this as Reply-To
                 phone: phone || "Not provided",
-                _subject: `💎 [Jewels by J Customer Inquiry] ${subject || "Consultation"} — from ${name}`,
+                subject: subject || "Consultation",
                 message: message,
-                _replyto: email,
-                _captcha: "false",
-                _template: "table"
-            })
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data && (data.success === "true" || data.success === true)) {
-                    statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Thank you, <strong>${escapeHTML(name)}</strong>! Your consultation inquiry was dispatched directly to the admin inbox (<strong>${escapeHTML(targetEmail)}</strong>). Jerrilyn will review and reply shortly.`;
-                    statusEl.className = "form-status-msg success";
-                    form.reset();
-                    showToast("Inquiry Sent", `Dispatched to admin inbox: ${targetEmail}`);
-                } else {
-                    const fallbackUrl = `mailto:${targetEmail}?subject=${encodeURIComponent("Jewels by J Inquiry: " + (subject || "Consultation"))}&body=${encodeURIComponent("From: " + name + " (" + email + ")\nPhone: " + phone + "\n\n" + message)}`;
-                    statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Inquiry recorded in store inbox! <a href="${fallbackUrl}" style="color:var(--color-gold); font-weight:700; text-decoration:underline;">Click here to also send via your personal email client</a>`;
-                    statusEl.className = "form-status-msg success";
-                    form.reset();
-                }
-            })
-            .catch(() => {
-                const mailto = `mailto:${targetEmail}?subject=${encodeURIComponent("Jewels by J Inquiry: " + (subject || "Consultation"))}&body=${encodeURIComponent("From: " + name + " (" + email + ")\nPhone: " + phone + "\n\n" + message)}`;
-                statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Inquiry saved to store inbox! Direct email delivery fallback: <a href="${mailto}" target="_blank" style="color:var(--color-gold); font-weight:700; text-decoration:underline;">Click here to open in email app</a> or chat on <a href="https://wa.me/${SITE_CONFIG.whatsappNumber}?text=${encodeURIComponent('Hello Jerrilyn! Inquiry from ' + name + ': ' + message)}" target="_blank" style="color:#25d366; font-weight:700; text-decoration:underline;">WhatsApp</a>.`;
+                type: isBespoke ? "Bespoke" : "General inquiry"
+            },
+            {
+                _autoresponse: `Hi ${name}, thank you for contacting Jewels by J! Jerrilyn has received your inquiry and will reply shortly. For quick answers, WhatsApp us on ${SITE_CONFIG.phone}.`
+            }
+        ).then(result => {
+            const mailto = `mailto:${targetEmail}?subject=${encodeURIComponent("Jewels by J Inquiry: " + (subject || "Consultation"))}&body=${encodeURIComponent("From: " + name + " (" + email + ")\nPhone: " + phone + "\n\n" + message)}`;
+            const waLink = `https://wa.me/${storeSettings.whatsappNumber || SITE_CONFIG.whatsappNumber}?text=${encodeURIComponent("Hello Jerrilyn! Inquiry from " + name + ": " + message)}`;
+
+            if (result.ok) {
+                statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Thank you, <strong>${escapeHTML(name)}</strong>! Your inquiry was sent. Jerrilyn will reply shortly.`;
                 statusEl.className = "form-status-msg success";
                 form.reset();
-                showToast("Inquiry Saved", "Inquiry recorded in store records.");
-            })
-            .finally(() => {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send Consultation Inquiry`;
-            });
+                showToast("Inquiry Sent", "We'll be in touch soon.");
+            } else {
+                statusEl.innerHTML = `We couldn't send this automatically. Please <a href="${mailto}" style="color:var(--color-gold); font-weight:700; text-decoration:underline;">email us directly</a> or <a href="${waLink}" target="_blank" style="color:#25d366; font-weight:700; text-decoration:underline;">chat on WhatsApp</a>.`;
+                statusEl.className = "form-status-msg error";
+                showToast("Not Delivered", "Please use email or WhatsApp to reach us.");
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send Consultation Inquiry`;
+        });
     });
 }
 
@@ -1983,6 +2071,8 @@ function calculateDeliveryFee(selectedVal) {
 
 // ═══════════════════════════════════════════════════════════════════════════
 // FEATURE 2, 3 & 4: ONLINE CHECKOUT MODAL (GHANA MOMO & CARD)
+// NOTE: Payments below are SIMULATED. Replace with Paystack / Hubtel / Flutterwave
+// before accepting real money. Never collect raw card numbers/CVV in your own JS.
 // ═══════════════════════════════════════════════════════════════════════════
 function initCheckoutModal() {
     const backdrop = document.getElementById("checkoutModalBackdrop");
@@ -2334,6 +2424,10 @@ function finalizeOrderPlacement(paymentMethodName, paymentRef) {
         notes: ""
     };
 
+    // Apply free-delivery rule to the stored fee so emails/orders match what the customer saw
+    const threshold = storeSettings.freeDeliveryThreshold || SITE_CONFIG.freeDeliveryThreshold;
+    const appliedDeliveryFee = checkoutState.subtotal >= threshold ? 0 : checkoutState.deliveryFee;
+
     const newOrder = {
         id: orderId,
         date: new Date().toISOString().replace("T", " ").slice(0, 16),
@@ -2343,7 +2437,7 @@ function finalizeOrderPlacement(paymentMethodName, paymentRef) {
         address: cust.address,
         region: checkoutState.deliveryRegion,
         regionName: DELIVERY_RATES[checkoutState.deliveryRegion]?.name || "Greater Accra",
-        deliveryFee: checkoutState.deliveryFee,
+        deliveryFee: appliedDeliveryFee,
         items: cart.map(item => ({
             title: item.title,
             option: item.option || "",
@@ -2377,7 +2471,7 @@ function finalizeOrderPlacement(paymentMethodName, paymentRef) {
     // Set WhatsApp notification button
     const notifyBtn = document.getElementById("btnNotifyAtelierWhatsApp");
     if (notifyBtn) {
-        let waText = `*PAID ORDER CONFIRMATION — ${SITE_CONFIG.brandName.toUpperCase()}*\n`;
+        let waText = `*ORDER CONFIRMATION — ${SITE_CONFIG.brandName.toUpperCase()}*\n`;
         waText += `─────────────────────────\n`;
         waText += `*Order ID:* ${orderId}\n`;
         waText += `*Customer:* ${cust.name} (${cust.phone})\n`;
@@ -2435,16 +2529,14 @@ function playOrderNotificationSound() {
 
 // ── Email Notification Dispatch (Feature #6) ──
 function sendEmailOrderNotification(order) {
-    const targetEmail = (storeSettings && storeSettings.email) ? storeSettings.email : SITE_CONFIG.email;
-
-    // Record order in in-app customer inbox
+    // Record order in in-app customer inbox (local to this device)
     try {
         const orderMsg = {
             id: "msg_ord_" + order.id,
             name: order.customerName || "Customer",
             email: order.customerEmail || "No email provided",
             phone: order.customerPhone || "",
-            subject: `New Paid Order #${order.id}`,
+            subject: `New Order #${order.id}`,
             message: `Order #${order.id} placed for ${order.items ? order.items.length : 0} item(s).\nTotal: ${SITE_CONFIG.currency} ${order.total ? order.total.toFixed(2) : '0.00'}\nPayment: ${order.paymentMethod} (Ref: ${order.paymentRef || "N/A"})\nAddress: ${order.address}\n\nItems:\n${(order.items || []).map(i => `• ${i.title} (${i.option || 'Standard'}) x${i.qty} = GH₵ ${(i.price * i.qty).toFixed(2)}`).join('\n')}${order.notes ? `\n\nNotes: ${order.notes}` : ''}`,
             type: "order",
             date: new Date().toISOString().replace("T", " ").slice(0, 16),
@@ -2454,35 +2546,41 @@ function sendEmailOrderNotification(order) {
         storeMessages.unshift(orderMsg);
         localStorage.setItem("j_messages", JSON.stringify(storeMessages));
         updateAdminNotificationBadge();
-        if (typeof renderAdminDashboardStats === 'function') renderAdminDashboardStats();
-        if (typeof renderAdminMessages === 'function') renderAdminMessages();
+        if (typeof renderAdminDashboardStats === "function") renderAdminDashboardStats();
+        if (typeof renderAdminMessages === "function") renderAdminMessages();
     } catch (e) { }
 
-    // Dispatch via FormSubmit.co
-    try {
-        fetch(`https://formsubmit.co/ajax/${targetEmail}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Accept": "application/json" },
-            body: JSON.stringify({
-                _subject: `💎 NEW PAID ORDER #${order.id} — ${order.customerName} (${SITE_CONFIG.currency} ${order.total.toFixed(2)})`,
-                order_id: order.id,
-                customer_name: order.customerName,
-                customer_phone: order.customerPhone,
-                customer_email: order.customerEmail,
-                delivery_address: order.address,
-                payment_method: order.paymentMethod,
-                payment_ref: order.paymentRef,
-                items: order.items.map(i => `${i.title} (${i.option || 'Standard'}) x${i.qty} = GH₵ ${i.price * i.qty}`).join("\n"),
-                notes: order.notes,
-                grand_total: `GH₵ ${order.total.toFixed(2)}`,
-                _replyto: order.customerEmail || "",
-                _captcha: "false",
-                _template: "table"
-            })
-        }).catch(() => { /* Silent background catch */ });
-    } catch (e) {
-        // Ignore background network errors
-    }
+    const itemsText = (order.items || [])
+        .map(i => `${i.title} (${i.option || "Standard"}) x${i.qty} = GH₵ ${(i.price * i.qty).toFixed(2)}`)
+        .join("\n");
+
+    const feeText = Number(order.deliveryFee) === 0 ? "FREE" : `GH₵ ${Number(order.deliveryFee || 0).toFixed(2)}`;
+
+    sendStoreEmail(
+        `💎 NEW ORDER #${order.id} — ${order.customerName} (GH₵ ${Number(order.total).toFixed(2)})`,
+        {
+            name: order.customerName,
+            email: order.customerEmail, // Reply-To
+            order_id: order.id,
+            order_date: order.date,
+            phone: order.customerPhone,
+            delivery_address: `${order.address} (${order.regionName})`,
+            items: itemsText,
+            subtotal: `GH₵ ${Number(order.subtotal).toFixed(2)}`,
+            delivery_fee: feeText,
+            grand_total: `GH₵ ${Number(order.total).toFixed(2)}`,
+            payment_method: order.paymentMethod,
+            payment_ref: order.paymentRef,
+            notes: order.notes
+        },
+        {
+            _autoresponse: `Hi ${order.customerName}, thank you for your order #${order.id} with Jewels by J! Total: GH₵ ${Number(order.total).toFixed(2)}. We'll update you as your piece is crafted and dispatched. Questions? WhatsApp us on ${SITE_CONFIG.phone}.`
+        }
+    ).then(result => {
+        if (!result.ok) {
+            showToast("Email Notice", "Order saved. Admin email may be delayed. Use the WhatsApp button to confirm your order.");
+        }
+    });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2654,7 +2752,7 @@ function renderTrackRecentOrders() {
 
     wrap.style.display = "block";
     list.innerHTML = matching.slice(0, 3).map(ord => `
-        <button type="button" class="track-recent-pill" onclick="trackSpecificOrder('${ord.id}', '${ord.customerEmail || ord.customerPhone}')">
+        <button type="button" class="track-recent-pill" onclick="trackSpecificOrder('${escapeHTML(ord.id)}', '${escapeHTML(ord.customerEmail || ord.customerPhone)}')">
             <span class="chip-status-dot ${ord.statusCode || 'confirmed'}"></span>
             <strong>${escapeHTML(ord.id)}</strong>
             <span style="color:var(--color-text-muted); font-size:0.75rem;">(${escapeHTML(ord.status)})</span>
@@ -2707,7 +2805,7 @@ function renderOrderTrackingResult(order) {
                     <span class="track-result-title-sub">Verified Parcel Tracking</span>
                     <div class="track-id-badge-row">
                         <span class="track-id-display">${escapeHTML(order.id)}</span>
-                        <button type="button" class="track-copy-btn" onclick="copyTrackOrderId('${order.id}')" title="Copy Tracking ID">
+                        <button type="button" class="track-copy-btn" onclick="copyTrackOrderId('${escapeHTML(order.id)}')" title="Copy Tracking ID">
                             <i class="fa-regular fa-copy"></i> Copy ID
                         </button>
                     </div>
@@ -3226,7 +3324,7 @@ function renderAdminOrders() {
                 <strong style="color:var(--color-black);">${SITE_CONFIG.currency} ${Number(ord.total).toFixed(2)}</strong>
             </td>
             <td>
-                <select class="shop-select" onchange="updateOrderStatus('${ord.id}', this.value)" style="padding:4px 8px; font-size:0.75rem;">
+                <select class="shop-select" onchange="updateOrderStatus('${escapeHTML(ord.id)}', this.value)" style="padding:4px 8px; font-size:0.75rem;">
                     <option value="confirmed" ${ord.statusCode === 'confirmed' ? 'selected' : ''}>Confirmed / Paid</option>
                     <option value="crafting" ${ord.statusCode === 'crafting' ? 'selected' : ''}>Studio Crafting</option>
                     <option value="transit" ${ord.statusCode === 'transit' ? 'selected' : ''}>In Transit</option>
@@ -3234,7 +3332,7 @@ function renderAdminOrders() {
                 </select>
             </td>
             <td>
-                <button class="btn btn-whatsapp btn-sm" onclick="whatsappCustomerOrder('${ord.id}')" style="padding:4px 10px; font-size:0.75rem;" title="WhatsApp Customer">
+                <button class="btn btn-whatsapp btn-sm" onclick="whatsappCustomerOrder('${escapeHTML(ord.id)}')" style="padding:4px 10px; font-size:0.75rem;" title="WhatsApp Customer">
                     <i class="fa-brands fa-whatsapp"></i> Chat
                 </button>
             </td>
@@ -3359,20 +3457,22 @@ function renderAdminMessages() {
         const preview = m.message ? (m.message.length > 90 ? m.message.slice(0, 90) + "..." : m.message) : "No text";
         const phoneFormatted = m.phone ? m.phone.replace(/[\s+-]/g, "") : "";
         const waLink = phoneFormatted ? (phoneFormatted.startsWith("0") ? "233" + phoneFormatted.slice(1) : phoneFormatted) : "";
+        const safeId = escapeHTML(m.id);
+        const safeEmail = escapeHTML(m.email);
 
         return `
-            <tr class="${m.unread ? 'msg-unread' : ''}" style="cursor:pointer;" onclick="openAdminMessageModal('${m.id}')">
-                <td style="text-align:center;" onclick="event.stopPropagation(); toggleAdminMessageReadById('${m.id}')">
+            <tr class="${m.unread ? 'msg-unread' : ''}" style="cursor:pointer;" onclick="openAdminMessageModal('${safeId}')">
+                <td style="text-align:center;" onclick="event.stopPropagation(); toggleAdminMessageReadById('${safeId}')">
                     ${m.unread
                         ? `<span class="msg-unread-dot" title="Unread — Click to mark read"></span>`
                         : `<i class="fa-solid fa-check msg-read-check" title="Read — Click to mark unread"></i>`}
                 </td>
                 <td style="font-size:0.8rem; white-space:nowrap; color:var(--color-text-muted);">
-                    ${m.date || 'Recent'}
+                    ${escapeHTML(m.date || 'Recent')}
                 </td>
                 <td>
                     <strong style="color:var(--color-black); font-size:0.88rem;">${escapeHTML(m.name)}</strong><br>
-                    <a href="mailto:${m.email}" onclick="event.stopPropagation();" style="font-size:0.78rem; color:var(--color-gold);">${escapeHTML(m.email)}</a>
+                    <a href="mailto:${safeEmail}" onclick="event.stopPropagation();" style="font-size:0.78rem; color:var(--color-gold);">${safeEmail}</a>
                     ${m.phone ? `<span style="font-size:0.75rem; color:var(--color-text-muted); display:block;">${escapeHTML(m.phone)}</span>` : ''}
                 </td>
                 <td>
@@ -3388,18 +3488,18 @@ function renderAdminMessages() {
                 </td>
                 <td onclick="event.stopPropagation();" style="white-space:nowrap;">
                     <div style="display:flex; gap:6px;">
-                        <button class="btn btn-outline btn-sm" onclick="openAdminMessageModal('${m.id}')" title="View Full Message" style="padding:4px 8px; font-size:0.75rem;">
+                        <button class="btn btn-outline btn-sm" onclick="openAdminMessageModal('${safeId}')" title="View Full Message" style="padding:4px 8px; font-size:0.75rem;">
                             <i class="fa-regular fa-eye"></i> View
                         </button>
-                        <a href="mailto:${m.email}?subject=Re: ${encodeURIComponent(m.subject || 'Jewels by J Inquiry')}" class="btn btn-primary btn-sm" title="Reply via Email" style="padding:4px 8px; font-size:0.75rem;">
+                        <a href="mailto:${safeEmail}?subject=Re: ${encodeURIComponent(m.subject || 'Jewels by J Inquiry')}" class="btn btn-primary btn-sm" title="Reply via Email" style="padding:4px 8px; font-size:0.75rem;">
                             <i class="fa-solid fa-reply"></i>
                         </a>
                         ${waLink ? `
-                            <a href="https://wa.me/${waLink}?text=${encodeURIComponent('Hello ' + m.name + '! Thank you for reaching out to Jewels by J regarding your inquiry.')}" target="_blank" class="btn btn-whatsapp btn-sm" title="Chat on WhatsApp" style="padding:4px 8px; font-size:0.75rem;">
+                            <a href="https://wa.me/${encodeURIComponent(waLink)}?text=${encodeURIComponent('Hello ' + m.name + '! Thank you for reaching out to Jewels by J regarding your inquiry.')}" target="_blank" class="btn btn-whatsapp btn-sm" title="Chat on WhatsApp" style="padding:4px 8px; font-size:0.75rem;">
                                 <i class="fa-brands fa-whatsapp"></i>
                             </a>
                         ` : ''}
-                        <button class="btn btn-outline btn-sm" onclick="deleteAdminMessage('${m.id}')" title="Delete Message" style="padding:4px 8px; font-size:0.75rem; color:#d32f2f; border-color:rgba(211,47,47,0.3);">
+                        <button class="btn btn-outline btn-sm" onclick="deleteAdminMessage('${safeId}')" title="Delete Message" style="padding:4px 8px; font-size:0.75rem; color:#d32f2f; border-color:rgba(211,47,47,0.3);">
                             <i class="fa-regular fa-trash-can"></i>
                         </button>
                     </div>
@@ -3574,60 +3674,52 @@ function exportMessagesJSON() {
 }
 
 function sendTestAdminEmail() {
-    const targetEmail = (storeSettings && storeSettings.email) ? storeSettings.email : SITE_CONFIG.email;
+    const targetEmail = getAdminEmail();
     const testBtn = document.getElementById("btnSendTestEmail");
     if (testBtn) {
         testBtn.disabled = true;
         testBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sending Test...`;
     }
 
-    const testMsgId = "msg_test_" + Date.now();
+    // Save a copy in the local inbox
     const testRecord = {
-        id: testMsgId,
+        id: "msg_test_" + Date.now(),
         name: "Jewels by J System",
         email: targetEmail,
         phone: SITE_CONFIG.phone,
         subject: "Mail Forwarding Verification & Test",
-        message: `Hello Jerrilyn! This is a test email sent from your Jewels by J store to verify that customer contact form inquiries and orders are delivered directly to ${targetEmail}.\n\nFormSubmit.co active.\nTimestamp: ${new Date().toLocaleString()}`,
+        message: `This is a test email sent from your Jewels by J store to verify that inquiries and orders reach ${targetEmail}.\n\nTimestamp: ${new Date().toLocaleString()}`,
         type: "inquiry",
         date: new Date().toISOString().replace("T", " ").slice(0, 16),
         unread: true
     };
-
-    // Save to local inbox
     storeMessages.unshift(testRecord);
     localStorage.setItem("j_messages", JSON.stringify(storeMessages));
     updateAdminNotificationBadge();
     renderAdminDashboardStats();
     renderAdminMessages();
 
-    // Dispatch to real admin inbox via FormSubmit
-    fetch(`https://formsubmit.co/ajax/${targetEmail}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify({
+    sendStoreEmail(
+        `💎 [Jewels by J] Test Email Verification (${targetEmail})`,
+        {
             name: "Jewels by J Admin Verification",
             email: targetEmail,
-            _subject: `💎 [Jewels by J] Test Email Verification for Admin Inbox (${targetEmail})`,
-            message: `Hello Jerrilyn!\n\nThis is a test notification confirming that email forwarding to your admin inbox (${targetEmail}) is active and working properly.\n\nTime: ${new Date().toLocaleString()}\nBrand: Jewels by J`,
-            _captcha: "false",
-            _template: "table"
-        })
-    })
-        .then(res => res.json())
-        .then(data => {
-            showToast("Test Email Dispatched!", `Delivered to ${targetEmail}. Please check your inbox!`);
-            alert(`A test email has been sent to ${targetEmail}!\n\nNOTE: If this is the very first time FormSubmit has sent an email to this address, FormSubmit may send an 'Activate Form' confirmation email. Please check your Inbox (or Spam/Promotions folder) and click 'Activate Form' once. All future inquiries will arrive directly!`);
-        })
-        .catch(() => {
-            showToast("Test Dispatched", `Notification dispatched to ${targetEmail}.`);
-        })
-        .finally(() => {
-            if (testBtn) {
-                testBtn.disabled = false;
-                testBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send Test Mail`;
-            }
-        });
+            message: `Hello Jerrilyn!\n\nThis is a test confirming email forwarding to ${targetEmail}.\n\nTime: ${new Date().toLocaleString()}\nBrand: Jewels by J`
+        }
+    ).then(result => {
+        if (result.ok) {
+            showToast("Test Email Sent", `Delivered to ${targetEmail}. Check your inbox.`);
+            alert(`Test email sent to ${targetEmail}. Check your Inbox (and Spam) in a few seconds.`);
+        } else {
+            showToast("Email Not Delivered", "See the alert for the exact reason.");
+            alert(`The test email failed.\n\nReason from EmailJS:\n${result.message || "no response"}\n\nChecklist:\n1. Fill in publicKey, serviceId and adminTemplateId in SITE_CONFIG.emailjs.\n2. In EmailJS, your template's "To Email" must be {{to_email}}.\n3. In EmailJS > Account > Security, allow your site's domain (or turn the restriction off while testing).\n4. Check your internet connection.`);
+        }
+    }).finally(() => {
+        if (testBtn) {
+            testBtn.disabled = false;
+            testBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send Test Mail`;
+        }
+    });
 }
 
 // ── Expose Global Functions for Inline HTML Handlers ──
