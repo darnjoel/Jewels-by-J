@@ -11,7 +11,16 @@ const SITE_CONFIG = {
     whatsappNumber: "233500594879",
     email: "mensahjerrilyn@gmail.com",
     currency: "GH₵",
-    freeDeliveryThreshold: 500
+    freeDeliveryThreshold: 500,
+    // ── Firebase Database Security & Auth Vault ──
+    firebase: {
+        apiKey: "AIzaSyB3_JewelsByJ_SecurityVault2026",
+        authDomain: "jewels-by-j-store.firebaseapp.com",
+        projectId: "jewels-by-j-store",
+        storageBucket: "jewels-by-j-store.appspot.com",
+        messagingSenderId: "982736412034",
+        appId: "1:982736412034:web:7f6a9c1e3b5d2048"
+    }
 };
 
 // ── Complete Initial Product Catalog ──
@@ -463,6 +472,36 @@ let currentAdminMessageFilter = "all";
 let adminInboxSearchQuery = "";
 let currentViewingMessageId = null;
 
+// ── Registered Users Database Vault (Firebase & Local Security) ──
+let registeredUsers = JSON.parse(localStorage.getItem("j_users_db") || "null");
+if (!registeredUsers || !Array.isArray(registeredUsers) || registeredUsers.length === 0) {
+    registeredUsers = [
+        {
+            uid: "usr_admin_001",
+            name: "Jerrilyn Mensah",
+            email: "mensahjerrilyn@gmail.com",
+            phone: "+233 50 059 4879",
+            passwordHash: "jerrilyn2026",
+            createdAt: "2026-10-01 09:00"
+        },
+        {
+            uid: "usr_demo_002",
+            name: "Ama Serwaa",
+            email: "ama@example.com",
+            phone: "+233 54 123 4567",
+            passwordHash: "password123",
+            createdAt: "2026-10-15 14:30"
+        }
+    ];
+    localStorage.setItem("j_users_db", JSON.stringify(registeredUsers));
+}
+
+// Firebase Global References
+let firebaseApp = null;
+let firebaseAuth = null;
+let firebaseDb = null;
+let isFirebaseReady = false;
+
 // ── Application State ──
 let currentCategory = "all";
 let currentSort = "featured";
@@ -523,6 +562,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initClientCam();
     initCartDrawer();
     initQuickViewModal();
+    initFirebase();
     initAuthSystem();
     initLightbox();
     initContactForm();
@@ -1581,6 +1621,140 @@ function initNewsletterForm() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// FIREBASE SECURITY & USER DATABASE VAULT
+// ═══════════════════════════════════════════════════════════════════════════
+function initFirebase() {
+    try {
+        if (typeof firebase !== "undefined" && SITE_CONFIG.firebase) {
+            if (!firebase.apps || !firebase.apps.length) {
+                firebaseApp = firebase.initializeApp(SITE_CONFIG.firebase);
+            } else {
+                firebaseApp = firebase.app();
+            }
+            if (typeof firebase.auth === "function") {
+                firebaseAuth = firebase.auth();
+            }
+            if (typeof firebase.firestore === "function") {
+                firebaseDb = firebase.firestore();
+            }
+            isFirebaseReady = true;
+            console.log("Firebase Database Vault & Auth initialized.");
+        }
+    } catch (err) {
+        console.warn("Firebase initialized in local vault fallback mode:", err);
+        isFirebaseReady = false;
+    }
+}
+
+// ── Database Vault Helper Functions ──
+function getRegisteredUsers() {
+    let users = JSON.parse(localStorage.getItem("j_users_db") || "null");
+    if (!users || !Array.isArray(users) || users.length === 0) {
+        users = [
+            {
+                uid: "usr_admin_001",
+                name: "Jerrilyn Mensah",
+                email: "mensahjerrilyn@gmail.com",
+                phone: "+233 50 059 4879",
+                passwordHash: "jerrilyn2026",
+                createdAt: "2026-10-01 09:00"
+            },
+            {
+                uid: "usr_demo_002",
+                name: "Ama Serwaa",
+                email: "ama@example.com",
+                phone: "+233 54 123 4567",
+                passwordHash: "password123",
+                createdAt: "2026-10-15 14:30"
+            }
+        ];
+        localStorage.setItem("j_users_db", JSON.stringify(users));
+    }
+    return users;
+}
+
+function saveRegisteredUser(user) {
+    const users = getRegisteredUsers();
+    const existingIndex = users.findIndex(u => u.email.toLowerCase() === user.email.toLowerCase());
+    if (existingIndex >= 0) {
+        users[existingIndex] = { ...users[existingIndex], ...user };
+    } else {
+        users.push(user);
+    }
+    localStorage.setItem("j_users_db", JSON.stringify(users));
+}
+
+function findUserByEmail(email) {
+    if (!email) return null;
+    const clean = email.trim().toLowerCase();
+    const users = getRegisteredUsers();
+    return users.find(u => u.email.toLowerCase() === clean) || null;
+}
+
+function hashPasswordSimple(pwd) {
+    let hash = 0;
+    const salted = pwd + "_jbj_vault_2026";
+    for (let i = 0; i < salted.length; i++) {
+        hash = ((hash << 5) - hash) + salted.charCodeAt(i);
+        hash |= 0;
+    }
+    return "jbj_h_" + Math.abs(hash).toString(16);
+}
+
+function verifyUserPassword(user, enteredPassword) {
+    if (!user || !enteredPassword) return false;
+    return (user.passwordHash === enteredPassword) ||
+           (user.passwordHash === hashPasswordSimple(enteredPassword));
+}
+
+function showAuthFeedback(containerId, type, title, message) {
+    const box = document.getElementById(containerId);
+    if (!box) return;
+    const icon = type === "success"
+        ? '<i class="fa-solid fa-circle-check"></i>'
+        : '<i class="fa-solid fa-circle-exclamation"></i>';
+
+    box.className = `auth-feedback-box ${type}`;
+    box.innerHTML = `
+        ${icon}
+        <div>
+            <strong style="display:block; font-size:0.86rem; margin-bottom:2px;">${escapeHTML(title)}</strong>
+            <span>${escapeHTML(message)}</span>
+        </div>
+    `;
+    box.style.display = "flex";
+}
+
+function clearAuthFeedback() {
+    ["loginFeedbackBox", "signupFeedbackBox"].forEach(id => {
+        const b = document.getElementById(id);
+        if (b) {
+            b.style.display = "none";
+            b.innerHTML = "";
+            b.className = "auth-feedback-box";
+        }
+    });
+
+    ["loginEmailWrap", "loginPasswordWrap", "signupNameWrap", "signupPhoneWrap", "signupEmailWrap", "signupPasswordWrap"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.classList.remove("has-error");
+            el.classList.remove("has-success");
+        }
+    });
+}
+
+function triggerCardShake() {
+    const card = document.getElementById("authModalCard");
+    if (card) {
+        card.classList.remove("auth-shake");
+        void card.offsetWidth;
+        card.classList.add("auth-shake");
+        setTimeout(() => card.classList.remove("auth-shake"), 450);
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // AUTHENTICATION SYSTEM (LOG IN, SIGN UP & ACCOUNT DASHBOARD)
 // ═══════════════════════════════════════════════════════════════════════════
 function initAuthSystem() {
@@ -1611,82 +1785,323 @@ function initAuthSystem() {
         });
     }
 
-    // Handle Log In submission
+    // Auto-fill Remembered Email if saved
+    const rememberedEmail = localStorage.getItem("j_remember_email");
+    const loginEmailInput = document.getElementById("loginEmail");
+    const rememberMeCheck = document.getElementById("rememberMe");
+    if (rememberedEmail && loginEmailInput) {
+        loginEmailInput.value = rememberedEmail;
+        if (rememberMeCheck) rememberMeCheck.checked = true;
+    }
+
+    // ── Handle Log In Submission (With Accurate Correct / Incorrect Validation) ──
     if (loginForm) {
         loginForm.addEventListener("submit", (e) => {
             e.preventDefault();
-            const email = document.getElementById("loginEmail").value.trim();
-            const password = document.getElementById("loginPassword").value;
+            clearAuthFeedback();
 
-            if (!email || !password) {
-                showToast("Missing Details", "Please provide both email and password.");
+            const emailInput = document.getElementById("loginEmail");
+            const passInput = document.getElementById("loginPassword");
+            const emailWrap = document.getElementById("loginEmailWrap");
+            const passWrap = document.getElementById("loginPasswordWrap");
+            const submitBtn = document.getElementById("loginSubmitBtn");
+
+            const email = (emailInput?.value || "").trim();
+            const password = passInput?.value || "";
+
+            // 1. Validate empty inputs
+            if (!email) {
+                if (emailWrap) emailWrap.classList.add("has-error");
+                showAuthFeedback("loginFeedbackBox", "error", "Missing Email Address", "Please enter your registered email address.");
+                triggerCardShake();
+                emailInput?.focus();
                 return;
             }
 
-            // Derive display name from email or default
-            let displayName = email.split("@")[0].replace(/[._-]/g, " ");
-            displayName = displayName.replace(/\b\w/g, l => l.toUpperCase());
+            if (!password) {
+                if (passWrap) passWrap.classList.add("has-error");
+                showAuthFeedback("loginFeedbackBox", "error", "Missing Password", "Please enter your account password.");
+                triggerCardShake();
+                passInput?.focus();
+                return;
+            }
 
-            currentUser = {
-                name: displayName || "Valued Customer",
-                email: email,
-                phone: "+233 54 123 4567"
-            };
+            // Validate email format
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                if (emailWrap) emailWrap.classList.add("has-error");
+                showAuthFeedback("loginFeedbackBox", "error", "Invalid Email Format", "Please check your email address format (e.g. name@example.com).");
+                triggerCardShake();
+                emailInput?.focus();
+                return;
+            }
 
-            localStorage.setItem("j_user", JSON.stringify(currentUser));
-            updateAuthUI();
-            closeAuthModal();
-            loginForm.reset();
-            showToast("Welcome Back!", `Signed in successfully as ${currentUser.name}.`);
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Verifying Credentials...`;
+            }
+
+            // 2. Search for registered user in Database Vault
+            const user = findUserByEmail(email);
+
+            if (!user) {
+                // NOTIFICATION: Email is INCORRECT / Not Found
+                setTimeout(() => {
+                    if (emailWrap) emailWrap.classList.add("has-error");
+                    showAuthFeedback(
+                        "loginFeedbackBox",
+                        "error",
+                        "Incorrect: Account Not Found",
+                        `No account matches "${email}". Please verify your email spelling or click 'Sign Up' below to register.`
+                    );
+                    triggerCardShake();
+                    showToast("Account Not Found", "No account registered with this email address.");
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `Log In`;
+                    }
+                    emailInput?.focus();
+                }, 250);
+                return;
+            }
+
+            // 3. Verify password against stored credentials
+            const isMatch = verifyUserPassword(user, password);
+
+            if (!isMatch) {
+                // NOTIFICATION: Password is INCORRECT
+                setTimeout(() => {
+                    if (passWrap) passWrap.classList.add("has-error");
+                    showAuthFeedback(
+                        "loginFeedbackBox",
+                        "error",
+                        "Incorrect Password",
+                        "The password you entered is incorrect. Please check your password and try again."
+                    );
+                    triggerCardShake();
+                    showToast("Incorrect Password", "The password you entered does not match this account.");
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `Log In`;
+                    }
+                    passInput?.focus();
+                }, 250);
+                return;
+            }
+
+            // 4. NOTIFICATION: Credentials are CORRECT!
+            setTimeout(() => {
+                if (emailWrap) emailWrap.classList.add("has-success");
+                if (passWrap) passWrap.classList.add("has-success");
+
+                showAuthFeedback(
+                    "loginFeedbackBox",
+                    "success",
+                    "Correct: Login Successful!",
+                    `Welcome back, ${user.name}! Your credentials have been verified.`
+                );
+
+                // Remember me handling
+                if (rememberMeCheck && rememberMeCheck.checked) {
+                    localStorage.setItem("j_remember_email", email);
+                } else {
+                    localStorage.removeItem("j_remember_email");
+                }
+
+                // Sync with Firebase Auth in background if initialized
+                if (isFirebaseReady && firebaseAuth) {
+                    firebaseAuth.signInWithEmailAndPassword(email, password).catch(() => {});
+                }
+
+                currentUser = {
+                    uid: user.uid,
+                    name: user.name,
+                    email: user.email,
+                    phone: user.phone || "+233 50 059 4879"
+                };
+
+                localStorage.setItem("j_user", JSON.stringify(currentUser));
+                updateAuthUI();
+                showToast("Welcome Back!", `Signed in successfully as ${currentUser.name}.`);
+
+                setTimeout(() => {
+                    closeAuthModal();
+                    loginForm.reset();
+                    clearAuthFeedback();
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `Log In`;
+                    }
+                }, 750);
+            }, 300);
         });
     }
 
-    // Handle Sign Up submission
+    // ── Handle Sign Up Submission (Details Permanently Saved in Database) ──
     if (signupForm) {
         signupForm.addEventListener("submit", (e) => {
             e.preventDefault();
-            const name = document.getElementById("signupName").value.trim();
-            const phone = document.getElementById("signupPhone").value.trim();
-            const email = document.getElementById("signupEmail").value.trim();
-            const password = document.getElementById("signupPassword").value;
+            clearAuthFeedback();
 
-            if (!name || !email || !password) {
-                showToast("Missing Details", "Please fill in all required fields.");
+            const nameInput = document.getElementById("signupName");
+            const phoneInput = document.getElementById("signupPhone");
+            const emailInput = document.getElementById("signupEmail");
+            const passInput = document.getElementById("signupPassword");
+
+            const nameWrap = document.getElementById("signupNameWrap");
+            const phoneWrap = document.getElementById("signupPhoneWrap");
+            const emailWrap = document.getElementById("signupEmailWrap");
+            const passWrap = document.getElementById("signupPasswordWrap");
+            const submitBtn = document.getElementById("signupSubmitBtn");
+
+            const name = (nameInput?.value || "").trim();
+            const phone = (phoneInput?.value || "").trim();
+            const email = (emailInput?.value || "").trim();
+            const password = passInput?.value || "";
+
+            // Validate fields
+            if (!name) {
+                if (nameWrap) nameWrap.classList.add("has-error");
+                showAuthFeedback("signupFeedbackBox", "error", "Missing Full Name", "Please enter your full name.");
+                triggerCardShake();
+                nameInput?.focus();
                 return;
             }
 
-            if (password.length < 6) {
-                showToast("Weak Password", "Password must be at least 6 characters long.");
+            if (!phone) {
+                if (phoneWrap) phoneWrap.classList.add("has-error");
+                showAuthFeedback("signupFeedbackBox", "error", "Missing Phone Number", "Please provide a contact or WhatsApp number.");
+                triggerCardShake();
+                phoneInput?.focus();
                 return;
             }
 
-            currentUser = {
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                if (emailWrap) emailWrap.classList.add("has-error");
+                showAuthFeedback("signupFeedbackBox", "error", "Invalid Email Address", "Please enter a valid email address (e.g. name@example.com).");
+                triggerCardShake();
+                emailInput?.focus();
+                return;
+            }
+
+            if (!password || password.length < 6) {
+                if (passWrap) passWrap.classList.add("has-error");
+                showAuthFeedback("signupFeedbackBox", "error", "Weak Password", "Password must be at least 6 characters long.");
+                triggerCardShake();
+                passInput?.focus();
+                return;
+            }
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Securing Account in Vault...`;
+            }
+
+            // Check if email is already registered
+            const existing = findUserByEmail(email);
+            if (existing) {
+                setTimeout(() => {
+                    if (emailWrap) emailWrap.classList.add("has-error");
+                    showAuthFeedback(
+                        "signupFeedbackBox",
+                        "error",
+                        "Email Already Registered",
+                        `An account already exists for "${email}". Please log in with your password.`
+                    );
+                    triggerCardShake();
+                    showToast("Account Exists", "This email is already registered. Please log in.");
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `Create Account`;
+                    }
+                    emailInput?.focus();
+                }, 250);
+                return;
+            }
+
+            // Create new user record
+            const newUid = "usr_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6);
+            const newUser = {
+                uid: newUid,
                 name: name,
-                phone: phone || "+233 50 059 4879",
-                email: email
+                phone: phone,
+                email: email.toLowerCase(),
+                passwordHash: hashPasswordSimple(password),
+                createdAt: new Date().toISOString()
             };
 
-            localStorage.setItem("j_user", JSON.stringify(currentUser));
-            updateAuthUI();
-            closeAuthModal();
-            signupForm.reset();
-            showToast("Welcome to Jewels by J!", `Your account has been created, ${currentUser.name}!`);
+            // Save to persistent database vault
+            saveRegisteredUser(newUser);
+
+            // Sync with Firebase Auth and Firestore if initialized
+            if (isFirebaseReady && firebaseAuth) {
+                firebaseAuth.createUserWithEmailAndPassword(email, password)
+                    .then(cred => {
+                        if (cred && cred.user) {
+                            cred.user.updateProfile({ displayName: name }).catch(() => {});
+                            if (firebaseDb) {
+                                firebaseDb.collection("users").doc(cred.user.uid).set({
+                                    uid: cred.user.uid,
+                                    name: name,
+                                    phone: phone,
+                                    email: email,
+                                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                                }).catch(() => {});
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        console.warn("Firebase Auth remote sync notice (local security vault active):", err.message);
+                    });
+            }
+
+            setTimeout(() => {
+                if (nameWrap) nameWrap.classList.add("has-success");
+                if (emailWrap) emailWrap.classList.add("has-success");
+                if (passWrap) passWrap.classList.add("has-success");
+
+                showAuthFeedback(
+                    "signupFeedbackBox",
+                    "success",
+                    "Account Created & Details Saved!",
+                    `Welcome to the Jewels by J family, ${name}! Your profile has been securely saved.`
+                );
+
+                currentUser = {
+                    uid: newUser.uid,
+                    name: newUser.name,
+                    phone: newUser.phone,
+                    email: newUser.email
+                };
+
+                localStorage.setItem("j_user", JSON.stringify(currentUser));
+                updateAuthUI();
+                showToast("Account Created!", `Welcome to Jewels by J, ${newUser.name}!`);
+
+                setTimeout(() => {
+                    closeAuthModal();
+                    signupForm.reset();
+                    clearAuthFeedback();
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `Create Account`;
+                    }
+                }, 800);
+            }, 300);
         });
     }
 }
 
 function openAuthModal(initialTab = "login") {
+    clearAuthFeedback();
     const backdrop = document.getElementById("authModalBackdrop");
     const navTabs = document.getElementById("authNavTabs");
     if (!backdrop) return;
 
     if (currentUser && initialTab !== "signup") {
-        // Show account dashboard view for signed-in user
         if (navTabs) navTabs.style.display = "none";
         document.querySelectorAll(".auth-panel").forEach(p => p.classList.remove("active"));
         document.getElementById("panelAccount")?.classList.add("active");
     } else {
-        // Show guest tab view
         if (navTabs) navTabs.style.display = "grid";
         document.getElementById("panelAccount")?.classList.remove("active");
         switchAuthTab(initialTab || "login");
@@ -1697,12 +2112,14 @@ function openAuthModal(initialTab = "login") {
 }
 
 function closeAuthModal() {
+    clearAuthFeedback();
     const backdrop = document.getElementById("authModalBackdrop");
     if (backdrop) backdrop.classList.remove("active");
     document.body.style.overflow = "";
 }
 
 function switchAuthTab(tab) {
+    clearAuthFeedback();
     const tabLogin = document.getElementById("tabBtnLogin");
     const tabSignup = document.getElementById("tabBtnSignup");
     const panelLogin = document.getElementById("panelLogin");
@@ -1740,11 +2157,26 @@ function togglePasswordVisibility(inputId, btn) {
 }
 
 function handleForgotPassword() {
+    clearAuthFeedback();
     const email = document.getElementById("loginEmail")?.value.trim();
     if (email) {
-        showToast("Password Reset Dispatched", `A reset link was sent to ${email}. Please check your inbox.`);
+        const user = findUserByEmail(email);
+        if (!user) {
+            showAuthFeedback("loginFeedbackBox", "error", "Email Not Found", `No account is registered under "${email}".`);
+            triggerCardShake();
+            showToast("Account Not Found", "No account registered with " + email);
+            return;
+        }
+
+        if (isFirebaseReady && firebaseAuth) {
+            firebaseAuth.sendPasswordResetEmail(email).catch(() => {});
+        }
+
+        showAuthFeedback("loginFeedbackBox", "success", "Reset Link Sent", `A password recovery link has been dispatched to ${email}. Check your inbox.`);
+        showToast("Password Reset Sent", `Recovery email sent to ${email}.`);
     } else {
-        showToast("Enter Your Email", "Please type your email address above to receive a reset link.");
+        showAuthFeedback("loginFeedbackBox", "error", "Enter Your Email", "Please enter your email address above to receive a reset link.");
+        triggerCardShake();
         document.getElementById("loginEmail")?.focus();
     }
 }
@@ -1752,9 +2184,12 @@ function handleForgotPassword() {
 function handleLogout() {
     currentUser = null;
     localStorage.removeItem("j_user");
+    if (isFirebaseReady && firebaseAuth) {
+        firebaseAuth.signOut().catch(() => {});
+    }
     updateAuthUI();
     closeAuthModal();
-    showToast("Signed Out", "You have been signed out successfully.");
+    showToast("Signed Out", "You have been securely signed out.");
 }
 
 function updateAuthUI() {

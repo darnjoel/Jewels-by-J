@@ -2823,6 +2823,80 @@ button {
     color: var(--color-gold);
 }
 
+/* Auth Dynamic Feedback Alert Box */
+.auth-feedback-box {
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 0.83rem;
+    line-height: 1.5;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    animation: fadeInSection 0.2s ease;
+}
+
+.auth-feedback-box.error {
+    background: #fdf2f2;
+    border: 1px solid rgba(211, 47, 47, 0.35);
+    color: #b71c1c;
+}
+
+.auth-feedback-box.error i {
+    color: #d32f2f;
+    font-size: 1rem;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.auth-feedback-box.success {
+    background: #f0fdf4;
+    border: 1px solid rgba(46, 125, 50, 0.35);
+    color: #1b5e20;
+}
+
+.auth-feedback-box.success i {
+    color: #2e7d32;
+    font-size: 1rem;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.auth-input-wrap.has-error input {
+    border-color: #d32f2f !important;
+    background: #fffafa;
+}
+
+.auth-input-wrap.has-success input {
+    border-color: #2e7d32 !important;
+    background: #fafffa;
+}
+
+.auth-security-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 12px;
+    font-size: 0.72rem;
+    color: var(--color-text-subtle);
+}
+
+.auth-security-badge i {
+    color: var(--color-gold);
+    font-size: 0.8rem;
+}
+
+@keyframes shakeCard {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+}
+
+.auth-shake {
+    animation: shakeCard 0.4s ease-in-out !important;
+}
+
 /* Customer Account Dashboard Modal View */
 .account-dashboard-panel {
     display: none;

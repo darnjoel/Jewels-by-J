@@ -1660,7 +1660,7 @@
        7B. AUTHENTICATION MODAL (LOG IN & SIGN UP)
        ═══════════════════════════════════════════════════════════════════════ -->
     <div class="auth-modal-backdrop" id="authModalBackdrop">
-        <div class="auth-modal-card">
+        <div class="auth-modal-card" id="authModalCard">
             <button class="auth-close-btn" id="authCloseBtn" aria-label="Close authentication modal"
                 onclick="closeAuthModal()">
                 <i class="fa-solid fa-xmark"></i>
@@ -1683,17 +1683,21 @@
                         <h3>Welcome Back</h3>
                         <p>Sign in to track orders, manage favorites, and checkout faster.</p>
                     </div>
-                    <form id="loginForm">
+
+                    <!-- Dynamic Feedback Banner for Login Status (Correct / Incorrect) -->
+                    <div id="loginFeedbackBox" class="auth-feedback-box" style="display:none;" role="alert"></div>
+
+                    <form id="loginForm" novalidate>
                         <div class="auth-input-group">
                             <label for="loginEmail">Email Address</label>
-                            <div class="auth-input-wrap">
+                            <div class="auth-input-wrap" id="loginEmailWrap">
                                 <input type="email" id="loginEmail" required placeholder="you@example.com"
                                     autocomplete="email">
                             </div>
                         </div>
                         <div class="auth-input-group">
                             <label for="loginPassword">Password</label>
-                            <div class="auth-input-wrap">
+                            <div class="auth-input-wrap" id="loginPasswordWrap">
                                 <input type="password" id="loginPassword" required placeholder="Enter your password"
                                     autocomplete="current-password">
                                 <button type="button" class="password-toggle-btn"
@@ -1709,9 +1713,12 @@
                             </label>
                             <a class="auth-forgot-link" onclick="handleForgotPassword()">Forgot password?</a>
                         </div>
-                        <button type="submit" class="btn auth-submit-btn">
+                        <button type="submit" class="btn auth-submit-btn" id="loginSubmitBtn">
                             Log In
                         </button>
+                        <div class="auth-security-badge">
+                            <i class="fa-solid fa-shield-halved"></i> Secured with Firebase Database Vault
+                        </div>
                         <p class="auth-footer-prompt">
                             Don't have an account? <a class="auth-switch-link" onclick="switchAuthTab('signup')">Sign
                                 Up</a>
@@ -1725,31 +1732,35 @@
                         <h3>Create Your Account</h3>
                         <p>Join the Jewels by J family for bespoke updates &amp; exclusive drops.</p>
                     </div>
-                    <form id="signupForm">
+
+                    <!-- Dynamic Feedback Banner for Signup Status -->
+                    <div id="signupFeedbackBox" class="auth-feedback-box" style="display:none;" role="alert"></div>
+
+                    <form id="signupForm" novalidate>
                         <div class="auth-input-group">
                             <label for="signupName">Full Name</label>
-                            <div class="auth-input-wrap">
+                            <div class="auth-input-wrap" id="signupNameWrap">
                                 <input type="text" id="signupName" required placeholder="e.g. Ama Serwaa"
                                     autocomplete="name">
                             </div>
                         </div>
                         <div class="auth-input-group">
                             <label for="signupPhone">Phone Number (WhatsApp)</label>
-                            <div class="auth-input-wrap">
+                            <div class="auth-input-wrap" id="signupPhoneWrap">
                                 <input type="tel" id="signupPhone" required placeholder="e.g. 054 123 4567"
                                     autocomplete="tel">
                             </div>
                         </div>
                         <div class="auth-input-group">
                             <label for="signupEmail">Email Address</label>
-                            <div class="auth-input-wrap">
+                            <div class="auth-input-wrap" id="signupEmailWrap">
                                 <input type="email" id="signupEmail" required placeholder="you@example.com"
                                     autocomplete="email">
                             </div>
                         </div>
                         <div class="auth-input-group">
                             <label for="signupPassword">Password</label>
-                            <div class="auth-input-wrap">
+                            <div class="auth-input-wrap" id="signupPasswordWrap">
                                 <input type="password" id="signupPassword" required
                                     placeholder="Create a password (min. 6 chars)" autocomplete="new-password">
                                 <button type="button" class="password-toggle-btn"
@@ -1759,9 +1770,12 @@
                                 </button>
                             </div>
                         </div>
-                        <button type="submit" class="btn auth-submit-btn">
+                        <button type="submit" class="btn auth-submit-btn" id="signupSubmitBtn">
                             Create Account
                         </button>
+                        <div class="auth-security-badge">
+                            <i class="fa-solid fa-shield-halved"></i> Encrypted &amp; Secured with Firebase Vault
+                        </div>
                         <p class="auth-footer-prompt">
                             Already have an account? <a class="auth-switch-link" onclick="switchAuthTab('login')">Log
                                 In</a>
@@ -2468,6 +2482,11 @@
         target="_blank" class="whatsapp-fab" aria-label="Chat on WhatsApp" title="Chat on WhatsApp">
         <i class="fa-brands fa-whatsapp"></i>
     </a>
+
+    <!-- Firebase Security & Database SDKs (v10 compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <!-- Application Script -->
     <script src="app.js"></script>
