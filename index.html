@@ -665,31 +665,36 @@
                             Have a custom design idea, sizing question, or bespoke inquiry? Leave a message and it will be delivered directly to the admin's inbox.
                         </p>
 
-                        <form id="customerContactForm">
+                        <form id="customerContactForm" action="https://formsubmit.co/mensahjerrilyn@gmail.com" method="POST">
+                            <!-- FormSubmit Configuration Fields -->
+                            <input type="hidden" name="_captcha" value="false">
+                            <input type="hidden" name="_template" value="table">
+                            <input type="hidden" name="_subject" value="💎 [Jewels by J] New Customer Consultation Inquiry">
+
                             <div class="form-grid-2">
                                 <div class="form-field">
                                     <label for="contactName">Your Name *</label>
-                                    <input type="text" id="contactName" required placeholder="e.g. Ama Serwaa">
+                                    <input type="text" id="contactName" name="name" required placeholder="e.g. Ama Serwaa">
                                 </div>
                                 <div class="form-field">
                                     <label for="contactEmail">Your Email *</label>
-                                    <input type="email" id="contactEmail" required placeholder="e.g. ama@example.com">
+                                    <input type="email" id="contactEmail" name="email" required placeholder="e.g. ama@example.com">
                                 </div>
                             </div>
                             <div class="form-grid-2">
                                 <div class="form-field">
                                     <label for="contactPhone">Phone / WhatsApp Number (Optional)</label>
-                                    <input type="text" id="contactPhone" placeholder="e.g. +233 50 059 4879">
+                                    <input type="text" id="contactPhone" name="phone" placeholder="e.g. +233 50 059 4879">
                                 </div>
                                 <div class="form-field">
                                     <label for="contactSubject">Subject / Piece of Interest *</label>
-                                    <input type="text" id="contactSubject" required
+                                    <input type="text" id="contactSubject" name="subject" required
                                         placeholder="e.g. Moesha Royal Rose Cuban Nameplate or Custom Ring">
                                 </div>
                             </div>
                             <div class="form-field">
                                 <label for="contactMessage">Your Message *</label>
-                                <textarea id="contactMessage" required rows="4"
+                                <textarea id="contactMessage" name="message" required rows="4"
                                     placeholder="Write your custom text requirements, chain length preferences, or questions here..."></textarea>
                             </div>
                             <button type="submit" class="btn btn-primary btn-block" id="contactSubmitBtn">
