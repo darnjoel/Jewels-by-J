@@ -1477,8 +1477,185 @@ function closeLightbox() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// CONTACT FORM SUBMISSION (uses central email sender)
 // ═══════════════════════════════════════════════════════════════════════════
+// CONTACT & INQUIRY MESSAGING SYSTEM (STRICT ACCOUNT GATE)
+// ═══════════════════════════════════════════════════════════════════════════
+
+function saveContactDraft() {
+    const subject = (document.getElementById("contactSubject")?.value || "").trim();
+    const message = (document.getElementById("contactMessage")?.value || "").trim();
+    const phone = (document.getElementById("contactPhone")?.value || "").trim();
+    const name = (document.getElementById("contactName")?.value || "").trim();
+    const email = (document.getElementById("contactEmail")?.value || "").trim();
+
+    if (subject || message || phone || (name && !currentUser) || (email && !currentUser)) {
+        sessionStorage.setItem("j_contact_draft", JSON.stringify({
+            name, email, phone, subject, message, timestamp: Date.now()
+        }));
+    }
+}
+
+function restoreContactDraftIfExists() {
+    try {
+        const raw = sessionStorage.getItem("j_contact_draft");
+        if (!raw) return false;
+        const draft = JSON.parse(raw);
+        if (!draft) return false;
+
+        const subjectEl = document.getElementById("contactSubject");
+        const messageEl = document.getElementById("contactMessage");
+        const phoneEl = document.getElementById("contactPhone");
+
+        let restored = false;
+        if (subjectEl && draft.subject && !subjectEl.value) {
+            subjectEl.value = draft.subject;
+            restored = true;
+        }
+        if (messageEl && draft.message && !messageEl.value) {
+            messageEl.value = draft.message;
+            restored = true;
+        }
+        if (phoneEl && draft.phone && !phoneEl.value) {
+            phoneEl.value = draft.phone;
+            restored = true;
+        }
+
+        sessionStorage.removeItem("j_contact_draft");
+
+        if (restored) {
+            const statusEl = document.getElementById("contactFormStatus");
+            if (statusEl) {
+                statusEl.className = "form-status-msg success";
+                statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Welcome, <strong>${escapeHTML(currentUser?.name || "Client")}</strong>! Your drafted inquiry has been restored and is ready to send.`;
+            }
+            showToast("Draft Restored", "Your inquiry is ready to send to the admin.");
+            return true;
+        }
+        return false;
+    } catch (e) {
+        console.error("Failed to restore contact draft:", e);
+        return false;
+    }
+}
+
+function updateContactAuthGate() {
+    const statusBox = document.getElementById("contactUserStatusBox");
+    const nameInput = document.getElementById("contactName");
+    const emailInput = document.getElementById("contactEmail");
+    const phoneInput = document.getElementById("contactPhone");
+    const submitBtn = document.getElementById("contactSubmitBtn");
+
+    if (!statusBox) return;
+
+    if (currentUser) {
+        // Authenticated client mode
+        statusBox.innerHTML = `
+            <div class="contact-auth-gate verified-mode">
+                <div class="contact-auth-gate-header">
+                    <div class="contact-auth-gate-icon verified">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <div>
+                        <h4 class="contact-auth-gate-title">
+                            Verified Client: <span>${escapeHTML(currentUser.name)}</span>
+                        </h4>
+                        <p class="contact-auth-gate-desc">
+                            Inquiry will be sent to admin inbox (<strong>${escapeHTML(getAdminEmail())}</strong>) &amp; linked to your account profile (<strong>${escapeHTML(currentUser.email)}</strong>).
+                        </p>
+                    </div>
+                </div>
+                <div class="contact-auth-gate-badge">
+                    <span class="auth-pill"><i class="fa-solid fa-shield-halved"></i> Registered Client</span>
+                </div>
+            </div>
+        `;
+
+        if (nameInput) {
+            nameInput.value = currentUser.name;
+            nameInput.readOnly = true;
+            nameInput.classList.add("is-verified-input");
+        }
+        if (emailInput) {
+            emailInput.value = currentUser.email;
+            emailInput.readOnly = true;
+            emailInput.classList.add("is-verified-input");
+        }
+        if (phoneInput && currentUser.phone && !phoneInput.value) {
+            phoneInput.value = currentUser.phone;
+        }
+
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove("btn-locked");
+            submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send to Admin Inbox`;
+            submitBtn.title = "Send inquiry directly to admin inbox";
+        }
+    } else {
+        // Unauthenticated guest mode: strictly locked
+        statusBox.innerHTML = `
+            <div class="contact-auth-gate guest-mode">
+                <div class="contact-auth-gate-header">
+                    <div class="contact-auth-gate-icon">
+                        <i class="fa-solid fa-user-lock"></i>
+                    </div>
+                    <div>
+                        <h4 class="contact-auth-gate-title">Account Required to Send Inquiries</h4>
+                        <p class="contact-auth-gate-desc">
+                            Only registered clients with an active account can send messages or emails to our studio inbox. Please log in or create an account to proceed.
+                        </p>
+                    </div>
+                </div>
+                <div class="contact-auth-gate-actions">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="saveContactDraft(); openAuthModal('login');">
+                        <i class="fa-solid fa-right-to-bracket"></i> Log In to Send
+                    </button>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="saveContactDraft(); openAuthModal('signup');">
+                        <i class="fa-solid fa-user-plus"></i> Create Free Account
+                    </button>
+                </div>
+            </div>
+        `;
+
+        if (nameInput) {
+            nameInput.readOnly = false;
+            nameInput.classList.remove("is-verified-input");
+            if (!sessionStorage.getItem("j_contact_draft")) nameInput.value = "";
+        }
+        if (emailInput) {
+            emailInput.readOnly = false;
+            emailInput.classList.remove("is-verified-input");
+            if (!sessionStorage.getItem("j_contact_draft")) emailInput.value = "";
+        }
+
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.add("btn-locked");
+            submitBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Sign In to Send Message`;
+            submitBtn.title = "You must have an account to send a message or email";
+        }
+    }
+}
+
+function handleDirectEmailCard(e) {
+    if (!currentUser) {
+        if (e && e.preventDefault) e.preventDefault();
+        saveContactDraft();
+        showToast("Account Required", "Please log in or create an account to message the studio.");
+        openAuthModal("login");
+
+        const contactBox = document.querySelector(".contact-form-box");
+        if (contactBox) {
+            contactBox.scrollIntoView({ behavior: "smooth" });
+        }
+        const statusEl = document.getElementById("contactFormStatus");
+        if (statusEl) {
+            statusEl.className = "form-status-msg error";
+            statusEl.innerHTML = `<i class="fa-solid fa-lock"></i> <strong>Account Required:</strong> You must have an account to send a message or email to the studio. Please log in or create an account below.`;
+        }
+        return false;
+    }
+}
+
 function initContactForm() {
     const form = document.getElementById("customerContactForm");
     const statusEl = document.getElementById("contactFormStatus");
@@ -1486,21 +1663,60 @@ function initContactForm() {
 
     if (!form) return;
 
+    // Set initial gate state & restore draft if returning user
+    updateContactAuthGate();
+    restoreContactDraftIfExists();
+
+    // Autosave draft as client writes
+    const subjectInput = document.getElementById("contactSubject");
+    const messageInput = document.getElementById("contactMessage");
+    const phoneInput = document.getElementById("contactPhone");
+    if (subjectInput) subjectInput.addEventListener("input", saveContactDraft);
+    if (messageInput) messageInput.addEventListener("input", saveContactDraft);
+    if (phoneInput) phoneInput.addEventListener("input", saveContactDraft);
+
     form.addEventListener("submit", function (e) {
         e.preventDefault();
+
+        // ── ENFORCE STRICT ACCOUNT REQUIREMENT ──
+        if (!currentUser) {
+            saveContactDraft();
+            statusEl.className = "form-status-msg error";
+            statusEl.innerHTML = `
+                <div style="background:rgba(217,83,79,0.08); border:1px solid rgba(217,83,79,0.3); padding:14px; border-radius:8px; margin-top:10px; text-align:left;">
+                    <strong style="color:var(--color-sale); display:block; margin-bottom:4px;">
+                        <i class="fa-solid fa-user-lock"></i> Account Required to Send Messages
+                    </strong>
+                    <p style="font-size:0.84rem; line-height:1.5; color:var(--color-text-dark); margin:0 0 10px 0;">
+                        Without an account, you cannot send a message or email to our studio. Please sign in or create an account to submit your request — your drafted message has been safely saved!
+                    </p>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="openAuthModal('login')">
+                            <i class="fa-solid fa-right-to-bracket"></i> Log In Now
+                        </button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="openAuthModal('signup')">
+                            <i class="fa-solid fa-user-plus"></i> Create Free Account
+                        </button>
+                    </div>
+                </div>
+            `;
+            showToast("Account Required", "Please log in or create an account to send your message.");
+            openAuthModal("login");
+            return;
+        }
 
         // Honeypot: if a hidden field named "_honey" exists in the form and a bot filled it, silently stop.
         const honey = form.querySelector('[name="_honey"]');
         if (honey && honey.value) return;
 
-        const name = (document.getElementById("contactName")?.value || "").trim();
-        const email = (document.getElementById("contactEmail")?.value || "").trim();
-        const phone = (document.getElementById("contactPhone")?.value || "").trim();
+        const name = (currentUser.name || document.getElementById("contactName")?.value || "").trim();
+        const email = (currentUser.email || document.getElementById("contactEmail")?.value || "").trim();
+        const phone = (document.getElementById("contactPhone")?.value || currentUser.phone || "").trim();
         const subject = (document.getElementById("contactSubject")?.value || "").trim();
         const message = (document.getElementById("contactMessage")?.value || "").trim();
 
         if (!name || !email || !message) {
-            statusEl.textContent = "Please fill in all required fields (Name, Email, and Message).";
+            statusEl.textContent = "Please fill in all required fields (Subject and Message).";
             statusEl.className = "form-status-msg error";
             return;
         }
@@ -1512,10 +1728,11 @@ function initContactForm() {
 
         const targetEmail = getAdminEmail();
 
-        // Build inquiry record for in-app Customer Inbox
+        // Build inquiry record for in-app Customer Inbox with verified account badge
         const isBespoke = (subject.toLowerCase().includes("bespoke") || message.toLowerCase().includes("bespoke") || subject.toLowerCase().includes("custom"));
         const newMsgRecord = {
             id: "msg_" + Date.now(),
+            userId: currentUser.uid || ("user_" + Date.now()),
             name: name,
             email: email,
             phone: phone,
@@ -1523,10 +1740,11 @@ function initContactForm() {
             message: message,
             type: isBespoke ? "bespoke" : "inquiry",
             date: new Date().toISOString().replace("T", " ").slice(0, 16),
-            unread: true
+            unread: true,
+            verifiedAccount: true
         };
 
-        // Save to local inbox (only visible on this device)
+        // Save to local inbox
         storeMessages.unshift(newMsgRecord);
         localStorage.setItem("j_messages", JSON.stringify(storeMessages));
         updateAdminNotificationBadge();
@@ -1541,7 +1759,9 @@ function initContactForm() {
                 phone: phone || "Not provided",
                 subject: subject || "Consultation",
                 message: message,
-                type: isBespoke ? "Bespoke" : "General inquiry"
+                type: isBespoke ? "Bespoke" : "General inquiry",
+                sender_account_status: "Verified Registered Client",
+                sender_account_uid: currentUser.uid || "N/A"
             },
             {
                 _autoresponse: `Hi ${name}, thank you for contacting Jewels by J! Jerrilyn has received your inquiry and will reply shortly. For quick answers, WhatsApp us on ${SITE_CONFIG.phone}.`
@@ -1553,7 +1773,10 @@ function initContactForm() {
             if (result.ok) {
                 statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Thank you, <strong>${escapeHTML(name)}</strong>! Your inquiry was dispatched directly to the admin inbox (<strong>${escapeHTML(targetEmail)}</strong>). Jerrilyn will review and reply shortly.`;
                 statusEl.className = "form-status-msg success";
-                form.reset();
+                // Reset only subject and message; keep verified account identity in name and email
+                if (document.getElementById("contactSubject")) document.getElementById("contactSubject").value = "";
+                if (document.getElementById("contactMessage")) document.getElementById("contactMessage").value = "";
+                sessionStorage.removeItem("j_contact_draft");
                 showToast("Inquiry Delivered", `Sent to ${targetEmail}`);
             } else if (result.needsActivation) {
                 statusEl.innerHTML = `
@@ -1921,6 +2144,7 @@ function initAuthSystem() {
 
                 localStorage.setItem("j_user", JSON.stringify(currentUser));
                 updateAuthUI();
+                const hadContactDraft = restoreContactDraftIfExists();
                 showToast("Welcome Back!", `Signed in successfully as ${currentUser.name}.`);
 
                 setTimeout(() => {
@@ -1930,6 +2154,10 @@ function initAuthSystem() {
                     if (submitBtn) {
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = `Log In`;
+                    }
+                    if (hadContactDraft) {
+                        const contactBox = document.querySelector(".contact-form-box");
+                        if (contactBox) contactBox.scrollIntoView({ behavior: "smooth" });
                     }
                 }, 750);
             }, 300);
@@ -2075,6 +2303,7 @@ function initAuthSystem() {
 
                 localStorage.setItem("j_user", JSON.stringify(currentUser));
                 updateAuthUI();
+                const hadContactDraft = restoreContactDraftIfExists();
                 showToast("Account Created!", `Welcome to Jewels by J, ${newUser.name}!`);
 
                 setTimeout(() => {
@@ -2084,6 +2313,10 @@ function initAuthSystem() {
                     if (submitBtn) {
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = `Create Account`;
+                    }
+                    if (hadContactDraft) {
+                        const contactBox = document.querySelector(".contact-form-box");
+                        if (contactBox) contactBox.scrollIntoView({ behavior: "smooth" });
                     }
                 }, 800);
             }, 300);
@@ -2252,6 +2485,11 @@ function updateAuthUI() {
                 <button class="btn btn-outline btn-sm" onclick="closeMobileDrawer(); openAuthModal('signup');">Sign Up</button>
             `;
         }
+    }
+
+    // Synchronize contact & inquiry form account gate
+    if (typeof updateContactAuthGate === "function") {
+        updateContactAuthGate();
     }
 }
 
@@ -3931,7 +4169,8 @@ function renderAdminMessages() {
                     ${escapeHTML(m.date || 'Recent')}
                 </td>
                 <td>
-                    <strong style="color:var(--color-black); font-size:0.88rem;">${escapeHTML(m.name)}</strong><br>
+                    <strong style="color:var(--color-black); font-size:0.88rem;">${escapeHTML(m.name)}</strong>
+                    ${m.verifiedAccount ? `<span style="display:inline-block; font-size:0.68rem; color:var(--color-success); font-weight:700; margin-left:4px;" title="Verified Registered Client"><i class="fa-solid fa-circle-check"></i> Account</span>` : ''}<br>
                     <a href="mailto:${safeEmail}" onclick="event.stopPropagation();" style="font-size:0.78rem; color:var(--color-gold);">${safeEmail}</a>
                     ${m.phone ? `<span style="font-size:0.75rem; color:var(--color-text-muted); display:block;">${escapeHTML(m.phone)}</span>` : ''}
                 </td>
@@ -4025,7 +4264,9 @@ function openAdminMessageModal(msgId) {
     }
 
     if (subjectEl) subjectEl.textContent = msg.subject || "Consultation Inquiry";
-    if (senderEl) senderEl.textContent = msg.name;
+    if (senderEl) {
+        senderEl.innerHTML = `${escapeHTML(msg.name)} ${msg.verifiedAccount ? `<span class="badge badge-success" style="font-size:0.7rem; margin-left:6px;"><i class="fa-solid fa-circle-check"></i> Registered Account</span>` : ''}`;
+    }
     if (emailEl) {
         emailEl.textContent = msg.email;
         emailEl.href = `mailto:${msg.email}`;
@@ -4200,3 +4441,6 @@ window.markAllAdminMessagesRead = markAllAdminMessagesRead;
 window.exportMessagesJSON = exportMessagesJSON;
 window.sendTestAdminEmail = sendTestAdminEmail;
 window.saveAdminSettings = saveAdminSettings;
+window.saveContactDraft = saveContactDraft;
+window.updateContactAuthGate = updateContactAuthGate;
+window.handleDirectEmailCard = handleDirectEmailCard;

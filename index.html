@@ -633,7 +633,7 @@
                             <p class="contact-card-desc">+233 50 059 4879<br>Direct messaging &amp; orders</p>
                         </a>
 
-                        <a href="mailto:mensahjerrilyn@gmail.com" class="contact-card">
+                        <a href="mailto:mensahjerrilyn@gmail.com" class="contact-card" id="contactDirectEmailCard" onclick="handleDirectEmailCard(event)">
                             <div class="contact-card-icon">
                                 <i class="fa-solid fa-envelope"></i>
                             </div>
@@ -664,6 +664,9 @@
                         <p class="contact-form-sub">
                             Have a custom design idea, sizing question, or bespoke inquiry? Leave a message and it will be delivered directly to the admin's inbox.
                         </p>
+
+                        <!-- Account Status Gate Banner -->
+                        <div id="contactUserStatusBox" class="contact-user-status-box"></div>
 
                         <form id="customerContactForm" action="https://formsubmit.co/mensahjerrilyn@gmail.com" method="POST">
                             <!-- FormSubmit Configuration Fields -->
