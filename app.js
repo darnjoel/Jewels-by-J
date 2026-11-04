@@ -10,6 +10,9 @@ const SITE_CONFIG = {
     phone: "+233 50 059 4879",
     whatsappNumber: "233500594879",
     email: "mensahjerrilyn@gmail.com",
+    snapchatUrl: "https://snapchat.com/t/9O7WC58U",
+    instagramUrl: "https://www.instagram.com/Jewels.with_j",
+    tiktokUrl: "https://www.tiktok.com/@jewels.by_j4",
     currency: "GH₵",
     freeDeliveryThreshold: 500,
     // ── Firebase Database Security & Auth Vault ──

@@ -2484,6 +2484,27 @@ button {
     background: var(--color-black);
     color: #ffffff;
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.footer-social-link.social-snapchat:hover {
+    background: #FFFC00;
+    color: #000000;
+}
+
+.footer-social-link.social-instagram:hover {
+    background: #E1306C;
+    color: #ffffff;
+}
+
+.footer-social-link.social-tiktok:hover {
+    background: #000000;
+    color: #ffffff;
+}
+
+.footer-social-link.social-whatsapp:hover {
+    background: #25D366;
+    color: #ffffff;
 }
 
 .footer-col-title {
