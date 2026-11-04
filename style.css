@@ -2989,18 +2989,7 @@ button {
 }
 
 .auth-security-badge {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 12px;
-    font-size: 0.72rem;
-    color: var(--color-text-subtle);
-}
-
-.auth-security-badge i {
-    color: var(--color-gold);
-    font-size: 0.8rem;
+    display: none !important;
 }
 
 @keyframes shakeCard {
