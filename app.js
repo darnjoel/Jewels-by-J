@@ -2546,7 +2546,7 @@ function updateAuthUI() {
 
         if (drawerAvatar) drawerAvatar.innerHTML = `<i class="fa-regular fa-user"></i>`;
         if (drawerText) {
-            drawerText.innerHTML = `<strong>Welcome Beautiful!</strong><span>Sign in or create an account</span>`;
+            drawerText.innerHTML = `<strong>Welcome to Jewels by J!</strong><span>Sign in or create an account</span>`;
         }
         if (drawerActions) {
             drawerActions.innerHTML = `
