@@ -1558,7 +1558,7 @@ function updateContactAuthGate() {
     if (!statusBox) return;
 
     if (currentUser) {
-        // Authenticated client mode
+        // Authenticated client mode: show verified badge and pre-fill account details
         statusBox.innerHTML = `
             <div class="contact-auth-gate verified-mode">
                 <div class="contact-auth-gate-header">
@@ -1567,10 +1567,10 @@ function updateContactAuthGate() {
                     </div>
                     <div>
                         <h4 class="contact-auth-gate-title">
-                            Verified Client: <span>${escapeHTML(currentUser.name)}</span>
+                            Signed In: <span>${escapeHTML(currentUser.name)}</span>
                         </h4>
                         <p class="contact-auth-gate-desc">
-                            Inquiry will be sent to admin inbox (<strong>${escapeHTML(getAdminEmail())}</strong>) &amp; linked to your account profile (<strong>${escapeHTML(currentUser.email)}</strong>).
+                            Inquiry will dispatch directly to <strong>${escapeHTML(getAdminEmail())}</strong> &amp; link to your account profile (<strong>${escapeHTML(currentUser.email)}</strong>).
                         </p>
                     </div>
                 </div>
@@ -1593,35 +1593,20 @@ function updateContactAuthGate() {
         if (phoneInput && currentUser.phone && !phoneInput.value) {
             phoneInput.value = currentUser.phone;
         }
-
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.classList.remove("btn-locked");
-            submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send to Admin Inbox`;
-            submitBtn.title = "Send inquiry directly to admin inbox";
-        }
     } else {
-        // Unauthenticated guest mode: strictly locked
+        // Guest mode: open to all visitors without any account barrier
         statusBox.innerHTML = `
-            <div class="contact-auth-gate guest-mode">
+            <div class="contact-auth-gate guest-mode" style="background:rgba(255, 255, 255, 0.7); border-color:var(--color-border-light);">
                 <div class="contact-auth-gate-header">
-                    <div class="contact-auth-gate-icon">
-                        <i class="fa-solid fa-user-lock"></i>
+                    <div class="contact-auth-gate-icon" style="background:var(--color-blush-soft); color:var(--color-gold);">
+                        <i class="fa-regular fa-envelope"></i>
                     </div>
                     <div>
-                        <h4 class="contact-auth-gate-title">Account Required to Send Inquiries</h4>
+                        <h4 class="contact-auth-gate-title">Direct Studio Inbox — Open to All</h4>
                         <p class="contact-auth-gate-desc">
-                            Only registered clients with an active account can send messages or emails to our studio inbox. Please log in or create an account to proceed.
+                            Leave a message, custom order request, or question below. Messages deliver directly to <strong>${escapeHTML(getAdminEmail())}</strong>. No account required!
                         </p>
                     </div>
-                </div>
-                <div class="contact-auth-gate-actions">
-                    <button type="button" class="btn btn-primary btn-sm" onclick="saveContactDraft(); openAuthModal('login');">
-                        <i class="fa-solid fa-right-to-bracket"></i> Log In to Send
-                    </button>
-                    <button type="button" class="btn btn-outline btn-sm" onclick="saveContactDraft(); openAuthModal('signup');">
-                        <i class="fa-solid fa-user-plus"></i> Create Free Account
-                    </button>
                 </div>
             </div>
         `;
@@ -1629,41 +1614,27 @@ function updateContactAuthGate() {
         if (nameInput) {
             nameInput.readOnly = false;
             nameInput.classList.remove("is-verified-input");
-            if (!sessionStorage.getItem("j_contact_draft")) nameInput.value = "";
+            if (!sessionStorage.getItem("j_contact_draft") && !nameInput.value) nameInput.value = "";
         }
         if (emailInput) {
             emailInput.readOnly = false;
             emailInput.classList.remove("is-verified-input");
-            if (!sessionStorage.getItem("j_contact_draft")) emailInput.value = "";
+            if (!sessionStorage.getItem("j_contact_draft") && !emailInput.value) emailInput.value = "";
         }
+    }
 
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.classList.add("btn-locked");
-            submitBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Sign In to Send Message`;
-            submitBtn.title = "You must have an account to send a message or email";
-        }
+    // Submit button is always active and open for everyone
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("btn-locked");
+        submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send to Admin Inbox`;
+        submitBtn.title = "Send inquiry directly to admin inbox";
     }
 }
 
 function handleDirectEmailCard(e) {
-    if (!currentUser) {
-        if (e && e.preventDefault) e.preventDefault();
-        saveContactDraft();
-        showToast("Account Required", "Please log in or create an account to message the studio.");
-        openAuthModal("login");
-
-        const contactBox = document.querySelector(".contact-form-box");
-        if (contactBox) {
-            contactBox.scrollIntoView({ behavior: "smooth" });
-        }
-        const statusEl = document.getElementById("contactFormStatus");
-        if (statusEl) {
-            statusEl.className = "form-status-msg error";
-            statusEl.innerHTML = `<i class="fa-solid fa-lock"></i> <strong>Account Required:</strong> You must have an account to send a message or email to the studio. Please log in or create an account below.`;
-        }
-        return false;
-    }
+    // Open to all clients and visitors
+    return true;
 }
 
 function initContactForm() {
@@ -1688,45 +1659,24 @@ function initContactForm() {
     form.addEventListener("submit", function (e) {
         e.preventDefault();
 
-        // ── ENFORCE STRICT ACCOUNT REQUIREMENT ──
-        if (!currentUser) {
-            saveContactDraft();
-            statusEl.className = "form-status-msg error";
-            statusEl.innerHTML = `
-                <div style="background:rgba(217,83,79,0.08); border:1px solid rgba(217,83,79,0.3); padding:14px; border-radius:8px; margin-top:10px; text-align:left;">
-                    <strong style="color:var(--color-sale); display:block; margin-bottom:4px;">
-                        <i class="fa-solid fa-user-lock"></i> Account Required to Send Messages
-                    </strong>
-                    <p style="font-size:0.84rem; line-height:1.5; color:var(--color-text-dark); margin:0 0 10px 0;">
-                        Without an account, you cannot send a message or email to our studio. Please sign in or create an account to submit your request — your drafted message has been safely saved!
-                    </p>
-                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <button type="button" class="btn btn-primary btn-sm" onclick="openAuthModal('login')">
-                            <i class="fa-solid fa-right-to-bracket"></i> Log In Now
-                        </button>
-                        <button type="button" class="btn btn-outline btn-sm" onclick="openAuthModal('signup')">
-                            <i class="fa-solid fa-user-plus"></i> Create Free Account
-                        </button>
-                    </div>
-                </div>
-            `;
-            showToast("Account Required", "Please log in or create an account to send your message.");
-            openAuthModal("login");
-            return;
-        }
-
         // Honeypot: if a hidden field named "_honey" exists in the form and a bot filled it, silently stop.
         const honey = form.querySelector('[name="_honey"]');
         if (honey && honey.value) return;
 
-        const name = (currentUser.name || document.getElementById("contactName")?.value || "").trim();
-        const email = (currentUser.email || document.getElementById("contactEmail")?.value || "").trim();
-        const phone = (document.getElementById("contactPhone")?.value || currentUser.phone || "").trim();
-        const subject = (document.getElementById("contactSubject")?.value || "").trim();
-        const message = (document.getElementById("contactMessage")?.value || "").trim();
+        const nameInputEl = document.getElementById("contactName");
+        const emailInputEl = document.getElementById("contactEmail");
+        const phoneInputEl = document.getElementById("contactPhone");
+        const subjectInputEl = document.getElementById("contactSubject");
+        const messageInputEl = document.getElementById("contactMessage");
+
+        const name = ((currentUser && currentUser.name) || nameInputEl?.value || "").trim();
+        const email = ((currentUser && currentUser.email) || emailInputEl?.value || "").trim();
+        const phone = (phoneInputEl?.value || (currentUser && currentUser.phone) || "").trim();
+        const subject = (subjectInputEl?.value || "").trim();
+        const message = (messageInputEl?.value || "").trim();
 
         if (!name || !email || !message) {
-            statusEl.textContent = "Please fill in all required fields (Subject and Message).";
+            statusEl.textContent = "Please fill in all required fields (Name, Email, and Message).";
             statusEl.className = "form-status-msg error";
             return;
         }
@@ -1738,20 +1688,20 @@ function initContactForm() {
 
         const targetEmail = getAdminEmail();
 
-        // Build inquiry record for in-app Customer Inbox with verified account badge
+        // Build inquiry record for in-app Customer Inbox (open to both registered clients and guests)
         const isBespoke = (subject.toLowerCase().includes("bespoke") || message.toLowerCase().includes("bespoke") || subject.toLowerCase().includes("custom"));
         const newMsgRecord = {
             id: "msg_" + Date.now(),
-            userId: currentUser.uid || ("user_" + Date.now()),
+            userId: currentUser ? (currentUser.uid || ("user_" + Date.now())) : ("guest_" + Date.now()),
             name: name,
             email: email,
-            phone: phone,
+            phone: phone || "Not provided",
             subject: subject || "General Consultation Inquiry",
             message: message,
             type: isBespoke ? "bespoke" : "inquiry",
             date: new Date().toISOString().replace("T", " ").slice(0, 16),
             unread: true,
-            verifiedAccount: true
+            verifiedAccount: !!currentUser
         };
 
         // Save to local inbox
@@ -1782,13 +1732,19 @@ function initContactForm() {
         }
 
         // Direct web client compose links for 100% deliverability
-        const gmailDirectUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(targetEmail)}&su=${encodeURIComponent("💎 [Jewels by J Inquiry] " + (subject || "Consultation"))}&body=${encodeURIComponent("Hello Jerrilyn,\n\n" + message + "\n\n---\nClient Name: " + name + "\nClient Email: " + email + "\nClient Phone: " + (phone || "N/A") + "\nAccount: Verified Registered Client")}`;
+        const clientStatusStr = currentUser ? "Registered Client" : "Guest Visitor";
+        const gmailDirectUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(targetEmail)}&su=${encodeURIComponent("💎 [Jewels by J Inquiry] " + (subject || "Consultation"))}&body=${encodeURIComponent("Hello Jerrilyn,\n\n" + message + "\n\n---\nClient Name: " + name + "\nClient Email: " + email + "\nClient Phone: " + (phone || "N/A") + "\nClient Status: " + clientStatusStr)}`;
         const mailtoDirectUrl = `mailto:${encodeURIComponent(targetEmail)}?subject=${encodeURIComponent("💎 [Jewels by J Inquiry] " + (subject || "Consultation"))}&body=${encodeURIComponent("Hello Jerrilyn,\n\n" + message + "\n\n---\nClient Name: " + name + "\nClient Email: " + email + "\nClient Phone: " + (phone || "N/A"))}`;
         const waDirectUrl = `https://wa.me/${storeSettings.whatsappNumber || SITE_CONFIG.whatsappNumber}?text=${encodeURIComponent("Hello Jerrilyn! Inquiry from " + name + " (" + (subject || "Consultation") + "): " + message)}`;
 
-        // Reset subject and message input fields; preserve verified user identity
-        if (document.getElementById("contactSubject")) document.getElementById("contactSubject").value = "";
-        if (document.getElementById("contactMessage")) document.getElementById("contactMessage").value = "";
+        // Reset subject and message input fields; clear guest credentials while preserving verified user identity
+        if (!currentUser) {
+            if (nameInputEl) nameInputEl.value = "";
+            if (emailInputEl) emailInputEl.value = "";
+            if (phoneInputEl) phoneInputEl.value = "";
+        }
+        if (subjectInputEl) subjectInputEl.value = "";
+        if (messageInputEl) messageInputEl.value = "";
         sessionStorage.removeItem("j_contact_draft");
 
         sendStoreEmail(
@@ -1800,8 +1756,8 @@ function initContactForm() {
                 subject: subject || "Consultation",
                 message: message,
                 type: isBespoke ? "Bespoke" : "General inquiry",
-                sender_account_status: "Verified Registered Client",
-                sender_account_uid: currentUser.uid || "N/A"
+                sender_account_status: currentUser ? "Verified Registered Client" : "Guest Client",
+                sender_account_uid: (currentUser && currentUser.uid) || "Guest"
             },
             {
                 _autoresponse: `Hi ${name}, thank you for contacting Jewels by J! Jerrilyn has received your inquiry and will reply shortly. For quick answers, WhatsApp us on ${SITE_CONFIG.phone}.`
