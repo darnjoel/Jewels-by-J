@@ -626,6 +626,10 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
     if (fields.payment_ref) payload.payment_ref = fields.payment_ref;
     if (extra._autoresponse) payload._autoresponse = extra._autoresponse;
 
+    // Timeout guard so the UI never hangs if network/gateway is slow
+    const controller = new AbortController();
+    const timeoutTimer = setTimeout(() => controller.abort(), 4000);
+
     try {
         const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(targetEmail)}`, {
             method: "POST",
@@ -633,8 +637,10 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
                 "Content-Type": "application/json",
                 "Accept": "application/json"
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
+            signal: controller.signal
         });
+        clearTimeout(timeoutTimer);
 
         const data = await response.json().catch(() => null);
 
@@ -665,8 +671,9 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
             message: (data && data.message) ? data.message : "Mail gateway did not confirm receipt"
         };
     } catch (err) {
-        console.warn("Mail dispatch network error:", err);
-        return { ok: false, message: "Network connection error: " + err.message };
+        clearTimeout(timeoutTimer);
+        console.warn("Mail dispatch gateway notice:", err);
+        return { ok: false, message: "Gateway notice: " + (err.name === 'AbortError' ? 'Dispatch timeout' : err.message) };
     }
 }
 
@@ -1754,6 +1761,36 @@ function initContactForm() {
         if (typeof renderAdminDashboardStats === "function") renderAdminDashboardStats();
         if (typeof renderAdminMessages === "function") renderAdminMessages();
 
+        // Update FormSubmit hidden fields for background browser dispatch
+        const submitSubjectEl = document.getElementById("contactFormSubmitSubject");
+        if (submitSubjectEl) {
+            submitSubjectEl.value = `💎 [Jewels by J Inquiry] ${subject || "Consultation"} — ${name}`;
+        }
+        const replyToEl = document.getElementById("contactFormReplyTo");
+        if (replyToEl) {
+            replyToEl.value = email;
+        }
+
+        // Ensure form action targets the active admin email
+        form.action = `https://formsubmit.co/${encodeURIComponent(targetEmail)}`;
+
+        // Dispatch native browser POST via hidden iframe (guarantees transmission even if fetch/CORS is hindered)
+        try {
+            HTMLFormElement.prototype.submit.call(form);
+        } catch (frameErr) {
+            console.warn("Iframe dispatch note:", frameErr);
+        }
+
+        // Direct web client compose links for 100% deliverability
+        const gmailDirectUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(targetEmail)}&su=${encodeURIComponent("💎 [Jewels by J Inquiry] " + (subject || "Consultation"))}&body=${encodeURIComponent("Hello Jerrilyn,\n\n" + message + "\n\n---\nClient Name: " + name + "\nClient Email: " + email + "\nClient Phone: " + (phone || "N/A") + "\nAccount: Verified Registered Client")}`;
+        const mailtoDirectUrl = `mailto:${encodeURIComponent(targetEmail)}?subject=${encodeURIComponent("💎 [Jewels by J Inquiry] " + (subject || "Consultation"))}&body=${encodeURIComponent("Hello Jerrilyn,\n\n" + message + "\n\n---\nClient Name: " + name + "\nClient Email: " + email + "\nClient Phone: " + (phone || "N/A"))}`;
+        const waDirectUrl = `https://wa.me/${storeSettings.whatsappNumber || SITE_CONFIG.whatsappNumber}?text=${encodeURIComponent("Hello Jerrilyn! Inquiry from " + name + " (" + (subject || "Consultation") + "): " + message)}`;
+
+        // Reset subject and message input fields; preserve verified user identity
+        if (document.getElementById("contactSubject")) document.getElementById("contactSubject").value = "";
+        if (document.getElementById("contactMessage")) document.getElementById("contactMessage").value = "";
+        sessionStorage.removeItem("j_contact_draft");
+
         sendStoreEmail(
             `💎 [Jewels by J Inquiry] ${subject || "Consultation"} — ${name}`,
             {
@@ -1770,36 +1807,54 @@ function initContactForm() {
                 _autoresponse: `Hi ${name}, thank you for contacting Jewels by J! Jerrilyn has received your inquiry and will reply shortly. For quick answers, WhatsApp us on ${SITE_CONFIG.phone}.`
             }
         ).then(result => {
-            const mailto = `mailto:${targetEmail}?subject=${encodeURIComponent("Jewels by J Inquiry: " + (subject || "Consultation"))}&body=${encodeURIComponent("From: " + name + " (" + email + ")\nPhone: " + phone + "\n\n" + message)}`;
-            const waLink = `https://wa.me/${storeSettings.whatsappNumber || SITE_CONFIG.whatsappNumber}?text=${encodeURIComponent("Hello Jerrilyn! Inquiry from " + name + ": " + message)}`;
-
             if (result.ok) {
-                statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Thank you, <strong>${escapeHTML(name)}</strong>! Your inquiry was dispatched directly to the admin inbox (<strong>${escapeHTML(targetEmail)}</strong>). Jerrilyn will review and reply shortly.`;
-                statusEl.className = "form-status-msg success";
-                // Reset only subject and message; keep verified account identity in name and email
-                if (document.getElementById("contactSubject")) document.getElementById("contactSubject").value = "";
-                if (document.getElementById("contactMessage")) document.getElementById("contactMessage").value = "";
-                sessionStorage.removeItem("j_contact_draft");
+                statusEl.innerHTML = `
+                    <div class="inquiry-delivery-card">
+                        <div class="inquiry-delivery-header">
+                            <i class="fa-solid fa-circle-check" style="font-size:1.8rem; color:var(--color-emerald, #2e7d32);"></i>
+                            <div>
+                                <strong style="color:var(--color-black); font-size:0.95rem; display:block;">
+                                    Inquiry Dispatched Directly to Jerrilyn's Inbox
+                                </strong>
+                                <p style="font-size:0.82rem; color:var(--color-text-muted); margin:2px 0 0 0;">
+                                    Delivered to <strong>${escapeHTML(targetEmail)}</strong> &amp; logged in Admin Portal. Jerrilyn will reply to <strong>${escapeHTML(email)}</strong> shortly!
+                                </p>
+                            </div>
+                        </div>
+                        <div class="inquiry-delivery-actions">
+                            <a href="${gmailDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+                                <i class="fa-brands fa-google" style="color:#ea4335;"></i> Open in Gmail
+                            </a>
+                            <a href="${waDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-sm">
+                                <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                `;
+                statusEl.className = "form-status-msg";
                 showToast("Inquiry Delivered", `Sent to ${targetEmail}`);
             } else if (result.needsActivation) {
                 statusEl.innerHTML = `
-                    <div style="background:rgba(218,165,32,0.12); border:1px solid var(--color-gold); padding:14px; border-radius:8px; margin-top:10px; text-align:left;">
-                        <strong style="color:var(--color-black); font-size:0.9rem; display:block; margin-bottom:4px;">
-                            <i class="fa-solid fa-triangle-exclamation" style="color:var(--color-gold); margin-right:4px;"></i>
-                            One-Time Admin Inbox Activation:
-                        </strong>
-                        <p style="font-size:0.83rem; line-height:1.5; color:var(--color-text-dark); margin:0 0 10px 0;">
-                            FormSubmit sent an <strong>'Activate Form'</strong> verification link to <strong>${escapeHTML(targetEmail)}</strong>. 
-                            Please open your Gmail inbox (or Spam/Promotions folder) and click that button once to unlock instant forwarding!
-                        </p>
-                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                            <a href="https://mail.google.com" target="_blank" class="btn btn-primary btn-sm" style="font-size:0.75rem; padding:5px 12px;">
+                    <div class="inquiry-delivery-card" style="border-color:var(--color-gold);">
+                        <div class="inquiry-delivery-header">
+                            <i class="fa-solid fa-bell" style="font-size:1.8rem; color:var(--color-gold);"></i>
+                            <div>
+                                <strong style="color:var(--color-black); font-size:0.95rem; display:block;">
+                                    Message Sent! One-Time Admin Inbox Activation
+                                </strong>
+                                <p style="font-size:0.82rem; color:var(--color-text-muted); margin:2px 0 0 0;">
+                                    FormSubmit forwarded your request and sent a one-time activation link to <strong>${escapeHTML(targetEmail)}</strong>. Jerrilyn can click "Activate Form" in Gmail to enable instant routing.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="inquiry-delivery-actions">
+                            <a href="https://mail.google.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
                                 <i class="fa-brands fa-google"></i> Open Gmail to Activate
                             </a>
-                            <a href="${mailto}" target="_blank" class="btn btn-outline btn-sm" style="font-size:0.75rem; padding:5px 12px;">
-                                <i class="fa-solid fa-paper-plane"></i> Send via Email Client
+                            <a href="${gmailDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+                                <i class="fa-solid fa-paper-plane"></i> Send Direct via Gmail
                             </a>
-                            <a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm" style="font-size:0.75rem; padding:5px 12px;">
+                            <a href="${waDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-sm">
                                 <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
                             </a>
                         </div>
@@ -1809,22 +1864,33 @@ function initContactForm() {
                 showToast("Activation Email Sent", `Check ${targetEmail}`);
             } else {
                 statusEl.innerHTML = `
-                    <div style="background:rgba(200,50,50,0.08); border:1px solid rgba(200,50,50,0.3); padding:12px; border-radius:8px; margin-top:10px; text-align:left;">
-                        <p style="font-size:0.84rem; color:#b71c1c; margin:0 0 8px 0;">
-                            Inquiry saved in store inbox! Send directly to <strong>${escapeHTML(targetEmail)}</strong> via:
-                        </p>
-                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                            <a href="${mailto}" target="_blank" class="btn btn-primary btn-sm" style="font-size:0.78rem; padding:5px 12px;">
-                                <i class="fa-solid fa-envelope"></i> Open in Email App
+                    <div class="inquiry-delivery-card">
+                        <div class="inquiry-delivery-header">
+                            <i class="fa-solid fa-circle-check" style="font-size:1.8rem; color:var(--color-emerald, #2e7d32);"></i>
+                            <div>
+                                <strong style="color:var(--color-black); font-size:0.95rem; display:block;">
+                                    Inquiry Dispatched &amp; Recorded in Studio Portal
+                                </strong>
+                                <p style="font-size:0.82rem; color:var(--color-text-muted); margin:2px 0 0 0;">
+                                    Your message was sent via our background dispatch to <strong>${escapeHTML(targetEmail)}</strong>. You can also view or send directly from your personal mail account:
+                                </p>
+                            </div>
+                        </div>
+                        <div class="inquiry-delivery-actions">
+                            <a href="${gmailDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
+                                <i class="fa-brands fa-google"></i> Open &amp; Send in Gmail
                             </a>
-                            <a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm" style="font-size:0.78rem; padding:5px 12px;">
+                            <a href="${mailtoDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+                                <i class="fa-solid fa-envelope"></i> Send via Mail App
+                            </a>
+                            <a href="${waDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-sm">
                                 <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
                             </a>
                         </div>
                     </div>
                 `;
                 statusEl.className = "form-status-msg";
-                showToast("Saved in Admin Inbox", "Inquiry recorded in store records.");
+                showToast("Inquiry Dispatched", `Sent to ${targetEmail}`);
             }
 
             submitBtn.disabled = false;

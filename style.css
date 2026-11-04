@@ -2429,6 +2429,37 @@ button {
     color: var(--color-sale);
 }
 
+.inquiry-delivery-card {
+    background: #ffffff;
+    border: 1px solid rgba(46, 125, 50, 0.35);
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
+    margin-top: 16px;
+    text-align: left;
+    box-shadow: 0 4px 18px rgba(46, 125, 50, 0.08);
+    animation: fadeIn 0.3s ease;
+}
+
+.inquiry-delivery-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.inquiry-delivery-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.inquiry-delivery-actions .btn {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    14. SITE FOOTER (THE STRAND BRAND WINE / BLUSH SIGNATURE)
    ═══════════════════════════════════════════════════════════════════════════ */

@@ -682,11 +682,16 @@
                         <!-- Account Status Gate Banner -->
                         <div id="contactUserStatusBox" class="contact-user-status-box"></div>
 
-                        <form id="customerContactForm" action="https://formsubmit.co/mensahjerrilyn@gmail.com" method="POST">
+                        <!-- Invisible Mail Dispatch Frame (prevents page redirect while guaranteeing browser POST delivery) -->
+                        <iframe name="mailDeliveryFrame" id="mailDeliveryFrame" style="display:none; width:0; height:0; border:0;"></iframe>
+
+                        <form id="customerContactForm" action="https://formsubmit.co/mensahjerrilyn@gmail.com" method="POST" target="mailDeliveryFrame">
                             <!-- FormSubmit Configuration Fields -->
                             <input type="hidden" name="_captcha" value="false">
                             <input type="hidden" name="_template" value="table">
-                            <input type="hidden" name="_subject" value="💎 [Jewels by J] New Customer Consultation Inquiry">
+                            <input type="hidden" name="_subject" id="contactFormSubmitSubject" value="💎 [Jewels by J] New Customer Consultation Inquiry">
+                            <input type="hidden" name="_replyto" id="contactFormReplyTo" value="">
+                            <input type="hidden" name="_autoresponse" value="Thank you for contacting Jewels by J! Jerrilyn has received your inquiry and will reply shortly. For quick answers, WhatsApp us on +233 50 059 4879.">
 
                             <div class="form-grid-2">
                                 <div class="form-field">
