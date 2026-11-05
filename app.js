@@ -433,12 +433,32 @@ if (!storeSettings) {
         whatsappNumber: SITE_CONFIG.whatsappNumber,
         email: SITE_CONFIG.email,
         freeDeliveryThreshold: SITE_CONFIG.freeDeliveryThreshold,
-        adminPIN: "2023"
+        adminPIN: "2023",
+        preferences: {
+            storeStatus: "open",
+            orderChime: true,
+            autoMarkRead: true,
+            lowStockThreshold: 3,
+            currency: "GHS",
+            waTemplate: "Hello! ✨ Thank you for contacting Jewels by J. How can we assist with your bespoke jewelry today?"
+        }
     };
     localStorage.setItem("j_settings", JSON.stringify(storeSettings));
-} else if (storeSettings.adminPIN === "1234") {
-    storeSettings.adminPIN = "2023";
-    localStorage.setItem("j_settings", JSON.stringify(storeSettings));
+} else {
+    if (storeSettings.adminPIN === "1234") {
+        storeSettings.adminPIN = "2023";
+    }
+    if (!storeSettings.preferences) {
+        storeSettings.preferences = {
+            storeStatus: "open",
+            orderChime: true,
+            autoMarkRead: true,
+            lowStockThreshold: 3,
+            currency: "GHS",
+            waTemplate: "Hello! ✨ Thank you for contacting Jewels by J. How can we assist with your bespoke jewelry today?"
+        };
+        localStorage.setItem("j_settings", JSON.stringify(storeSettings));
+    }
 }
 
 // ── Store Messages / Inquiries (Admin Customer Inbox) ──
@@ -3707,6 +3727,31 @@ function initAdminPortal() {
     if (setPin) setPin.value = storeSettings.adminPIN || "2023";
     if (setWeb3) setWeb3.value = storeSettings.web3Key || "";
 
+    // Populate Preferences form
+    const pref = storeSettings.preferences || {};
+    const statusOpen = document.getElementById("prefStatusOpen");
+    const statusPaused = document.getElementById("prefStatusPaused");
+    if (pref.storeStatus === "paused") {
+        if (statusPaused) statusPaused.checked = true;
+    } else {
+        if (statusOpen) statusOpen.checked = true;
+    }
+
+    const chimeCheck = document.getElementById("prefOrderChime");
+    if (chimeCheck) chimeCheck.checked = pref.orderChime !== false;
+
+    const autoReadCheck = document.getElementById("prefAutoMarkRead");
+    if (autoReadCheck) autoReadCheck.checked = pref.autoMarkRead !== false;
+
+    const lowStockInput = document.getElementById("prefLowStockThreshold");
+    if (lowStockInput) lowStockInput.value = pref.lowStockThreshold || 3;
+
+    const currSelect = document.getElementById("prefCurrency");
+    if (currSelect) currSelect.value = pref.currency || "GHS";
+
+    const waTemplateInput = document.getElementById("prefWaTemplate");
+    if (waTemplateInput) waTemplateInput.value = pref.waTemplate || "Hello! ✨ Thank you for contacting Jewels by J. How can we assist with your bespoke jewelry today?";
+
     const inboxEmailDisplay = document.getElementById("inboxStoreEmailDisplay");
     if (inboxEmailDisplay) inboxEmailDisplay.textContent = activeEmail;
     const contactEmailDisplay = document.getElementById("contactDisplayEmail");
@@ -3727,7 +3772,24 @@ function updateAdminNotificationBadge() {
     }
 }
 
-// ── PIN Authentication Keypad ──
+// ── PIN Authentication Keypad & Eye Radio ──
+let adminPinVisible = false;
+
+function toggleAdminPinKeypadVisibility() {
+    adminPinVisible = !adminPinVisible;
+    const radio = document.getElementById("adminPinEyeRadio");
+    if (radio) radio.checked = adminPinVisible;
+    const icon = document.getElementById("adminPinEyeIcon");
+    const label = document.getElementById("adminPinEyeLabel");
+    const display = document.getElementById("adminPinDisplay");
+
+    if (icon) icon.className = adminPinVisible ? "fa-regular fa-eye-slash" : "fa-regular fa-eye";
+    if (label) label.textContent = adminPinVisible ? "Hide PIN" : "Show PIN";
+    if (display) display.classList.toggle("show-digits", adminPinVisible);
+
+    updateAdminPinDots();
+}
+
 function pressAdminKey(digit) {
     if (adminEnteredPIN.length < 4) {
         adminEnteredPIN += digit;
@@ -3744,10 +3806,19 @@ function clearAdminKey() {
 }
 
 function updateAdminPinDots() {
+    const display = document.getElementById("adminPinDisplay");
+    if (display) display.classList.toggle("show-digits", adminPinVisible);
+
     for (let i = 1; i <= 4; i++) {
         const dot = document.getElementById("pindot-" + i);
         if (dot) {
-            dot.classList.toggle("filled", i <= adminEnteredPIN.length);
+            const hasDigit = i <= adminEnteredPIN.length;
+            dot.classList.toggle("filled", hasDigit);
+            if (adminPinVisible) {
+                dot.textContent = hasDigit ? adminEnteredPIN[i - 1] : "";
+            } else {
+                dot.textContent = "";
+            }
         }
     }
 }
@@ -3780,6 +3851,16 @@ function unlockAdminDashboard() {
 function lockAdminDashboard() {
     isAdminAuthenticated = false;
     adminEnteredPIN = "";
+    adminPinVisible = false;
+    const radio = document.getElementById("adminPinEyeRadio");
+    if (radio) radio.checked = false;
+    const icon = document.getElementById("adminPinEyeIcon");
+    if (icon) icon.className = "fa-regular fa-eye";
+    const label = document.getElementById("adminPinEyeLabel");
+    if (label) label.textContent = "Show PIN";
+    const display = document.getElementById("adminPinDisplay");
+    if (display) display.classList.remove("show-digits");
+
     updateAdminPinDots();
     const gate = document.getElementById("adminAuthGate");
     const dash = document.getElementById("adminDashboardView");
@@ -4164,12 +4245,114 @@ function exportOrdersJSON() {
     showToast("Backup Saved", "Orders exported to JSON file.");
 }
 
+function toggleFieldVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const isPass = input.type === "password";
+    input.type = isPass ? "text" : "password";
+    const icon = btn.querySelector("i");
+    if (icon) {
+        icon.className = isPass ? "fa-regular fa-eye-slash" : "fa-regular fa-eye";
+    }
+}
+
+function handleAdminChangePIN(event) {
+    event.preventDefault();
+    const currentInput = document.getElementById("admCurrentPin");
+    const newInput = document.getElementById("admNewPin");
+    const confirmInput = document.getElementById("admConfirmPin");
+
+    const currentVal = currentInput ? currentInput.value.trim() : "";
+    const newVal = newInput ? newInput.value.trim() : "";
+    const confirmVal = confirmInput ? confirmInput.value.trim() : "";
+
+    const activePIN = storeSettings.adminPIN || "2023";
+
+    if (currentVal !== activePIN) {
+        showToast("Incorrect PIN", "Your current PIN does not match our records.");
+        if (currentInput) currentInput.focus();
+        return;
+    }
+
+    if (!/^\d{4}$/.test(newVal)) {
+        showToast("Invalid PIN Format", "New PIN must be exactly 4 numeric digits (e.g. 2023).");
+        if (newInput) newInput.focus();
+        return;
+    }
+
+    if (newVal !== confirmVal) {
+        showToast("PIN Mismatch", "The new PIN and confirmation PIN do not match.");
+        if (confirmInput) confirmInput.focus();
+        return;
+    }
+
+    // Save new PIN
+    storeSettings.adminPIN = newVal;
+    localStorage.setItem("j_settings", JSON.stringify(storeSettings));
+
+    // Clear inputs
+    if (currentInput) currentInput.value = "";
+    if (newInput) newInput.value = "";
+    if (confirmInput) confirmInput.value = "";
+
+    // Sync any auxiliary inputs
+    const setPin = document.getElementById("settingAdminPIN");
+    if (setPin) setPin.value = newVal;
+
+    playNotificationChime();
+    showToast("PIN Changed! ✨", "Your admin access PIN has been updated successfully.");
+}
+
+function saveAdminPreferences(event) {
+    event.preventDefault();
+    if (!storeSettings.preferences) storeSettings.preferences = {};
+
+    const statusPaused = document.getElementById("prefStatusPaused");
+    storeSettings.preferences.storeStatus = (statusPaused && statusPaused.checked) ? "paused" : "open";
+    storeSettings.preferences.orderChime = !!document.getElementById("prefOrderChime")?.checked;
+    storeSettings.preferences.autoMarkRead = !!document.getElementById("prefAutoMarkRead")?.checked;
+    storeSettings.preferences.lowStockThreshold = parseInt(document.getElementById("prefLowStockThreshold")?.value, 10) || 3;
+    storeSettings.preferences.currency = document.getElementById("prefCurrency")?.value || "GHS";
+    storeSettings.preferences.waTemplate = (document.getElementById("prefWaTemplate")?.value || "").trim();
+
+    localStorage.setItem("j_settings", JSON.stringify(storeSettings));
+
+    playNotificationChime();
+    showToast("Preferences Saved ✨", "Store operational preferences have been updated.");
+}
+
+function playNotificationChime() {
+    if (storeSettings?.preferences?.orderChime === false) return;
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        if (ctx.state === "suspended") {
+            ctx.resume();
+        }
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.25, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.6);
+    } catch (e) {
+        // Audio playback suppressed or unsupported
+    }
+}
+
 function saveAdminSettings(event) {
     event.preventDefault();
     storeSettings.whatsappNumber = document.getElementById("settingWhatsapp").value.trim();
     storeSettings.email = document.getElementById("settingEmail").value.trim();
     storeSettings.freeDeliveryThreshold = parseFloat(document.getElementById("settingFreeDelivery").value);
-    storeSettings.adminPIN = document.getElementById("settingAdminPIN").value.trim() || "2023";
+    const pinField = document.getElementById("settingAdminPIN");
+    if (pinField) storeSettings.adminPIN = pinField.value.trim() || storeSettings.adminPIN;
     storeSettings.web3Key = (document.getElementById("settingWeb3Key")?.value || "").trim();
 
     localStorage.setItem("j_settings", JSON.stringify(storeSettings));
@@ -4180,7 +4363,8 @@ function saveAdminSettings(event) {
     const contactEmailDisplay = document.getElementById("contactDisplayEmail");
     if (contactEmailDisplay) contactEmailDisplay.textContent = storeSettings.email;
 
-    showToast("Settings Saved", "Store contact and security settings updated.");
+    playNotificationChime();
+    showToast("Settings Saved", "Store contact and delivery parameters updated.");
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -4541,3 +4725,8 @@ window.saveAdminSettings = saveAdminSettings;
 window.saveContactDraft = saveContactDraft;
 window.updateContactAuthGate = updateContactAuthGate;
 window.handleDirectEmailCard = handleDirectEmailCard;
+window.toggleAdminPinKeypadVisibility = toggleAdminPinKeypadVisibility;
+window.toggleFieldVisibility = toggleFieldVisibility;
+window.handleAdminChangePIN = handleAdminChangePIN;
+window.saveAdminPreferences = saveAdminPreferences;
+window.playNotificationChime = playNotificationChime;

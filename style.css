@@ -3943,18 +3943,115 @@ body.modal-open {
 .admin-pin-display {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 12px;
-    margin: 20px 0;
+    margin: 18px 0 10px;
 }
 .pin-dot {
     width: 14px;
     height: 14px;
     border-radius: 50%;
     border: 2px solid var(--color-black);
-    transition: background 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: monospace;
+    color: transparent;
 }
 .pin-dot.filled {
     background: var(--color-black);
+}
+
+/* Eye Radio & Show Digits Mode */
+.admin-pin-display.show-digits {
+    gap: 10px;
+}
+.admin-pin-display.show-digits .pin-dot {
+    width: 36px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--color-gold);
+    background: #ffffff;
+    color: var(--color-black);
+}
+.admin-pin-display.show-digits .pin-dot.filled {
+    background: var(--color-black);
+    color: var(--color-gold);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.admin-pin-eye-toggle-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 18px;
+}
+.admin-eye-radio {
+    cursor: pointer;
+    user-select: none;
+    display: inline-flex;
+}
+.admin-eye-radio input[type="checkbox"] {
+    display: none;
+}
+.eye-radio-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-soft);
+    border: 1px solid var(--color-border);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    transition: var(--transition-fast);
+}
+.eye-radio-pill:hover {
+    background: var(--color-blush);
+    color: var(--color-black);
+}
+.admin-eye-radio input[type="checkbox"]:checked + .eye-radio-pill {
+    background: var(--color-blush);
+    color: var(--color-black);
+    border-color: var(--color-gold);
+    box-shadow: 0 2px 8px rgba(197, 160, 89, 0.25);
+}
+
+/* PIN & Password Input Field with Eye Button */
+.pin-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.pin-input-group input {
+    width: 100%;
+    padding-right: 42px !important;
+}
+.pin-field-eye-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+.pin-field-eye-btn:hover {
+    color: var(--color-gold);
+    background: var(--color-surface-soft);
 }
 .admin-keypad {
     display: grid;

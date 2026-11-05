@@ -1259,11 +1259,22 @@
                             controls.
                         </p>
 
-                        <div class="admin-pin-display">
+                        <div class="admin-pin-display" id="adminPinDisplay">
                             <div class="pin-dot" id="pindot-1"></div>
                             <div class="pin-dot" id="pindot-2"></div>
                             <div class="pin-dot" id="pindot-3"></div>
                             <div class="pin-dot" id="pindot-4"></div>
+                        </div>
+
+                        <!-- Eye Radio Toggle for Keypad PIN -->
+                        <div class="admin-pin-eye-toggle-wrap">
+                            <label class="admin-eye-radio" for="adminPinEyeRadio" title="Show or hide typed PIN digits">
+                                <input type="checkbox" id="adminPinEyeRadio" onchange="toggleAdminPinKeypadVisibility()">
+                                <span class="eye-radio-pill" id="adminPinEyePill">
+                                    <i class="fa-regular fa-eye" id="adminPinEyeIcon"></i>
+                                    <span id="adminPinEyeLabel">Show PIN</span>
+                                </span>
+                            </label>
                         </div>
 
                         <div class="admin-keypad">
@@ -1498,64 +1509,218 @@
                             </div>
                         </div>
 
-                        <!-- TAB 4: STORE SETTINGS -->
+                        <!-- TAB 4: STORE SETTINGS & PREFERENCES -->
                         <div class="admin-tab-content" id="admTabContentSettings" style="display:none;">
-                            <div style="max-width:540px;">
-                                <h3 style="font-size:1.15rem; margin-bottom:6px;">Admin Store Configuration</h3>
-                                <p style="font-size:0.8rem; color:var(--color-text-muted); margin-bottom:20px;">Update
-                                    contact details, courier parameters, and security PIN.</p>
+                            <div style="max-width:920px;">
+                                <div style="margin-bottom:24px;">
+                                    <h3 style="font-size:1.3rem; margin-bottom:4px; font-family:var(--font-heading);">Store Configuration &amp; Preferences</h3>
+                                    <p style="font-size:0.85rem; color:var(--color-text-muted);">Manage your customer dispatch channels, access PIN security, and automated operational preferences.</p>
+                                </div>
 
-                                <form id="adminSettingsForm" onsubmit="saveAdminSettings(event)">
-                                    <div class="form-group" style="margin-bottom:14px;">
-                                        <label
-                                            style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Store
-                                            WhatsApp Number (Country code + phone)</label>
-                                        <input type="text" id="settingWhatsapp" class="customizer-input-field"
-                                            value="233500594879" required>
-                                    </div>
-                                    <div class="form-group" style="margin-bottom:14px;">
-                                        <label
-                                            style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Store
-                                            Notification Email (Admin Inbox)</label>
-                                        <div style="display:flex; gap:8px;">
-                                            <input type="email" id="settingEmail" class="customizer-input-field"
-                                                value="mensahjerrilyn@gmail.com" required>
-                                            <button type="button" class="btn btn-outline btn-sm" onclick="sendTestAdminEmail()"
-                                                id="btnSendTestEmail" style="white-space:nowrap;">
-                                                <i class="fa-solid fa-paper-plane"></i> Send Test Mail
-                                            </button>
+                                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(380px, 1fr)); gap:24px; align-items:start;">
+                                    
+                                    <!-- Column 1: Store Communication & Security PIN -->
+                                    <div style="display:flex; flex-direction:column; gap:24px;">
+                                        <!-- Card: Store Channels -->
+                                        <div style="background:#fff; border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:24px; box-shadow:var(--shadow-sm);">
+                                            <div style="border-bottom:1px solid var(--color-border); padding-bottom:12px; margin-bottom:16px;">
+                                                <h4 style="font-size:1.05rem; color:var(--color-black); margin-bottom:2px;">
+                                                    <i class="fa-solid fa-tower-broadcast" style="color:var(--color-gold); margin-right:6px;"></i> Store Channels &amp; Delivery
+                                                </h4>
+                                                <p style="font-size:0.78rem; color:var(--color-text-muted);">Store notification endpoints and delivery thresholds.</p>
+                                            </div>
+
+                                            <form id="adminSettingsForm" onsubmit="saveAdminSettings(event)">
+                                                <div class="form-group" style="margin-bottom:14px;">
+                                                    <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">
+                                                        Store WhatsApp Number (Country code + phone)
+                                                    </label>
+                                                    <input type="text" id="settingWhatsapp" class="customizer-input-field" value="233500594879" required>
+                                                </div>
+
+                                                <div class="form-group" style="margin-bottom:14px;">
+                                                    <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">
+                                                        Store Notification Email (Admin Inbox)
+                                                    </label>
+                                                    <div style="display:flex; gap:8px;">
+                                                        <input type="email" id="settingEmail" class="customizer-input-field" value="mensahjerrilyn@gmail.com" required>
+                                                        <button type="button" class="btn btn-outline btn-sm" onclick="sendTestAdminEmail()" id="btnSendTestEmail" style="white-space:nowrap;">
+                                                            <i class="fa-solid fa-paper-plane"></i> Test Mail
+                                                        </button>
+                                                    </div>
+                                                    <span style="font-size:0.74rem; color:var(--color-text-muted); display:block; margin-top:4px;">
+                                                        All website consultation inquiries and order notices dispatch here.
+                                                    </span>
+                                                </div>
+
+                                                <div class="form-group" style="margin-bottom:14px;">
+                                                    <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">
+                                                        Web3Forms Access Key (Automated Email Forwarding)
+                                                    </label>
+                                                    <input type="text" id="settingWeb3Key" class="customizer-input-field" placeholder="e.g. 12345678-abcd-ef01-2345-6789abcdef01">
+                                                    <span style="font-size:0.74rem; color:var(--color-text-muted); display:block; margin-top:4px;">
+                                                        Generate a free key instantly at <a href="https://web3forms.com" target="_blank" style="color:var(--color-gold); text-decoration:underline;">web3forms.com</a> for zero-downtime background delivery.
+                                                    </span>
+                                                </div>
+
+                                                <div class="form-group" style="margin-bottom:20px;">
+                                                    <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">
+                                                        Free Delivery Threshold (GH₵)
+                                                    </label>
+                                                    <input type="number" id="settingFreeDelivery" class="customizer-input-field" value="500" required>
+                                                </div>
+
+                                                <button type="submit" class="btn btn-primary btn-block">
+                                                    <i class="fa-solid fa-floppy-disk"></i> Save Channels &amp; Delivery
+                                                </button>
+                                            </form>
                                         </div>
-                                        <span style="font-size:0.75rem; color:var(--color-text-muted); display:block; margin-top:4px;">
-                                            All customer inquiries sent from the website and paid order notices are delivered to this inbox.
-                                        </span>
+
+                                        <!-- Card: Security & Change Admin PIN -->
+                                        <div style="background:#fff; border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:24px; box-shadow:var(--shadow-sm);">
+                                            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--color-border); padding-bottom:12px; margin-bottom:16px;">
+                                                <div>
+                                                    <h4 style="font-size:1.05rem; color:var(--color-black); margin-bottom:2px;">
+                                                        <i class="fa-solid fa-key" style="color:var(--color-gold); margin-right:6px;"></i> Admin Access PIN &amp; Security
+                                                    </h4>
+                                                    <p style="font-size:0.78rem; color:var(--color-text-muted);">Change your master 4-digit PIN used to unlock the dashboard.</p>
+                                                </div>
+                                                <span class="badge badge-gold" style="font-size:0.75rem; padding:4px 8px;">Active: Protected</span>
+                                            </div>
+
+                                            <form id="adminChangePinForm" onsubmit="handleAdminChangePIN(event)">
+                                                <div class="form-group" style="margin-bottom:14px;">
+                                                    <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Current 4-Digit PIN *</label>
+                                                    <div class="pin-input-group">
+                                                        <input type="password" id="admCurrentPin" class="customizer-input-field" maxlength="4" placeholder="Enter current PIN" required pattern="[0-9]{4}">
+                                                        <button type="button" class="pin-field-eye-btn" onclick="toggleFieldVisibility('admCurrentPin', this)" title="Show/Hide PIN" aria-label="Show/Hide Current PIN">
+                                                            <i class="fa-regular fa-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-grid-2" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+                                                    <div class="form-group">
+                                                        <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">New 4-Digit PIN *</label>
+                                                        <div class="pin-input-group">
+                                                            <input type="password" id="admNewPin" class="customizer-input-field" maxlength="4" placeholder="New PIN" required pattern="[0-9]{4}">
+                                                            <button type="button" class="pin-field-eye-btn" onclick="toggleFieldVisibility('admNewPin', this)" title="Show/Hide PIN" aria-label="Show/Hide New PIN">
+                                                                <i class="fa-regular fa-eye"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Confirm New PIN *</label>
+                                                        <div class="pin-input-group">
+                                                            <input type="password" id="admConfirmPin" class="customizer-input-field" maxlength="4" placeholder="Confirm PIN" required pattern="[0-9]{4}">
+                                                            <button type="button" class="pin-field-eye-btn" onclick="toggleFieldVisibility('admConfirmPin', this)" title="Show/Hide PIN" aria-label="Show/Hide Confirm PIN">
+                                                                <i class="fa-regular fa-eye"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                                                    <span style="font-size:0.74rem; color:var(--color-text-muted);">
+                                                        <i class="fa-solid fa-shield-halved" style="color:var(--color-success); margin-right:4px;"></i> Numeric 4 digits (e.g. 2023)
+                                                    </span>
+                                                    <button type="submit" class="btn btn-outline btn-sm" style="border-color:var(--color-gold); color:var(--color-black);">
+                                                        <i class="fa-solid fa-lock"></i> Update Access PIN
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
-                                    <div class="form-group" style="margin-bottom:14px;">
-                                        <label
-                                            style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Web3Forms Access Key (Optional for Automated Background Dispatch)</label>
-                                        <input type="text" id="settingWeb3Key" class="customizer-input-field"
-                                            placeholder="e.g. 12345678-abcd-ef01-2345-6789abcdef01">
-                                        <span style="font-size:0.75rem; color:var(--color-text-muted); display:block; margin-top:4px;">
-                                            Generate a free key instantly at <a href="https://web3forms.com" target="_blank" style="color:var(--color-gold); text-decoration:underline;">web3forms.com</a> to enable automated background forwarding to Jerrilyn's inbox with zero third-party downtime.
-                                        </span>
+
+                                    <!-- Column 2: Operational Preferences -->
+                                    <div style="background:#fff; border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:24px; box-shadow:var(--shadow-sm);">
+                                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--color-border); padding-bottom:12px; margin-bottom:16px;">
+                                            <div>
+                                                <h4 style="font-size:1.05rem; color:var(--color-black); margin-bottom:2px;">
+                                                    <i class="fa-solid fa-sliders" style="color:var(--color-gold); margin-right:6px;"></i> Store Operational Preferences
+                                                </h4>
+                                                <p style="font-size:0.78rem; color:var(--color-text-muted);">Live store behavior, audio chimes, alerts, and customer messaging.</p>
+                                            </div>
+                                            <span class="badge badge-bestseller" style="font-size:0.75rem; padding:4px 8px;">Preferences</span>
+                                        </div>
+
+                                        <form id="adminPreferencesForm" onsubmit="saveAdminPreferences(event)">
+                                            <!-- Store Live Status -->
+                                            <div style="background:var(--color-surface-soft); padding:16px; border-radius:var(--radius-md); border:1px solid var(--color-border); margin-bottom:16px;">
+                                                <label style="font-size:0.8rem; font-weight:700; color:var(--color-black); display:block; margin-bottom:8px;">
+                                                    <i class="fa-solid fa-store" style="color:var(--color-gold); margin-right:4px;"></i> Store Operating Status
+                                                </label>
+                                                <div style="display:flex; flex-direction:column; gap:8px;">
+                                                    <label style="display:flex; align-items:center; gap:8px; font-size:0.82rem; cursor:pointer;">
+                                                        <input type="radio" name="prefStoreStatus" value="open" id="prefStatusOpen" checked style="accent-color:var(--color-gold);">
+                                                        <span><strong style="color:var(--color-success);">🟢 Live &amp; Accepting Orders</strong> — Online checkout active</span>
+                                                    </label>
+                                                    <label style="display:flex; align-items:center; gap:8px; font-size:0.82rem; cursor:pointer;">
+                                                        <input type="radio" name="prefStoreStatus" value="paused" id="prefStatusPaused" style="accent-color:var(--color-gold);">
+                                                        <span><strong style="color:#e65100;">🟡 Vacation / Break Mode</strong> — Browsing enabled, checkout paused</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <!-- Audio & Inquiry Preferences -->
+                                            <div style="background:var(--color-surface-soft); padding:16px; border-radius:var(--radius-md); border:1px solid var(--color-border); margin-bottom:16px;">
+                                                <label style="font-size:0.8rem; font-weight:700; color:var(--color-black); display:block; margin-bottom:8px;">
+                                                    <i class="fa-solid fa-bell" style="color:var(--color-gold); margin-right:4px;"></i> Alerts &amp; Automation
+                                                </label>
+                                                <div style="display:flex; flex-direction:column; gap:10px;">
+                                                    <label style="display:flex; align-items:center; justify-content:space-between; font-size:0.82rem; cursor:pointer;">
+                                                        <span>Play chime on new order or customer inquiry</span>
+                                                        <input type="checkbox" id="prefOrderChime" checked style="accent-color:var(--color-gold); width:16px; height:16px;">
+                                                    </label>
+                                                    <label style="display:flex; align-items:center; justify-content:space-between; font-size:0.82rem; cursor:pointer;">
+                                                        <span>Automatically mark inquiries as read upon opening</span>
+                                                        <input type="checkbox" id="prefAutoMarkRead" checked style="accent-color:var(--color-gold); width:16px; height:16px;">
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <!-- Low Stock & Currency Grid -->
+                                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+                                                <div style="background:var(--color-surface-soft); padding:14px; border-radius:var(--radius-md); border:1px solid var(--color-border);">
+                                                    <label style="font-size:0.78rem; font-weight:700; color:var(--color-black); display:block; margin-bottom:4px;">
+                                                        <i class="fa-solid fa-boxes-stacked" style="color:var(--color-gold); margin-right:4px;"></i> Low Stock Warning
+                                                    </label>
+                                                    <div style="display:flex; align-items:center; gap:6px; margin-top:6px;">
+                                                        <input type="number" id="prefLowStockThreshold" class="customizer-input-field" min="1" max="50" value="3" style="width:70px; padding:6px 8px; font-size:0.85rem;">
+                                                        <span style="font-size:0.75rem; color:var(--color-text-muted);">units</span>
+                                                    </div>
+                                                </div>
+
+                                                <div style="background:var(--color-surface-soft); padding:14px; border-radius:var(--radius-md); border:1px solid var(--color-border);">
+                                                    <label style="font-size:0.78rem; font-weight:700; color:var(--color-black); display:block; margin-bottom:4px;">
+                                                        <i class="fa-solid fa-coins" style="color:var(--color-gold); margin-right:4px;"></i> Store Currency
+                                                    </label>
+                                                    <select id="prefCurrency" class="shop-select" style="width:100%; padding:6px 8px; font-size:0.82rem; margin-top:6px;">
+                                                        <option value="GHS">Ghanaian Cedi (GH₵)</option>
+                                                        <option value="USD">US Dollar ($)</option>
+                                                        <option value="GBP">British Pound (£)</option>
+                                                        <option value="EUR">Euro (€)</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- WhatsApp Template -->
+                                            <div class="form-group" style="margin-bottom:20px;">
+                                                <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">
+                                                    <i class="fa-brands fa-whatsapp" style="color:#25d366; margin-right:4px;"></i> WhatsApp Quick-Chat Greeting Template
+                                                </label>
+                                                <textarea id="prefWaTemplate" class="customizer-input-field" rows="2" style="font-size:0.85rem; padding:10px 14px;" placeholder="Hello! ✨ Thank you for contacting Jewels by J. How can we assist with your bespoke jewelry today?"></textarea>
+                                                <span style="font-size:0.74rem; color:var(--color-text-muted); display:block; margin-top:4px;">
+                                                    Pre-populates the WhatsApp chat greeting when following up with clients.
+                                                </span>
+                                            </div>
+
+                                            <button type="submit" class="btn btn-primary btn-block">
+                                                <i class="fa-solid fa-check"></i> Save Store Preferences
+                                            </button>
+                                        </form>
                                     </div>
-                                    <div class="form-group" style="margin-bottom:14px;">
-                                        <label
-                                            style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Free
-                                            Delivery Threshold (GH₵)</label>
-                                        <input type="number" id="settingFreeDelivery" class="customizer-input-field"
-                                            value="500" required>
-                                    </div>
-                                    <div class="form-group" style="margin-bottom:22px;">
-                                        <label
-                                            style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Admin
-                                            Access PIN (4 digits)</label>
-                                        <input type="password" id="settingAdminPIN" class="customizer-input-field"
-                                            maxlength="4" value="2023" required>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary btn-block">
-                                        <i class="fa-solid fa-floppy-disk"></i> Save Admin Settings
-                                    </button>
-                                </form>
+                                </div>
                             </div>
                         </div>
                     </div>
