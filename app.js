@@ -1172,6 +1172,7 @@ function openQuickView(productId) {
     }
 
     document.getElementById("quickModalBackdrop")?.classList.add("active");
+    document.body.classList.add("modal-open");
     document.body.style.overflow = "hidden";
 }
 
@@ -1183,6 +1184,7 @@ function selectQuickViewOption(opt, btn) {
 
 function closeQuickView() {
     document.getElementById("quickModalBackdrop")?.classList.remove("active");
+    document.body.classList.remove("modal-open");
     document.body.style.overflow = "";
 }
 
@@ -2401,6 +2403,7 @@ function openAuthModal(initialTab = "login") {
     }
 
     backdrop.classList.add("active");
+    document.body.classList.add("modal-open");
     document.body.style.overflow = "hidden";
 }
 
@@ -2408,6 +2411,7 @@ function closeAuthModal() {
     clearAuthFeedback();
     const backdrop = document.getElementById("authModalBackdrop");
     if (backdrop) backdrop.classList.remove("active");
+    document.body.classList.remove("modal-open");
     document.body.style.overflow = "";
 }
 
@@ -2875,12 +2879,14 @@ function openCheckoutModal() {
     renderCheckoutMiniItems();
 
     backdrop.classList.add("active");
+    document.body.classList.add("modal-open");
     document.body.style.overflow = "hidden";
 }
 
 function closeCheckoutModal() {
     const backdrop = document.getElementById("checkoutModalBackdrop");
     if (backdrop) backdrop.classList.remove("active");
+    document.body.classList.remove("modal-open");
     document.body.style.overflow = "";
 
     if (checkoutState.simTimer) {
@@ -3881,7 +3887,12 @@ function openAddProductModal() {
         preview.style.display = "none";
     }
 
-    if (backdrop) backdrop.classList.add("active");
+    if (backdrop) {
+        backdrop.classList.add("active");
+        backdrop.style.display = "flex";
+    }
+    document.body.classList.add("modal-open");
+    document.body.style.overflow = "hidden";
 }
 
 function openEditProductModal(productId) {
@@ -3911,12 +3922,22 @@ function openEditProductModal(productId) {
         preview.style.display = "block";
     }
 
-    if (backdrop) backdrop.classList.add("active");
+    if (backdrop) {
+        backdrop.classList.add("active");
+        backdrop.style.display = "flex";
+    }
+    document.body.classList.add("modal-open");
+    document.body.style.overflow = "hidden";
 }
 
 function closeAdminProductModal() {
     const backdrop = document.getElementById("adminProductModalBackdrop");
-    if (backdrop) backdrop.classList.remove("active");
+    if (backdrop) {
+        backdrop.classList.remove("active");
+        backdrop.style.display = "none";
+    }
+    document.body.classList.remove("modal-open");
+    document.body.style.overflow = "";
 }
 
 function handleAdminImageUpload(event) {
@@ -4359,13 +4380,23 @@ function openAdminMessageModal(msgId) {
         toggleReadBtn.textContent = msg.unread ? "Mark as Read" : "Mark as Unread";
     }
 
-    if (modal) modal.style.display = "flex";
+    if (modal) {
+        modal.classList.add("active");
+        modal.style.display = "flex";
+    }
+    document.body.classList.add("modal-open");
+    document.body.style.overflow = "hidden";
     renderAdminMessages();
 }
 
 function closeAdminMessageModal() {
     const modal = document.getElementById("adminMessageModalBackdrop");
-    if (modal) modal.style.display = "none";
+    if (modal) {
+        modal.classList.remove("active");
+        modal.style.display = "none";
+    }
+    document.body.classList.remove("modal-open");
+    document.body.style.overflow = "";
     currentViewingMessageId = null;
 }
 
@@ -4496,6 +4527,9 @@ window.filterAdminMessages = filterAdminMessages;
 window.handleAdminInboxSearch = handleAdminInboxSearch;
 window.openAdminMessageModal = openAdminMessageModal;
 window.closeAdminMessageModal = closeAdminMessageModal;
+window.openAddProductModal = openAddProductModal;
+window.openEditProductModal = openEditProductModal;
+window.closeAdminProductModal = closeAdminProductModal;
 window.toggleAdminMessageReadById = toggleAdminMessageReadById;
 window.toggleCurrentAdminMessageRead = toggleCurrentAdminMessageRead;
 window.deleteCurrentAdminMessage = deleteCurrentAdminMessage;

@@ -2239,7 +2239,7 @@
     <!-- ═══════════════════════════════════════════════════════════════════════
        7D. ADMIN ADD / EDIT PRODUCT MODAL (FEATURE #8)
        ═══════════════════════════════════════════════════════════════════════ -->
-    <div class="auth-modal-backdrop" id="adminProductModalBackdrop">
+    <div class="auth-modal-backdrop" id="adminProductModalBackdrop" onclick="if(event.target === this) closeAdminProductModal()">
         <div class="auth-modal-card" style="max-width:640px;">
             <button class="auth-close-btn" onclick="closeAdminProductModal()" aria-label="Close modal">
                 <i class="fa-solid fa-xmark"></i>
@@ -2366,58 +2366,56 @@
     </div>
 
     <!-- Admin Message View Modal -->
-    <div class="modal-backdrop" id="adminMessageModalBackdrop" style="display:none;">
-        <div class="modal-card" style="max-width:560px;">
-            <div
-                style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--color-border); padding-bottom:14px; margin-bottom:18px;">
-                <div>
-                    <span class="badge badge-bestseller" id="adminMsgModalBadge">Inquiry</span>
-                    <h3 style="font-size:1.2rem; color:var(--color-black); margin-top:4px;" id="adminMsgModalSubject">
-                        Message Subject</h3>
-                </div>
-                <button type="button" class="modal-close-btn" onclick="closeAdminMessageModal()">&times;</button>
-            </div>
-            <div
-                style="background:var(--color-surface-soft); padding:14px; border-radius:var(--radius-md); font-size:0.85rem; margin-bottom:18px;">
-                <div class="form-grid-2" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+    <div class="auth-modal-backdrop modal-backdrop" id="adminMessageModalBackdrop" style="display:none;" onclick="if(event.target === this) closeAdminMessageModal()">
+        <div class="auth-modal-card modal-card" style="max-width:600px;">
+            <button class="auth-close-btn" type="button" onclick="closeAdminMessageModal()" aria-label="Close message details">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div style="padding:28px 24px;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid var(--color-border); padding-bottom:14px; margin-bottom:18px; padding-right:34px;">
                     <div>
-                        <span
-                            style="font-size:0.72rem; color:var(--color-text-muted); text-transform:uppercase; font-weight:700; display:block;">From:</span>
-                        <strong id="adminMsgModalSender" style="display:block; color:var(--color-black);">Customer Name</strong>
-                        <span id="adminMsgModalEmail" style="color:var(--color-gold); font-size:0.8rem;">email@example.com</span>
-                    </div>
-                    <div>
-                        <span
-                            style="font-size:0.72rem; color:var(--color-text-muted); text-transform:uppercase; font-weight:700; display:block;">Received:</span>
-                        <div id="adminMsgModalDate" style="color:var(--color-black); font-size:0.8rem;">Date</div>
-                        <div id="adminMsgModalPhone" style="color:var(--color-text-muted); font-size:0.8rem;">Phone</div>
+                        <span class="badge badge-bestseller" id="adminMsgModalBadge">Inquiry</span>
+                        <h3 style="font-size:1.25rem; color:var(--color-black); margin-top:6px; font-family:var(--font-heading);" id="adminMsgModalSubject">
+                            Message Subject</h3>
                     </div>
                 </div>
-            </div>
-            <div style="margin-bottom:24px;">
-                <span
-                    style="font-size:0.75rem; color:var(--color-text-muted); text-transform:uppercase; font-weight:700; display:block; margin-bottom:6px;">Message
-                    Body:</span>
-                <div id="adminMsgModalBody"
-                    style="background:#fff; border:1px solid var(--color-border); border-radius:var(--radius-md); padding:16px; font-size:0.9rem; line-height:1.6; color:var(--color-black); white-space:pre-wrap; min-height:90px;">
+                <div style="background:var(--color-surface-soft); padding:16px; border-radius:var(--radius-md); font-size:0.85rem; margin-bottom:18px;">
+                    <div class="form-grid-2" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div>
+                            <span style="font-size:0.72rem; color:var(--color-text-muted); text-transform:uppercase; font-weight:700; display:block; margin-bottom:3px;">From:</span>
+                            <strong id="adminMsgModalSender" style="display:block; color:var(--color-black); font-size:0.92rem;">Customer Name</strong>
+                            <a id="adminMsgModalEmail" href="#" style="color:var(--color-gold); font-size:0.82rem; word-break:break-all;">email@example.com</a>
+                        </div>
+                        <div>
+                            <span style="font-size:0.72rem; color:var(--color-text-muted); text-transform:uppercase; font-weight:700; display:block; margin-bottom:3px;">Details:</span>
+                            <div id="adminMsgModalDate" style="color:var(--color-black); font-size:0.82rem;">Date</div>
+                            <div id="adminMsgModalPhone" style="color:var(--color-text-muted); font-size:0.82rem;">Phone</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                <button type="button" class="btn btn-outline btn-sm" onclick="deleteCurrentAdminMessage()"
-                    style="color:#d32f2f; border-color:rgba(211,47,47,0.3);">
-                    <i class="fa-regular fa-trash-can"></i> Delete
-                </button>
-                <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                    <button type="button" class="btn btn-outline btn-sm" id="adminMsgModalToggleReadBtn"
-                        onclick="toggleCurrentAdminMessageRead()">
-                        Mark as Unread
+                <div style="margin-bottom:24px;">
+                    <span style="font-size:0.75rem; color:var(--color-text-muted); text-transform:uppercase; font-weight:700; display:block; margin-bottom:8px;">Message Body:</span>
+                    <div id="adminMsgModalBody"
+                        style="background:#fff; border:1px solid var(--color-border); border-radius:var(--radius-md); padding:16px; font-size:0.92rem; line-height:1.65; color:var(--color-black); white-space:pre-wrap; min-height:100px; max-height:280px; overflow-y:auto;">
+                    </div>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-top:1px solid var(--color-border); padding-top:16px;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="deleteCurrentAdminMessage()"
+                        style="color:#d32f2f; border-color:rgba(211,47,47,0.3);">
+                        <i class="fa-regular fa-trash-can"></i> Delete
                     </button>
-                    <a href="#" id="adminMsgModalReplyEmail" class="btn btn-primary btn-sm">
-                        <i class="fa-solid fa-reply"></i> Reply via Email
-                    </a>
-                    <a href="#" id="adminMsgModalReplyWa" target="_blank" class="btn btn-whatsapp btn-sm">
-                        <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
-                    </a>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button type="button" class="btn btn-outline btn-sm" id="adminMsgModalToggleReadBtn"
+                            onclick="toggleCurrentAdminMessageRead()">
+                            Mark as Unread
+                        </button>
+                        <a href="#" id="adminMsgModalReplyEmail" class="btn btn-primary btn-sm">
+                            <i class="fa-solid fa-reply"></i> Reply via Email
+                        </a>
+                        <a href="#" id="adminMsgModalReplyWa" target="_blank" class="btn btn-whatsapp btn-sm">
+                            <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
