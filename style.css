@@ -58,6 +58,164 @@ html {
     font-size: 16px;
 }
 
+/* Preferences: Font Size Scaling */
+html[data-font-size="compact"] {
+    font-size: 14.5px;
+}
+html[data-font-size="standard"],
+html:not([data-font-size]) {
+    font-size: 16px;
+}
+html[data-font-size="comfort"] {
+    font-size: 17.5px;
+}
+html[data-font-size="large"] {
+    font-size: 19px;
+}
+
+/* Preferences: Heading Typography */
+html[data-heading-font="cormorant"],
+html:not([data-heading-font]) {
+    --font-heading: 'Cormorant Garamond', Georgia, serif;
+}
+html[data-heading-font="playfair"] {
+    --font-heading: 'Playfair Display', Georgia, serif;
+}
+html[data-heading-font="modern"] {
+    --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Preferences: Theme Palettes */
+html[data-theme="dark"] {
+    --color-cream: #141112;
+    --color-surface: #1b1718;
+    --color-surface-soft: #241f20;
+    --color-black: #faf6f5;
+    --color-black-light: #ece6e4;
+    --color-text: #f5eeea;
+    --color-text-muted: #b8aaa4;
+    --color-text-subtle: #8a7c76;
+    --color-border: #332b2c;
+    --color-border-light: #3d3335;
+    --color-blush: #3b282e;
+    --color-wine: #52313a;
+    --color-blush-soft: #281a1f;
+    --color-gold: #c5a059;
+    --color-gold-light: #dfc082;
+    background-color: #141112 !important;
+    color: #f5eeea !important;
+}
+
+html[data-theme="dark"] body {
+    background-color: #141112 !important;
+    color: #f5eeea !important;
+}
+
+html[data-theme="dark"] .admin-dashboard-wrap,
+html[data-theme="dark"] .admin-settings-card,
+html[data-theme="dark"] .admin-stat-card,
+html[data-theme="dark"] .admin-auth-card,
+html[data-theme="dark"] .auth-modal-card,
+html[data-theme="dark"] .modal-card,
+html[data-theme="dark"] .quick-modal-card,
+html[data-theme="dark"] .checkout-card {
+    background: #1b1718 !important;
+    color: #f5eeea !important;
+    border-color: #332b2c !important;
+}
+
+html[data-theme="dark"] .customizer-input-field,
+html[data-theme="dark"] .shop-select,
+html[data-theme="dark"] select,
+html[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),
+html[data-theme="dark"] textarea {
+    background: #241f20 !important;
+    color: #f5eeea !important;
+    border-color: #3d3335 !important;
+}
+
+html[data-theme="dark"] .admin-table th {
+    background: #241f20 !important;
+    color: #dfc082 !important;
+}
+
+html[data-theme="dark"] .admin-table td {
+    border-color: #332b2c !important;
+    color: #f5eeea !important;
+}
+
+html[data-theme="dark"] .admin-table tr:hover {
+    background: rgba(197, 160, 89, 0.08) !important;
+}
+
+html[data-theme="rosegold"] {
+    --color-blush: #fcedf2;
+    --color-wine: #f7d5e1;
+    --color-blush-soft: #fff5f8;
+    --color-gold: #b76e79;
+    --color-gold-light: #d88f9a;
+    --color-gold-glow: rgba(183, 110, 121, 0.25);
+    --color-border: #f0dfe4;
+}
+
+html[data-theme="champagne"] {
+    --color-blush: #fbf5ea;
+    --color-wine: #f5e9d3;
+    --color-blush-soft: #fdfbf7;
+    --color-gold: #c2983b;
+    --color-gold-light: #dec06b;
+    --color-gold-glow: rgba(194, 152, 59, 0.25);
+    --color-border: #ede4d1;
+}
+
+html[data-theme="emerald"] {
+    --color-blush: #e8f5e9;
+    --color-wine: #c8e6c9;
+    --color-blush-soft: #f1f8e9;
+    --color-gold: #00796b;
+    --color-gold-light: #26a69a;
+    --color-gold-glow: rgba(0, 121, 107, 0.25);
+    --color-border: #d0e4d2;
+}
+
+/* Theme Option Cards */
+.theme-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+}
+.theme-option-card {
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 10px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    background: var(--color-surface);
+}
+.theme-option-card:hover {
+    border-color: var(--color-gold);
+    transform: translateY(-2px);
+}
+.theme-option-card.active {
+    border-color: var(--color-gold) !important;
+    box-shadow: 0 0 0 2px var(--color-gold);
+    background: var(--color-surface-soft);
+}
+.theme-preview-circles {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 6px;
+}
+.theme-preview-swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
 body {
     background-color: var(--color-surface);
     color: var(--color-text);

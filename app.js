@@ -435,6 +435,9 @@ if (!storeSettings) {
         freeDeliveryThreshold: SITE_CONFIG.freeDeliveryThreshold,
         adminPIN: "2023",
         preferences: {
+            theme: "default",
+            fontSize: "standard",
+            headingFont: "cormorant",
             storeStatus: "open",
             orderChime: true,
             autoMarkRead: true,
@@ -450,6 +453,9 @@ if (!storeSettings) {
     }
     if (!storeSettings.preferences) {
         storeSettings.preferences = {
+            theme: "default",
+            fontSize: "standard",
+            headingFont: "cormorant",
             storeStatus: "open",
             orderChime: true,
             autoMarkRead: true,
@@ -3727,7 +3733,9 @@ function initAdminPortal() {
     if (setPin) setPin.value = storeSettings.adminPIN || "2023";
     if (setWeb3) setWeb3.value = storeSettings.web3Key || "";
 
-    // Populate Preferences form
+    // Populate Preferences form & apply theme/font-size
+    applyStoredPreferences();
+
     const pref = storeSettings.preferences || {};
     const statusOpen = document.getElementById("prefStatusOpen");
     const statusPaused = document.getElementById("prefStatusPaused");
@@ -3772,43 +3780,84 @@ function updateAdminNotificationBadge() {
     }
 }
 
-// ── PIN Authentication Keypad & Eye Radio ──
+// ── Password & PIN Authentication Gate ──
 let adminPinVisible = false;
+
+function handleAdminLoginSubmit(event) {
+    if (event) event.preventDefault();
+    const input = document.getElementById("adminPasswordInput");
+    const entered = input ? input.value.trim() : adminEnteredPIN;
+    const valid = storeSettings.adminPIN || "2023";
+
+    if (entered === valid) {
+        unlockAdminDashboard();
+        if (input) input.value = "";
+        adminEnteredPIN = "";
+    } else {
+        showToast("Incorrect Password / PIN", "Access denied. Please check your credentials.");
+        if (input) {
+            input.value = "";
+            input.focus();
+        }
+        adminEnteredPIN = "";
+        updateAdminPinDots();
+    }
+}
+
+function toggleAdminPasswordInputEye(isChecked) {
+    const input = document.getElementById("adminPasswordInput");
+    const icon = document.getElementById("adminPinEyeIcon");
+    const label = document.getElementById("adminPinEyeLabel");
+    if (input) {
+        input.type = isChecked ? "text" : "password";
+    }
+    if (icon) {
+        icon.className = isChecked ? "fa-regular fa-eye-slash" : "fa-regular fa-eye";
+    }
+    if (label) {
+        label.textContent = isChecked ? "Hide Password / PIN" : "Show Password / PIN";
+    }
+}
+
+function toggleAdminKeypadDisplay() {
+    const grid = document.getElementById("adminKeypadGrid");
+    const btn = document.getElementById("btnToggleKeypad");
+    if (!grid) return;
+    const isHidden = grid.style.display === "none";
+    grid.style.display = isHidden ? "grid" : "none";
+    if (btn) {
+        btn.innerHTML = isHidden
+            ? `<i class="fa-solid fa-keyboard" style="margin-right:4px;"></i> Hide on-screen keypad`
+            : `<i class="fa-solid fa-calculator" style="margin-right:4px;"></i> Use on-screen numeric keypad`;
+    }
+}
 
 function toggleAdminPinKeypadVisibility() {
     adminPinVisible = !adminPinVisible;
     const radio = document.getElementById("adminPinEyeRadio");
     if (radio) radio.checked = adminPinVisible;
-    const icon = document.getElementById("adminPinEyeIcon");
-    const label = document.getElementById("adminPinEyeLabel");
-    const display = document.getElementById("adminPinDisplay");
-
-    if (icon) icon.className = adminPinVisible ? "fa-regular fa-eye-slash" : "fa-regular fa-eye";
-    if (label) label.textContent = adminPinVisible ? "Hide PIN" : "Show PIN";
-    if (display) display.classList.toggle("show-digits", adminPinVisible);
-
-    updateAdminPinDots();
+    toggleAdminPasswordInputEye(adminPinVisible);
 }
 
 function pressAdminKey(digit) {
-    if (adminEnteredPIN.length < 4) {
-        adminEnteredPIN += digit;
-        updateAdminPinDots();
-        if (adminEnteredPIN.length === 4) {
-            setTimeout(submitAdminPIN, 180);
-        }
+    const input = document.getElementById("adminPasswordInput");
+    if (input) {
+        input.value += digit;
     }
+    adminEnteredPIN += digit;
+    updateAdminPinDots();
 }
 
 function clearAdminKey() {
+    const input = document.getElementById("adminPasswordInput");
+    if (input) {
+        input.value = input.value.slice(0, -1);
+    }
     adminEnteredPIN = adminEnteredPIN.slice(0, -1);
     updateAdminPinDots();
 }
 
 function updateAdminPinDots() {
-    const display = document.getElementById("adminPinDisplay");
-    if (display) display.classList.toggle("show-digits", adminPinVisible);
-
     for (let i = 1; i <= 4; i++) {
         const dot = document.getElementById("pindot-" + i);
         if (dot) {
@@ -3824,14 +3873,7 @@ function updateAdminPinDots() {
 }
 
 function submitAdminPIN() {
-    const validPIN = storeSettings.adminPIN || "2023";
-    if (adminEnteredPIN === validPIN) {
-        unlockAdminDashboard();
-    } else {
-        showToast("Incorrect PIN", "Access denied. Please check your 4-digit PIN.");
-        adminEnteredPIN = "";
-        updateAdminPinDots();
-    }
+    handleAdminLoginSubmit(null);
 }
 
 function unlockAdminDashboard() {
@@ -3854,12 +3896,10 @@ function lockAdminDashboard() {
     adminPinVisible = false;
     const radio = document.getElementById("adminPinEyeRadio");
     if (radio) radio.checked = false;
-    const icon = document.getElementById("adminPinEyeIcon");
-    if (icon) icon.className = "fa-regular fa-eye";
-    const label = document.getElementById("adminPinEyeLabel");
-    if (label) label.textContent = "Show PIN";
-    const display = document.getElementById("adminPinDisplay");
-    if (display) display.classList.remove("show-digits");
+    toggleAdminPasswordInputEye(false);
+
+    const input = document.getElementById("adminPasswordInput");
+    if (input) input.value = "";
 
     updateAdminPinDots();
     const gate = document.getElementById("adminAuthGate");
@@ -4269,24 +4309,24 @@ function handleAdminChangePIN(event) {
     const activePIN = storeSettings.adminPIN || "2023";
 
     if (currentVal !== activePIN) {
-        showToast("Incorrect PIN", "Your current PIN does not match our records.");
+        showToast("Incorrect Password / PIN", "Your current password or PIN does not match our records.");
         if (currentInput) currentInput.focus();
         return;
     }
 
-    if (!/^\d{4}$/.test(newVal)) {
-        showToast("Invalid PIN Format", "New PIN must be exactly 4 numeric digits (e.g. 2023).");
+    if (newVal.length < 3) {
+        showToast("Too Short", "New password or PIN must be at least 3 characters long.");
         if (newInput) newInput.focus();
         return;
     }
 
     if (newVal !== confirmVal) {
-        showToast("PIN Mismatch", "The new PIN and confirmation PIN do not match.");
+        showToast("Mismatch", "The new password/PIN and confirmation do not match.");
         if (confirmInput) confirmInput.focus();
         return;
     }
 
-    // Save new PIN
+    // Save new Password / PIN
     storeSettings.adminPIN = newVal;
     localStorage.setItem("j_settings", JSON.stringify(storeSettings));
 
@@ -4300,25 +4340,74 @@ function handleAdminChangePIN(event) {
     if (setPin) setPin.value = newVal;
 
     playNotificationChime();
-    showToast("PIN Changed! ✨", "Your admin access PIN has been updated successfully.");
+    showToast("Access Key Updated! ✨", "Your new master password / PIN is now active.");
+}
+
+// ── Preferences & Theme Engine ──
+function applyStoredPreferences() {
+    const pref = storeSettings.preferences || {};
+    const theme = pref.theme || "default";
+    const fontSize = pref.fontSize || "standard";
+    const headingFont = pref.headingFont || "cormorant";
+
+    document.documentElement.setAttribute("data-theme", theme);
+    document.documentElement.setAttribute("data-font-size", fontSize);
+    document.documentElement.setAttribute("data-heading-font", headingFont);
+
+    // Sync UI elements
+    const prefThemeInput = document.getElementById("prefTheme");
+    if (prefThemeInput) prefThemeInput.value = theme;
+
+    document.querySelectorAll(".theme-option-card").forEach(c => c.classList.remove("active"));
+    const activeCard = document.getElementById("themeOpt" + (theme.charAt(0).toUpperCase() + theme.slice(1)));
+    if (activeCard) activeCard.classList.add("active");
+
+    const fontSelect = document.getElementById("prefFontSize");
+    if (fontSelect) fontSelect.value = fontSize;
+
+    const headingSelect = document.getElementById("prefHeadingFont");
+    if (headingSelect) headingSelect.value = headingFont;
+}
+
+function selectThemePreference(themeKey) {
+    document.querySelectorAll(".theme-option-card").forEach(c => c.classList.remove("active"));
+    const card = document.getElementById("themeOpt" + (themeKey.charAt(0).toUpperCase() + themeKey.slice(1)));
+    if (card) card.classList.add("active");
+
+    const hidden = document.getElementById("prefTheme");
+    if (hidden) hidden.value = themeKey;
+
+    document.documentElement.setAttribute("data-theme", themeKey);
+}
+
+function applyFontSizePreview(sizeKey) {
+    document.documentElement.setAttribute("data-font-size", sizeKey);
+}
+
+function applyHeadingFontPreview(fontKey) {
+    document.documentElement.setAttribute("data-heading-font", fontKey);
 }
 
 function saveAdminPreferences(event) {
     event.preventDefault();
     if (!storeSettings.preferences) storeSettings.preferences = {};
 
+    const theme = document.getElementById("prefTheme")?.value || "default";
+    const fontSize = document.getElementById("prefFontSize")?.value || "standard";
+    const headingFont = document.getElementById("prefHeadingFont")?.value || "cormorant";
     const statusPaused = document.getElementById("prefStatusPaused");
+
+    storeSettings.preferences.theme = theme;
+    storeSettings.preferences.fontSize = fontSize;
+    storeSettings.preferences.headingFont = headingFont;
     storeSettings.preferences.storeStatus = (statusPaused && statusPaused.checked) ? "paused" : "open";
     storeSettings.preferences.orderChime = !!document.getElementById("prefOrderChime")?.checked;
-    storeSettings.preferences.autoMarkRead = !!document.getElementById("prefAutoMarkRead")?.checked;
-    storeSettings.preferences.lowStockThreshold = parseInt(document.getElementById("prefLowStockThreshold")?.value, 10) || 3;
-    storeSettings.preferences.currency = document.getElementById("prefCurrency")?.value || "GHS";
-    storeSettings.preferences.waTemplate = (document.getElementById("prefWaTemplate")?.value || "").trim();
 
     localStorage.setItem("j_settings", JSON.stringify(storeSettings));
 
+    applyStoredPreferences();
     playNotificationChime();
-    showToast("Preferences Saved ✨", "Store operational preferences have been updated.");
+    showToast("Preferences Applied ✨", `Theme: ${theme.toUpperCase()}, Font: ${fontSize.toUpperCase()} saved.`);
 }
 
 function playNotificationChime() {
@@ -4730,3 +4819,13 @@ window.toggleFieldVisibility = toggleFieldVisibility;
 window.handleAdminChangePIN = handleAdminChangePIN;
 window.saveAdminPreferences = saveAdminPreferences;
 window.playNotificationChime = playNotificationChime;
+window.handleAdminLoginSubmit = handleAdminLoginSubmit;
+window.toggleAdminPasswordInputEye = toggleAdminPasswordInputEye;
+window.toggleAdminKeypadDisplay = toggleAdminKeypadDisplay;
+window.selectThemePreference = selectThemePreference;
+window.applyFontSizePreview = applyFontSizePreview;
+window.applyHeadingFontPreview = applyHeadingFontPreview;
+window.applyStoredPreferences = applyStoredPreferences;
+
+// Initialize Preferences Immediately
+applyStoredPreferences();

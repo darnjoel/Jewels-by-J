@@ -1248,50 +1248,62 @@
         <section id="section-admin" class="page-section">
             <div class="admin-section">
                 <div class="container">
-                    <!-- PIN Lock Gate (Shown when not authenticated) -->
+                    <!-- Password & PIN Lock Gate (Shown when not authenticated) -->
                     <div class="admin-auth-card" id="adminAuthGate">
                         <div class="admin-lock-icon">
                             <i class="fa-solid fa-shield-halved"></i>
                         </div>
                         <h2 style="font-size:1.4rem; margin-bottom:6px;">Admin Portal</h2>
                         <p style="font-size:0.85rem; color:var(--color-text-muted); margin-bottom:20px;">
-                            Enter your 4-digit security PIN to access the product catalogue, order manager, and pricing
-                            controls.
+                            Enter your security password or master PIN to access the store management suite.
                         </p>
 
-                        <div class="admin-pin-display" id="adminPinDisplay">
-                            <div class="pin-dot" id="pindot-1"></div>
-                            <div class="pin-dot" id="pindot-2"></div>
-                            <div class="pin-dot" id="pindot-3"></div>
-                            <div class="pin-dot" id="pindot-4"></div>
-                        </div>
+                        <form id="adminLoginForm" onsubmit="handleAdminLoginSubmit(event)" style="max-width:340px; margin:0 auto;">
+                            <div class="pin-input-group" style="margin-bottom:12px;">
+                                <input type="password" id="adminPasswordInput" class="customizer-input-field"
+                                    placeholder="Enter password or PIN"
+                                    style="font-size:1.05rem; letter-spacing:0.06em; text-align:center; padding:12px 42px 12px 16px;"
+                                    autocomplete="current-password" required autofocus>
+                                <button type="button" class="pin-field-eye-btn" onclick="toggleFieldVisibility('adminPasswordInput', this)" title="Show/Hide Password" aria-label="Show/Hide Password">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                            </div>
 
-                        <!-- Eye Radio Toggle for Keypad PIN -->
-                        <div class="admin-pin-eye-toggle-wrap">
-                            <label class="admin-eye-radio" for="adminPinEyeRadio" title="Show or hide typed PIN digits">
-                                <input type="checkbox" id="adminPinEyeRadio" onchange="toggleAdminPinKeypadVisibility()">
-                                <span class="eye-radio-pill" id="adminPinEyePill">
-                                    <i class="fa-regular fa-eye" id="adminPinEyeIcon"></i>
-                                    <span id="adminPinEyeLabel">Show PIN</span>
-                                </span>
-                            </label>
-                        </div>
+                            <!-- Eye Radio Toggle Pill -->
+                            <div class="admin-pin-eye-toggle-wrap">
+                                <label class="admin-eye-radio" for="adminPinEyeRadio" title="Show or hide typed characters">
+                                    <input type="checkbox" id="adminPinEyeRadio" onchange="toggleAdminPasswordInputEye(this.checked)">
+                                    <span class="eye-radio-pill" id="adminPinEyePill">
+                                        <i class="fa-regular fa-eye" id="adminPinEyeIcon"></i>
+                                        <span id="adminPinEyeLabel">Show Password / PIN</span>
+                                    </span>
+                                </label>
+                            </div>
 
-                        <div class="admin-keypad">
-                            <button class="keypad-btn" onclick="pressAdminKey('1')">1</button>
-                            <button class="keypad-btn" onclick="pressAdminKey('2')">2</button>
-                            <button class="keypad-btn" onclick="pressAdminKey('3')">3</button>
-                            <button class="keypad-btn" onclick="pressAdminKey('4')">4</button>
-                            <button class="keypad-btn" onclick="pressAdminKey('5')">5</button>
-                            <button class="keypad-btn" onclick="pressAdminKey('6')">6</button>
-                            <button class="keypad-btn" onclick="pressAdminKey('7')">7</button>
-                            <button class="keypad-btn" onclick="pressAdminKey('8')">8</button>
-                            <button class="keypad-btn" onclick="pressAdminKey('9')">9</button>
-                            <button class="keypad-btn" onclick="clearAdminKey()"><i
-                                    class="fa-solid fa-arrow-left"></i></button>
-                            <button class="keypad-btn" onclick="pressAdminKey('0')">0</button>
-                            <button class="keypad-btn" onclick="submitAdminPIN()"><i
-                                    class="fa-solid fa-check"></i></button>
+                            <button type="submit" class="btn btn-primary btn-block" style="margin-bottom:16px;">
+                                <i class="fa-solid fa-arrow-right-to-bracket"></i> Unlock Dashboard
+                            </button>
+                        </form>
+
+                        <!-- Optional Numeric Keypad for PIN users -->
+                        <div style="margin-top:4px;">
+                            <button type="button" id="btnToggleKeypad" onclick="toggleAdminKeypadDisplay()" style="background:none; border:none; color:var(--color-text-muted); font-size:0.78rem; text-decoration:underline; cursor:pointer;">
+                                <i class="fa-solid fa-calculator" style="margin-right:4px;"></i> Use on-screen numeric keypad
+                            </button>
+                            <div class="admin-keypad" id="adminKeypadGrid" style="display:none; margin-top:14px;">
+                                <button class="keypad-btn" type="button" onclick="pressAdminKey('1')">1</button>
+                                <button class="keypad-btn" type="button" onclick="pressAdminKey('2')">2</button>
+                                <button class="keypad-btn" type="button" onclick="pressAdminKey('3')">3</button>
+                                <button class="keypad-btn" type="button" onclick="pressAdminKey('4')">4</button>
+                                <button class="keypad-btn" type="button" onclick="pressAdminKey('5')">5</button>
+                                <button class="keypad-btn" type="button" onclick="pressAdminKey('6')">6</button>
+                                <button class="keypad-btn" type="button" onclick="pressAdminKey('7')">7</button>
+                                <button class="keypad-btn" type="button" onclick="pressAdminKey('8')">8</button>
+                                <button class="keypad-btn" type="button" onclick="pressAdminKey('9')">9</button>
+                                <button class="keypad-btn" type="button" onclick="clearAdminKey()"><i class="fa-solid fa-arrow-left"></i></button>
+                                <button class="keypad-btn" type="button" onclick="pressAdminKey('0')">0</button>
+                                <button class="keypad-btn" type="button" onclick="submitAdminPIN()"><i class="fa-solid fa-check"></i></button>
+                            </div>
                         </div>
                     </div>
 
@@ -1576,24 +1588,24 @@
                                             </form>
                                         </div>
 
-                                        <!-- Card: Security & Change Admin PIN -->
+                                        <!-- Card: Security & Change Admin Password / PIN -->
                                         <div style="background:#fff; border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:24px; box-shadow:var(--shadow-sm);">
                                             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--color-border); padding-bottom:12px; margin-bottom:16px;">
                                                 <div>
                                                     <h4 style="font-size:1.05rem; color:var(--color-black); margin-bottom:2px;">
-                                                        <i class="fa-solid fa-key" style="color:var(--color-gold); margin-right:6px;"></i> Admin Access PIN &amp; Security
+                                                        <i class="fa-solid fa-key" style="color:var(--color-gold); margin-right:6px;"></i> Admin Access Password &amp; PIN
                                                     </h4>
-                                                    <p style="font-size:0.78rem; color:var(--color-text-muted);">Change your master 4-digit PIN used to unlock the dashboard.</p>
+                                                    <p style="font-size:0.78rem; color:var(--color-text-muted);">Change your master password or PIN used to unlock the dashboard.</p>
                                                 </div>
-                                                <span class="badge badge-gold" style="font-size:0.75rem; padding:4px 8px;">Active: Protected</span>
+                                                <span class="badge badge-gold" style="font-size:0.75rem; padding:4px 8px;">Master Key</span>
                                             </div>
 
                                             <form id="adminChangePinForm" onsubmit="handleAdminChangePIN(event)">
                                                 <div class="form-group" style="margin-bottom:14px;">
-                                                    <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Current 4-Digit PIN *</label>
+                                                    <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Current Password / PIN *</label>
                                                     <div class="pin-input-group">
-                                                        <input type="password" id="admCurrentPin" class="customizer-input-field" maxlength="4" placeholder="Enter current PIN" required pattern="[0-9]{4}">
-                                                        <button type="button" class="pin-field-eye-btn" onclick="toggleFieldVisibility('admCurrentPin', this)" title="Show/Hide PIN" aria-label="Show/Hide Current PIN">
+                                                        <input type="password" id="admCurrentPin" class="customizer-input-field" placeholder="Enter current password or PIN" required>
+                                                        <button type="button" class="pin-field-eye-btn" onclick="toggleFieldVisibility('admCurrentPin', this)" title="Show/Hide Password" aria-label="Show/Hide Current Password">
                                                             <i class="fa-regular fa-eye"></i>
                                                         </button>
                                                     </div>
@@ -1601,19 +1613,19 @@
 
                                                 <div class="form-grid-2" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
                                                     <div class="form-group">
-                                                        <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">New 4-Digit PIN *</label>
+                                                        <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">New Password / PIN *</label>
                                                         <div class="pin-input-group">
-                                                            <input type="password" id="admNewPin" class="customizer-input-field" maxlength="4" placeholder="New PIN" required pattern="[0-9]{4}">
-                                                            <button type="button" class="pin-field-eye-btn" onclick="toggleFieldVisibility('admNewPin', this)" title="Show/Hide PIN" aria-label="Show/Hide New PIN">
+                                                            <input type="password" id="admNewPin" class="customizer-input-field" placeholder="New password or PIN" required minlength="3">
+                                                            <button type="button" class="pin-field-eye-btn" onclick="toggleFieldVisibility('admNewPin', this)" title="Show/Hide Password" aria-label="Show/Hide New Password">
                                                                 <i class="fa-regular fa-eye"></i>
                                                             </button>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Confirm New PIN *</label>
+                                                        <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Confirm New Password / PIN *</label>
                                                         <div class="pin-input-group">
-                                                            <input type="password" id="admConfirmPin" class="customizer-input-field" maxlength="4" placeholder="Confirm PIN" required pattern="[0-9]{4}">
-                                                            <button type="button" class="pin-field-eye-btn" onclick="toggleFieldVisibility('admConfirmPin', this)" title="Show/Hide PIN" aria-label="Show/Hide Confirm PIN">
+                                                            <input type="password" id="admConfirmPin" class="customizer-input-field" placeholder="Confirm password or PIN" required minlength="3">
+                                                            <button type="button" class="pin-field-eye-btn" onclick="toggleFieldVisibility('admConfirmPin', this)" title="Show/Hide Password" aria-label="Show/Hide Confirm Password">
                                                                 <i class="fa-regular fa-eye"></i>
                                                             </button>
                                                         </div>
@@ -1622,97 +1634,145 @@
 
                                                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                                                     <span style="font-size:0.74rem; color:var(--color-text-muted);">
-                                                        <i class="fa-solid fa-shield-halved" style="color:var(--color-success); margin-right:4px;"></i> Numeric 4 digits (e.g. 2023)
+                                                        <i class="fa-solid fa-shield-halved" style="color:var(--color-success); margin-right:4px;"></i> Accepts letters, numbers, or symbols.
                                                     </span>
                                                     <button type="submit" class="btn btn-outline btn-sm" style="border-color:var(--color-gold); color:var(--color-black);">
-                                                        <i class="fa-solid fa-lock"></i> Update Access PIN
+                                                        <i class="fa-solid fa-lock"></i> Update Access Key
                                                     </button>
                                                 </div>
                                             </form>
                                         </div>
                                     </div>
 
-                                    <!-- Column 2: Operational Preferences -->
+                                    <!-- Column 2: Theme, Font Size & Preferences -->
                                     <div style="background:#fff; border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:24px; box-shadow:var(--shadow-sm);">
                                         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--color-border); padding-bottom:12px; margin-bottom:16px;">
                                             <div>
                                                 <h4 style="font-size:1.05rem; color:var(--color-black); margin-bottom:2px;">
-                                                    <i class="fa-solid fa-sliders" style="color:var(--color-gold); margin-right:6px;"></i> Store Operational Preferences
+                                                    <i class="fa-solid fa-palette" style="color:var(--color-gold); margin-right:6px;"></i> Theme, Font Size &amp; Preferences
                                                 </h4>
-                                                <p style="font-size:0.78rem; color:var(--color-text-muted);">Live store behavior, audio chimes, alerts, and customer messaging.</p>
+                                                <p style="font-size:0.78rem; color:var(--color-text-muted);">Choose your visual palette, typography scaling, and operational settings.</p>
                                             </div>
                                             <span class="badge badge-bestseller" style="font-size:0.75rem; padding:4px 8px;">Preferences</span>
                                         </div>
 
                                         <form id="adminPreferencesForm" onsubmit="saveAdminPreferences(event)">
-                                            <!-- Store Live Status -->
-                                            <div style="background:var(--color-surface-soft); padding:16px; border-radius:var(--radius-md); border:1px solid var(--color-border); margin-bottom:16px;">
+                                            
+                                            <!-- Theme Palette Selector -->
+                                            <div style="margin-bottom:16px;">
                                                 <label style="font-size:0.8rem; font-weight:700; color:var(--color-black); display:block; margin-bottom:8px;">
-                                                    <i class="fa-solid fa-store" style="color:var(--color-gold); margin-right:4px;"></i> Store Operating Status
+                                                    <i class="fa-solid fa-swatchbook" style="color:var(--color-gold); margin-right:4px;"></i> Visual Theme Palette
                                                 </label>
-                                                <div style="display:flex; flex-direction:column; gap:8px;">
-                                                    <label style="display:flex; align-items:center; gap:8px; font-size:0.82rem; cursor:pointer;">
-                                                        <input type="radio" name="prefStoreStatus" value="open" id="prefStatusOpen" checked style="accent-color:var(--color-gold);">
-                                                        <span><strong style="color:var(--color-success);">🟢 Live &amp; Accepting Orders</strong> — Online checkout active</span>
-                                                    </label>
-                                                    <label style="display:flex; align-items:center; gap:8px; font-size:0.82rem; cursor:pointer;">
-                                                        <input type="radio" name="prefStoreStatus" value="paused" id="prefStatusPaused" style="accent-color:var(--color-gold);">
-                                                        <span><strong style="color:#e65100;">🟡 Vacation / Break Mode</strong> — Browsing enabled, checkout paused</span>
-                                                    </label>
-                                                </div>
-                                            </div>
+                                                <div class="theme-picker-grid">
+                                                    <div class="theme-option-card active" id="themeOptDefault" onclick="selectThemePreference('default')">
+                                                        <div class="theme-preview-circles">
+                                                            <span class="theme-preview-swatch" style="background:#f7dbe3;"></span>
+                                                            <span class="theme-preview-swatch" style="background:#b98d4f;"></span>
+                                                            <span class="theme-preview-swatch" style="background:#ffffff;"></span>
+                                                        </div>
+                                                        <strong style="font-size:0.75rem; display:block;">Strand Blush</strong>
+                                                        <span style="font-size:0.68rem; color:var(--color-text-muted);">Signature</span>
+                                                    </div>
 
-                                            <!-- Audio & Inquiry Preferences -->
-                                            <div style="background:var(--color-surface-soft); padding:16px; border-radius:var(--radius-md); border:1px solid var(--color-border); margin-bottom:16px;">
-                                                <label style="font-size:0.8rem; font-weight:700; color:var(--color-black); display:block; margin-bottom:8px;">
-                                                    <i class="fa-solid fa-bell" style="color:var(--color-gold); margin-right:4px;"></i> Alerts &amp; Automation
-                                                </label>
-                                                <div style="display:flex; flex-direction:column; gap:10px;">
-                                                    <label style="display:flex; align-items:center; justify-content:space-between; font-size:0.82rem; cursor:pointer;">
-                                                        <span>Play chime on new order or customer inquiry</span>
-                                                        <input type="checkbox" id="prefOrderChime" checked style="accent-color:var(--color-gold); width:16px; height:16px;">
-                                                    </label>
-                                                    <label style="display:flex; align-items:center; justify-content:space-between; font-size:0.82rem; cursor:pointer;">
-                                                        <span>Automatically mark inquiries as read upon opening</span>
-                                                        <input type="checkbox" id="prefAutoMarkRead" checked style="accent-color:var(--color-gold); width:16px; height:16px;">
-                                                    </label>
-                                                </div>
-                                            </div>
+                                                    <div class="theme-option-card" id="themeOptDark" onclick="selectThemePreference('dark')">
+                                                        <div class="theme-preview-circles">
+                                                            <span class="theme-preview-swatch" style="background:#141112;"></span>
+                                                            <span class="theme-preview-swatch" style="background:#c5a059;"></span>
+                                                            <span class="theme-preview-swatch" style="background:#241f20;"></span>
+                                                        </div>
+                                                        <strong style="font-size:0.75rem; display:block;">Midnight Dark</strong>
+                                                        <span style="font-size:0.68rem; color:var(--color-text-muted);">Velvet Obsidian</span>
+                                                    </div>
 
-                                            <!-- Low Stock & Currency Grid -->
-                                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
-                                                <div style="background:var(--color-surface-soft); padding:14px; border-radius:var(--radius-md); border:1px solid var(--color-border);">
-                                                    <label style="font-size:0.78rem; font-weight:700; color:var(--color-black); display:block; margin-bottom:4px;">
-                                                        <i class="fa-solid fa-boxes-stacked" style="color:var(--color-gold); margin-right:4px;"></i> Low Stock Warning
-                                                    </label>
-                                                    <div style="display:flex; align-items:center; gap:6px; margin-top:6px;">
-                                                        <input type="number" id="prefLowStockThreshold" class="customizer-input-field" min="1" max="50" value="3" style="width:70px; padding:6px 8px; font-size:0.85rem;">
-                                                        <span style="font-size:0.75rem; color:var(--color-text-muted);">units</span>
+                                                    <div class="theme-option-card" id="themeOptRosegold" onclick="selectThemePreference('rosegold')">
+                                                        <div class="theme-preview-circles">
+                                                            <span class="theme-preview-swatch" style="background:#fcedf2;"></span>
+                                                            <span class="theme-preview-swatch" style="background:#b76e79;"></span>
+                                                            <span class="theme-preview-swatch" style="background:#fff5f8;"></span>
+                                                        </div>
+                                                        <strong style="font-size:0.75rem; display:block;">Rose Gold</strong>
+                                                        <span style="font-size:0.68rem; color:var(--color-text-muted);">Metallic Pink</span>
+                                                    </div>
+
+                                                    <div class="theme-option-card" id="themeOptChampagne" onclick="selectThemePreference('champagne')">
+                                                        <div class="theme-preview-circles">
+                                                            <span class="theme-preview-swatch" style="background:#fbf5ea;"></span>
+                                                            <span class="theme-preview-swatch" style="background:#c2983b;"></span>
+                                                            <span class="theme-preview-swatch" style="background:#fdfbf7;"></span>
+                                                        </div>
+                                                        <strong style="font-size:0.75rem; display:block;">Champagne</strong>
+                                                        <span style="font-size:0.68rem; color:var(--color-text-muted);">Prestige Gold</span>
+                                                    </div>
+
+                                                    <div class="theme-option-card" id="themeOptEmerald" onclick="selectThemePreference('emerald')">
+                                                        <div class="theme-preview-circles">
+                                                            <span class="theme-preview-swatch" style="background:#e8f5e9;"></span>
+                                                            <span class="theme-preview-swatch" style="background:#00796b;"></span>
+                                                            <span class="theme-preview-swatch" style="background:#26a69a;"></span>
+                                                        </div>
+                                                        <strong style="font-size:0.75rem; display:block;">Emerald Luxe</strong>
+                                                        <span style="font-size:0.68rem; color:var(--color-text-muted);">Rich Jewel</span>
                                                     </div>
                                                 </div>
+                                                <input type="hidden" id="prefTheme" value="default">
+                                            </div>
+
+                                            <!-- Font Size & Heading Typography Grid -->
+                                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+                                                <div style="background:var(--color-surface-soft); padding:14px; border-radius:var(--radius-md); border:1px solid var(--color-border);">
+                                                    <label style="font-size:0.78rem; font-weight:700; color:var(--color-black); display:block; margin-bottom:6px;">
+                                                        <i class="fa-solid fa-text-height" style="color:var(--color-gold); margin-right:4px;"></i> Font Size Scale
+                                                    </label>
+                                                    <select id="prefFontSize" class="shop-select" style="width:100%; padding:6px 8px; font-size:0.82rem;" onchange="applyFontSizePreview(this.value)">
+                                                        <option value="compact">Compact (14.5px)</option>
+                                                        <option value="standard" selected>Standard (16px)</option>
+                                                        <option value="comfort">Comfort (17.5px)</option>
+                                                        <option value="large">Large / Legible (19px)</option>
+                                                    </select>
+                                                </div>
 
                                                 <div style="background:var(--color-surface-soft); padding:14px; border-radius:var(--radius-md); border:1px solid var(--color-border);">
-                                                    <label style="font-size:0.78rem; font-weight:700; color:var(--color-black); display:block; margin-bottom:4px;">
-                                                        <i class="fa-solid fa-coins" style="color:var(--color-gold); margin-right:4px;"></i> Store Currency
+                                                    <label style="font-size:0.78rem; font-weight:700; color:var(--color-black); display:block; margin-bottom:6px;">
+                                                        <i class="fa-solid fa-font" style="color:var(--color-gold); margin-right:4px;"></i> Heading Typography
                                                     </label>
-                                                    <select id="prefCurrency" class="shop-select" style="width:100%; padding:6px 8px; font-size:0.82rem; margin-top:6px;">
-                                                        <option value="GHS">Ghanaian Cedi (GH₵)</option>
-                                                        <option value="USD">US Dollar ($)</option>
-                                                        <option value="GBP">British Pound (£)</option>
-                                                        <option value="EUR">Euro (€)</option>
+                                                    <select id="prefHeadingFont" class="shop-select" style="width:100%; padding:6px 8px; font-size:0.82rem;" onchange="applyHeadingFontPreview(this.value)">
+                                                        <option value="cormorant" selected>Cormorant (Luxury Serif)</option>
+                                                        <option value="playfair">Playfair (Glamour Serif)</option>
+                                                        <option value="modern">Inter (Clean Modern Sans)</option>
                                                     </select>
                                                 </div>
                                             </div>
 
-                                            <!-- WhatsApp Template -->
-                                            <div class="form-group" style="margin-bottom:20px;">
-                                                <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">
-                                                    <i class="fa-brands fa-whatsapp" style="color:#25d366; margin-right:4px;"></i> WhatsApp Quick-Chat Greeting Template
+                                            <!-- Store Live Status -->
+                                            <div style="background:var(--color-surface-soft); padding:14px; border-radius:var(--radius-md); border:1px solid var(--color-border); margin-bottom:16px;">
+                                                <label style="font-size:0.78rem; font-weight:700; color:var(--color-black); display:block; margin-bottom:6px;">
+                                                    <i class="fa-solid fa-store" style="color:var(--color-gold); margin-right:4px;"></i> Store Operating Status
                                                 </label>
-                                                <textarea id="prefWaTemplate" class="customizer-input-field" rows="2" style="font-size:0.85rem; padding:10px 14px;" placeholder="Hello! ✨ Thank you for contacting Jewels by J. How can we assist with your bespoke jewelry today?"></textarea>
-                                                <span style="font-size:0.74rem; color:var(--color-text-muted); display:block; margin-top:4px;">
-                                                    Pre-populates the WhatsApp chat greeting when following up with clients.
-                                                </span>
+                                                <div style="display:flex; flex-direction:column; gap:6px;">
+                                                    <label style="display:flex; align-items:center; gap:8px; font-size:0.82rem; cursor:pointer;">
+                                                        <input type="radio" name="prefStoreStatus" value="open" id="prefStatusOpen" checked style="accent-color:var(--color-gold);">
+                                                        <span><strong style="color:var(--color-success);">🟢 Live &amp; Accepting Orders</strong></span>
+                                                    </label>
+                                                    <label style="display:flex; align-items:center; gap:8px; font-size:0.82rem; cursor:pointer;">
+                                                        <input type="radio" name="prefStoreStatus" value="paused" id="prefStatusPaused" style="accent-color:var(--color-gold);">
+                                                        <span><strong style="color:#e65100;">🟡 Vacation / Break Mode</strong> (Checkout paused)</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <!-- Alerts & Chime -->
+                                            <div style="background:var(--color-surface-soft); padding:14px; border-radius:var(--radius-md); border:1px solid var(--color-border); margin-bottom:16px;">
+                                                <label style="display:flex; align-items:center; justify-content:space-between; font-size:0.82rem; cursor:pointer;">
+                                                    <span><i class="fa-solid fa-bell" style="color:var(--color-gold); margin-right:4px;"></i> Play audio chime on orders &amp; inquiries</span>
+                                                    <input type="checkbox" id="prefOrderChime" checked style="accent-color:var(--color-gold); width:16px; height:16px;">
+                                                </label>
+                                            </div>
+
+                                            <button type="submit" class="btn btn-primary btn-block">
+                                                <i class="fa-solid fa-check"></i> Save Visual &amp; Store Preferences
+                                            </button>
+                                        </form>
+                                    </div>
                                             </div>
 
                                             <button type="submit" class="btn btn-primary btn-block">
