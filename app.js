@@ -14,7 +14,7 @@ const SITE_CONFIG = {
     instagramUrl: "https://www.instagram.com/Jewels.with_j",
     tiktokUrl: "https://www.tiktok.com/@jewels.by_j4",
     currency: "GH₵",
-    freeDeliveryThreshold: 500,
+    freeDeliveryThreshold: 30,
     // ── Firebase Database Security & Auth Vault ──
     firebase: {
         apiKey: "AIzaSyB3_JewelsByJ_SecurityVault2026",
@@ -34,7 +34,7 @@ const INITIAL_PRODUCTS = [
         category: "necklaces",
         categoryName: "Nameplate Necklaces",
         price: 380,
-        originalPrice: 420,
+        originalPrice: null,
         badge: "Bestseller",
         badgeType: "bestseller",
         img: "images/jerrilyn.jpg",
@@ -625,6 +625,30 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
     if (fields.payment_method) payload.payment_method = fields.payment_method;
     if (fields.payment_ref) payload.payment_ref = fields.payment_ref;
     if (extra._autoresponse) payload._autoresponse = extra._autoresponse;
+
+    // Check if Web3Forms access key is configured for guaranteed zero-downtime background dispatch
+    if (storeSettings && storeSettings.web3Key) {
+        try {
+            const w3Resp = await fetch("https://api.web3forms.com/submit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                body: JSON.stringify({
+                    access_key: storeSettings.web3Key,
+                    subject: subject,
+                    from_name: fields.name || "Jewels by J Visitor",
+                    email: fields.email || "no-reply@jewelsbyj.com",
+                    message: fields.message || details,
+                    reply_to: fields.email || targetEmail
+                })
+            });
+            const w3Data = await w3Resp.json().catch(() => null);
+            if (w3Data && (w3Data.success || w3Data.status === 200)) {
+                return { ok: true, message: `Delivered directly to ${targetEmail} via Web3Forms!` };
+            }
+        } catch (w3Err) {
+            console.warn("Web3Forms notice:", w3Err);
+        }
+    }
 
     // Timeout guard so the UI never hangs if network/gateway is slow
     const controller = new AbortController();
@@ -1737,6 +1761,13 @@ function initContactForm() {
         const mailtoDirectUrl = `mailto:${encodeURIComponent(targetEmail)}?subject=${encodeURIComponent("💎 [Jewels by J Inquiry] " + (subject || "Consultation"))}&body=${encodeURIComponent("Hello Jerrilyn,\n\n" + message + "\n\n---\nClient Name: " + name + "\nClient Email: " + email + "\nClient Phone: " + (phone || "N/A"))}`;
         const waDirectUrl = `https://wa.me/${storeSettings.whatsappNumber || SITE_CONFIG.whatsappNumber}?text=${encodeURIComponent("Hello Jerrilyn! Inquiry from " + name + " (" + (subject || "Consultation") + "): " + message)}`;
 
+        // Open Gmail composer in a new tab immediately (allowed within user submit gesture)
+        try {
+            window.open(gmailDirectUrl, "_blank");
+        } catch (popupErr) {
+            console.warn("Popup notice:", popupErr);
+        }
+
         // Reset subject and message input fields; clear guest credentials while preserving verified user identity
         if (!currentUser) {
             if (nameInputEl) nameInputEl.value = "";
@@ -1796,10 +1827,10 @@ function initContactForm() {
                             <i class="fa-solid fa-bell" style="font-size:1.8rem; color:var(--color-gold);"></i>
                             <div>
                                 <strong style="color:var(--color-black); font-size:0.95rem; display:block;">
-                                    Message Sent! One-Time Admin Inbox Activation
+                                    One-Time Admin Inbox Activation Needed
                                 </strong>
                                 <p style="font-size:0.82rem; color:var(--color-text-muted); margin:2px 0 0 0;">
-                                    FormSubmit forwarded your request and sent a one-time activation link to <strong>${escapeHTML(targetEmail)}</strong>. Jerrilyn can click "Activate Form" in Gmail to enable instant routing.
+                                    FormSubmit forwarded your request and sent a one-time activation link to <strong>${escapeHTML(targetEmail)}</strong>. Jerrilyn must click "Activate Form" in Gmail once to enable automatic forwarding.
                                 </p>
                             </div>
                         </div>
@@ -1820,33 +1851,37 @@ function initContactForm() {
                 showToast("Activation Email Sent", `Check ${targetEmail}`);
             } else {
                 statusEl.innerHTML = `
-                    <div class="inquiry-delivery-card">
+                    <div class="inquiry-delivery-card" style="border: 2px solid var(--color-gold); background: #ffffff;">
                         <div class="inquiry-delivery-header">
-                            <i class="fa-solid fa-circle-check" style="font-size:1.8rem; color:var(--color-emerald, #2e7d32);"></i>
+                            <i class="fa-solid fa-envelope-circle-check" style="font-size:2rem; color:var(--color-gold);"></i>
                             <div>
-                                <strong style="color:var(--color-black); font-size:0.95rem; display:block;">
-                                    Inquiry Dispatched &amp; Recorded in Studio Portal
+                                <strong style="color:var(--color-black); font-size:1.02rem; display:block;">
+                                    Inquiry Recorded in Studio Portal!
                                 </strong>
-                                <p style="font-size:0.82rem; color:var(--color-text-muted); margin:2px 0 0 0;">
-                                    Your message was sent via our background dispatch to <strong>${escapeHTML(targetEmail)}</strong>. You can also view or send directly from your personal mail account:
+                                <p style="font-size:0.85rem; color:var(--color-text-muted); margin:4px 0 0 0; line-height:1.5;">
+                                    Your message has been saved in our store records. We also opened your <strong>Gmail composer tab</strong> addressed to <strong>${escapeHTML(targetEmail)}</strong>. Please click <strong>"Send"</strong> in Gmail to deliver directly into Jerrilyn's inbox!
                                 </p>
                             </div>
                         </div>
-                        <div class="inquiry-delivery-actions">
-                            <a href="${gmailDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
+                        <div style="margin-top:12px; padding:10px 14px; background:var(--color-blush-soft); border-radius:6px; font-size:0.82rem; color:var(--color-black);">
+                            <i class="fa-solid fa-circle-info" style="color:var(--color-gold); margin-right:6px;"></i>
+                            If your Gmail tab didn't open automatically, use the direct buttons below:
+                        </div>
+                        <div class="inquiry-delivery-actions" style="margin-top:12px;">
+                            <a href="${gmailDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" style="font-weight:600; padding:8px 16px;">
                                 <i class="fa-brands fa-google"></i> Open &amp; Send in Gmail
                             </a>
-                            <a href="${mailtoDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+                            <a href="${mailtoDirectUrl}" class="btn btn-outline btn-sm" style="padding:8px 14px;">
                                 <i class="fa-solid fa-envelope"></i> Send via Mail App
                             </a>
-                            <a href="${waDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-sm">
+                            <a href="${waDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-sm" style="padding:8px 14px;">
                                 <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
                             </a>
                         </div>
                     </div>
                 `;
                 statusEl.className = "form-status-msg";
-                showToast("Inquiry Dispatched", `Sent to ${targetEmail}`);
+                showToast("Inquiry Saved in Portal", `Click Send in Gmail to reach ${targetEmail}`);
             }
 
             submitBtn.disabled = false;
@@ -1952,7 +1987,7 @@ function hashPasswordSimple(pwd) {
 function verifyUserPassword(user, enteredPassword) {
     if (!user || !enteredPassword) return false;
     return (user.passwordHash === enteredPassword) ||
-           (user.passwordHash === hashPasswordSimple(enteredPassword));
+        (user.passwordHash === hashPasswordSimple(enteredPassword));
 }
 
 function showAuthFeedback(containerId, type, title, message) {
@@ -2157,7 +2192,7 @@ function initAuthSystem() {
 
                 // Sync with Firebase Auth in background if initialized
                 if (isFirebaseReady && firebaseAuth) {
-                    firebaseAuth.signInWithEmailAndPassword(email, password).catch(() => {});
+                    firebaseAuth.signInWithEmailAndPassword(email, password).catch(() => { });
                 }
 
                 currentUser = {
@@ -2290,7 +2325,7 @@ function initAuthSystem() {
                 firebaseAuth.createUserWithEmailAndPassword(email, password)
                     .then(cred => {
                         if (cred && cred.user) {
-                            cred.user.updateProfile({ displayName: name }).catch(() => {});
+                            cred.user.updateProfile({ displayName: name }).catch(() => { });
                             if (firebaseDb) {
                                 firebaseDb.collection("users").doc(cred.user.uid).set({
                                     uid: cred.user.uid,
@@ -2298,7 +2333,7 @@ function initAuthSystem() {
                                     phone: phone,
                                     email: email,
                                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                                }).catch(() => {});
+                                }).catch(() => { });
                             }
                         }
                     })
@@ -2427,7 +2462,7 @@ function handleForgotPassword() {
         }
 
         if (isFirebaseReady && firebaseAuth) {
-            firebaseAuth.sendPasswordResetEmail(email).catch(() => {});
+            firebaseAuth.sendPasswordResetEmail(email).catch(() => { });
         }
 
         showAuthFeedback("loginFeedbackBox", "success", "Reset Link Sent", `A password recovery link has been dispatched to ${email}. Check your inbox.`);
@@ -2443,7 +2478,7 @@ function handleLogout() {
     currentUser = null;
     localStorage.removeItem("j_user");
     if (isFirebaseReady && firebaseAuth) {
-        firebaseAuth.signOut().catch(() => {});
+        firebaseAuth.signOut().catch(() => { });
     }
     updateAuthUI();
     closeAuthModal();
@@ -3459,7 +3494,7 @@ function renderTrackRecentOrders() {
         matching = storeOrders.filter(ord => {
             const ordContact = (ord.customerEmail + " " + ord.customerPhone).toLowerCase();
             return (currentUser.email && ordContact.includes(currentUser.email.toLowerCase())) ||
-                   (currentUser.phone && ordContact.includes(currentUser.phone.toLowerCase()));
+                (currentUser.phone && ordContact.includes(currentUser.phone.toLowerCase()));
         });
     }
 
@@ -3547,10 +3582,10 @@ function renderOrderTrackingResult(order) {
                     <div class="track-stepper-bar-bg"></div>
                     <div class="track-stepper-bar-fill" style="width:${progressPercent}%;"></div>
                     ${steps.map((st, idx) => {
-                        const isCompleted = idx < activeIndex;
-                        const isActive = idx === activeIndex;
-                        const circleClass = isCompleted ? 'completed' : (isActive ? 'active' : '');
-                        return `
+        const isCompleted = idx < activeIndex;
+        const isActive = idx === activeIndex;
+        const circleClass = isCompleted ? 'completed' : (isActive ? 'active' : '');
+        return `
                             <div class="track-step-item ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}">
                                 <div class="track-step-circle ${circleClass}">
                                     <i class="fa-solid ${isCompleted ? 'fa-check' : st.icon}"></i>
@@ -3558,7 +3593,7 @@ function renderOrderTrackingResult(order) {
                                 <span class="track-step-name">${st.label}</span>
                             </div>
                         `;
-                    }).join("")}
+    }).join("")}
                 </div>
             </div>
 
@@ -3657,12 +3692,14 @@ function initAdminPortal() {
     const setEmail = document.getElementById("settingEmail");
     const setFree = document.getElementById("settingFreeDelivery");
     const setPin = document.getElementById("settingAdminPIN");
+    const setWeb3 = document.getElementById("settingWeb3Key");
 
     const activeEmail = storeSettings.email || SITE_CONFIG.email;
     if (setWa) setWa.value = storeSettings.whatsappNumber || SITE_CONFIG.whatsappNumber;
     if (setEmail) setEmail.value = activeEmail;
     if (setFree) setFree.value = storeSettings.freeDeliveryThreshold || SITE_CONFIG.freeDeliveryThreshold;
     if (setPin) setPin.value = storeSettings.adminPIN || "2023";
+    if (setWeb3) setWeb3.value = storeSettings.web3Key || "";
 
     const inboxEmailDisplay = document.getElementById("inboxStoreEmailDisplay");
     if (inboxEmailDisplay) inboxEmailDisplay.textContent = activeEmail;
@@ -4112,6 +4149,7 @@ function saveAdminSettings(event) {
     storeSettings.email = document.getElementById("settingEmail").value.trim();
     storeSettings.freeDeliveryThreshold = parseFloat(document.getElementById("settingFreeDelivery").value);
     storeSettings.adminPIN = document.getElementById("settingAdminPIN").value.trim() || "2023";
+    storeSettings.web3Key = (document.getElementById("settingWeb3Key")?.value || "").trim();
 
     localStorage.setItem("j_settings", JSON.stringify(storeSettings));
 
@@ -4187,8 +4225,8 @@ function renderAdminMessages() {
             <tr class="${m.unread ? 'msg-unread' : ''}" style="cursor:pointer;" onclick="openAdminMessageModal('${safeId}')">
                 <td style="text-align:center;" onclick="event.stopPropagation(); toggleAdminMessageReadById('${safeId}')">
                     ${m.unread
-                        ? `<span class="msg-unread-dot" title="Unread — Click to mark read"></span>`
-                        : `<i class="fa-solid fa-check msg-read-check" title="Read — Click to mark unread"></i>`}
+                ? `<span class="msg-unread-dot" title="Unread — Click to mark read"></span>`
+                : `<i class="fa-solid fa-check msg-read-check" title="Read — Click to mark unread"></i>`}
                 </td>
                 <td style="font-size:0.8rem; white-space:nowrap; color:var(--color-text-muted);">
                     ${escapeHTML(m.date || 'Recent')}
