@@ -387,12 +387,12 @@ if (!storeOrders) {
             address: "East Legon, near Melcom, Accra",
             region: "accra-std",
             regionName: "Greater Accra (Metro)",
-            deliveryFee: 35,
+            deliveryFee: 0,
             items: [
                 { title: "Jerrilyn Duo Butterfly Nameplates", option: "18\"", qty: 1, price: 380, img: "images/jerrilyn.jpg" }
             ],
             subtotal: 380,
-            total: 415,
+            total: 380,
             paymentMethod: "MTN MoMo",
             paymentRef: "MOMO-MTN-91283",
             notes: "Custom name 'Jerrilyn' in gold vermeil",
@@ -409,12 +409,12 @@ if (!storeOrders) {
             address: "KNUST Campus, Commercial Area, Kumasi",
             region: "kumasi",
             regionName: "Kumasi (Ashanti Region)",
-            deliveryFee: 50,
+            deliveryFee: 0,
             items: [
                 { title: "Selorm Custom Silver Cuban ID Bracelet", option: "7.5\"", qty: 1, price: 390, img: "images/B1.jpg" }
             ],
             subtotal: 390,
-            total: 440,
+            total: 390,
             paymentMethod: "Visa Card",
             paymentRef: "CARD-AUTH-88219",
             notes: "Engrave 'Selorm' in bold block capital",
@@ -424,6 +424,14 @@ if (!storeOrders) {
         }
     ];
     localStorage.setItem("j_orders", JSON.stringify(storeOrders));
+}
+
+// Normalize stored orders so delivery fees are never added to customer total
+if (Array.isArray(storeOrders)) {
+    storeOrders.forEach(ord => {
+        ord.deliveryFee = 0;
+        if (ord.subtotal) ord.total = ord.subtotal;
+    });
 }
 
 // ── Store Settings (Feature #7 & #8) ──
@@ -567,7 +575,7 @@ let checkoutState = {
     step: 1,
     subtotal: 0,
     deliveryRegion: "accra-std",
-    deliveryFee: 35,
+    deliveryFee: 0, // Delivery fee is NOT added to customer's price; arranged manually via phone/text
     deliveryTimeline: "24–48 Hours",
     grandTotal: 0,
     paymentMethod: "momo",
@@ -1342,7 +1350,7 @@ function renderCart() {
         `;
         if (subtotalEl) subtotalEl.textContent = `${SITE_CONFIG.currency} 0.00`;
         if (totalEl) totalEl.textContent = `${SITE_CONFIG.currency} 0.00`;
-        if (deliveryMeterEl) deliveryMeterEl.textContent = `Add ${SITE_CONFIG.currency} ${SITE_CONFIG.freeDeliveryThreshold.toFixed(2)} more for Free Ghana Delivery!`;
+        if (deliveryMeterEl) deliveryMeterEl.textContent = "Delivery is coordinated directly by phone or text upon order placement.";
         if (checkoutBtn) checkoutBtn.disabled = true;
         if (clearBtn) clearBtn.style.display = "none";
         return;
@@ -1380,14 +1388,9 @@ function renderCart() {
     if (subtotalEl) subtotalEl.textContent = `${SITE_CONFIG.currency} ${subtotal.toFixed(2)}`;
     if (totalEl) totalEl.textContent = `${SITE_CONFIG.currency} ${subtotal.toFixed(2)}`;
 
-    // Free Delivery Meter calculation
+    // Delivery Notice: Coordinated directly via phone/text, not added to cart total
     if (deliveryMeterEl) {
-        if (subtotal >= SITE_CONFIG.freeDeliveryThreshold) {
-            deliveryMeterEl.innerHTML = `<strong>✨ You've unlocked FREE Delivery across Ghana!</strong>`;
-        } else {
-            const needed = SITE_CONFIG.freeDeliveryThreshold - subtotal;
-            deliveryMeterEl.textContent = `Add ${SITE_CONFIG.currency} ${needed.toFixed(2)} more for Free Delivery!`;
-        }
+        deliveryMeterEl.innerHTML = `<i class="fa-solid fa-phone" style="margin-right:6px; color:var(--color-gold);"></i> <strong>Delivery arranged manually via phone/text (no fee added to total)</strong>`;
     }
 }
 
@@ -2850,7 +2853,7 @@ function calculateDeliveryFee(selectedVal) {
     const data = DELIVERY_RATES[key] || DELIVERY_RATES["accra-std"];
 
     if (resultFee) {
-        resultFee.textContent = `${SITE_CONFIG.currency} ${data.fee.toFixed(2)}`;
+        resultFee.innerHTML = `<span style="font-size:1.15rem; color:var(--color-gold); font-weight:700;">Arranged via Phone/Text</span><span style="display:block; font-size:0.75rem; color:var(--color-text-muted); font-weight:normal; margin-top:4px;">Not added to cart total — coordinated by admin</span>`;
     }
     if (resultArrival) {
         resultArrival.textContent = itemType === "ready" ? data.ready : data.custom;
@@ -2946,17 +2949,9 @@ function updateCheckoutTotals() {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
     checkoutState.subtotal = subtotal;
 
-    // Free delivery calculation
-    const threshold = storeSettings.freeDeliveryThreshold || SITE_CONFIG.freeDeliveryThreshold;
-    let fee = checkoutState.deliveryFee;
-    let isFree = false;
-
-    if (subtotal >= threshold) {
-        fee = 0;
-        isFree = true;
-    }
-
-    const grandTotal = subtotal + fee;
+    // Delivery fee is NOT added to customer's price; arranged manually via phone or text
+    checkoutState.deliveryFee = 0;
+    const grandTotal = subtotal;
     checkoutState.grandTotal = grandTotal;
 
     const subEl = document.getElementById("chkSubtotalDisplay");
@@ -2970,7 +2965,7 @@ function updateCheckoutTotals() {
     const cardBtnEl = document.getElementById("cardPayBtnAmount");
 
     const formattedSub = `${SITE_CONFIG.currency} ${subtotal.toFixed(2)}`;
-    const formattedDel = isFree ? `<span style="color:#2e7d32; font-weight:700;">FREE (Promo)</span>` : `${SITE_CONFIG.currency} ${fee.toFixed(2)}`;
+    const formattedDel = `<span style="color:var(--color-gold); font-weight:600; font-size:0.78rem;"><i class="fa-solid fa-phone" style="font-size:0.7rem; margin-right:3px;"></i> Arranged via Phone / Text</span>`;
     const formattedGrand = `${SITE_CONFIG.currency} ${grandTotal.toFixed(2)}`;
 
     if (subEl) subEl.textContent = formattedSub;
@@ -3004,7 +2999,7 @@ function renderCheckoutMiniItems() {
 function updateCheckoutDeliveryFee(regionKey) {
     const data = DELIVERY_RATES[regionKey] || DELIVERY_RATES["accra-std"];
     checkoutState.deliveryRegion = regionKey;
-    checkoutState.deliveryFee = data.fee;
+    checkoutState.deliveryFee = 0; // Fee is not added to customer's price
     checkoutState.deliveryTimeline = data.ready;
     updateCheckoutTotals();
 }
@@ -3214,10 +3209,6 @@ function finalizeOrderPlacement(paymentMethodName, paymentRef) {
         notes: ""
     };
 
-    // Apply free-delivery rule to the stored fee so emails/orders match what the customer saw
-    const threshold = storeSettings.freeDeliveryThreshold || SITE_CONFIG.freeDeliveryThreshold;
-    const appliedDeliveryFee = checkoutState.subtotal >= threshold ? 0 : checkoutState.deliveryFee;
-
     const newOrder = {
         id: orderId,
         date: new Date().toISOString().replace("T", " ").slice(0, 16),
@@ -3227,7 +3218,7 @@ function finalizeOrderPlacement(paymentMethodName, paymentRef) {
         address: cust.address,
         region: checkoutState.deliveryRegion,
         regionName: DELIVERY_RATES[checkoutState.deliveryRegion]?.name || "Greater Accra",
-        deliveryFee: appliedDeliveryFee,
+        deliveryFee: 0, // Delivery fee is NOT added to customer's price; arranged manually via phone/text
         items: cart.map(item => ({
             title: item.title,
             option: item.option || "",
@@ -3236,7 +3227,7 @@ function finalizeOrderPlacement(paymentMethodName, paymentRef) {
             img: item.img
         })),
         subtotal: checkoutState.subtotal,
-        total: checkoutState.grandTotal,
+        total: checkoutState.subtotal, // Price is strictly the subtotal of the items
         paymentMethod: paymentMethodName,
         paymentRef: paymentRef,
         notes: cust.notes || "None",
@@ -3344,7 +3335,7 @@ function sendEmailOrderNotification(order) {
         .map(i => `${i.title} (${i.option || "Standard"}) x${i.qty} = GH₵ ${(i.price * i.qty).toFixed(2)}`)
         .join("\n");
 
-    const feeText = Number(order.deliveryFee) === 0 ? "FREE" : `GH₵ ${Number(order.deliveryFee || 0).toFixed(2)}`;
+    const feeText = "Arranged manually via phone / text (Not added to order total)";
 
     sendStoreEmail(
         `💎 NEW ORDER #${order.id} — ${order.customerName} (GH₵ ${Number(order.total).toFixed(2)})`,
@@ -3680,17 +3671,13 @@ function renderOrderTrackingResult(order) {
                     ${itemsHtml}
                 </div>
                 <div style="margin-top:16px; padding-top:12px; border-top:1px solid var(--color-border-light);">
-                    <div class="track-summary-row">
-                        <span>Items Subtotal</span>
-                        <span>${SITE_CONFIG.currency} ${Number(order.subtotal || order.total).toFixed(2)}</span>
-                    </div>
-                    <div class="track-summary-row">
-                        <span>Delivery Fee (${escapeHTML(order.regionName || 'Standard')})</span>
-                        <span>${Number(order.deliveryFee) === 0 ? 'FREE' : `${SITE_CONFIG.currency} ${Number(order.deliveryFee || 0).toFixed(2)}`}</span>
-                    </div>
                     <div class="track-summary-row total">
-                        <span>Grand Total</span>
-                        <span style="color:var(--color-black);">${SITE_CONFIG.currency} ${Number(order.total).toFixed(2)}</span>
+                        <span>Order Total</span>
+                        <span style="color:var(--color-black); font-weight:700;">${SITE_CONFIG.currency} ${Number(order.total || order.subtotal).toFixed(2)}</span>
+                    </div>
+                    <div style="margin-top:10px; padding:10px 14px; background:var(--color-surface-soft); border-radius:var(--radius-md); border:1px solid var(--color-border); font-size:0.78rem; color:var(--color-text-muted); display:flex; align-items:flex-start; gap:8px;">
+                        <i class="fa-solid fa-phone" style="color:var(--color-gold); margin-top:2px;"></i>
+                        <span><strong>Delivery Notice:</strong> Delivery arrangements are coordinated directly by admin via phone or text message. No delivery fee is charged online.</span>
                     </div>
                 </div>
             </div>
