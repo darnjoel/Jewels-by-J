@@ -709,7 +709,18 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
             const clientName = fields.name || "Valued Client";
             const clientEmail = fields.email || "no-reply@jewelsbyj.com";
             const clientPhone = fields.phone || "Not provided";
-            const cleanSubject = (subject || (fields.order_id ? `New Order #${fields.order_id}` : "Customer Consultation")).replace(/^💎\s*/, "");
+
+            // Piece of interest is strictly what the customer entered (e.g. "bracelet" or "necklace")
+            const pieceOfInterest = (fields.piece_of_interest || fields.subject || "General Inquiry")
+                .replace(/^💎\s*/, "")
+                .replace(/^\[Jewels by J Inquiry\]\s*/i, "")
+                .replace(/\s*—\s*.*$/, "")
+                .trim();
+
+            // Simple, clean subject as requested: "Jewels by J Inquiry" (or Order # for orders)
+            const emailSubject = fields.order_id
+                ? `Jewels by J Order #${fields.order_id}`
+                : "Jewels by J Inquiry";
 
             // Build an elegant, structured notification body
             let richBody = "";
@@ -734,7 +745,7 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
                     `• Client Name:    ${clientName}\n` +
                     `• Client Email:   ${clientEmail}\n` +
                     `• Phone / WA:     ${clientPhone}\n` +
-                    `• Interested In:  ${fields.subject || cleanSubject}\n` +
+                    `• Interested In:  ${pieceOfInterest}\n` +
                     `──────────────────────────────────────────────\n` +
                     `Client Message:\n` +
                     `"${rawMessage || 'Customer inquiry submitted from store website.'}"\n\n` +
@@ -756,8 +767,9 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
                 reply_to: clientEmail,
                 phone: clientPhone,
                 customer_phone: clientPhone,
-                subject: `💎 [Jewels by J] ${cleanSubject} — ${clientName}`,
-                clean_subject: cleanSubject,
+                subject: emailSubject,
+                clean_subject: pieceOfInterest,
+                piece_of_interest: pieceOfInterest,
                 message: richBody,
                 raw_message: rawMessage,
                 content: richBody,
@@ -1908,7 +1920,7 @@ function initContactForm() {
         // Update FormSubmit hidden fields for background browser dispatch
         const submitSubjectEl = document.getElementById("contactFormSubmitSubject");
         if (submitSubjectEl) {
-            submitSubjectEl.value = `💎 [Jewels by J Inquiry] ${subject || "Consultation"} — ${name}`;
+            submitSubjectEl.value = "Jewels by J Inquiry";
         }
         const replyToEl = document.getElementById("contactFormReplyTo");
         if (replyToEl) {
@@ -1939,12 +1951,13 @@ function initContactForm() {
         sessionStorage.removeItem("j_contact_draft");
 
         sendStoreEmail(
-            `💎 [Jewels by J Inquiry] ${subject || "Consultation"} — ${name}`,
+            "Jewels by J Inquiry",
             {
                 name: name,
                 email: email, // EmailJS uses this as Reply-To
                 phone: phone || "Not provided",
-                subject: subject || "Consultation",
+                piece_of_interest: subject || "General Inquiry",
+                subject: subject || "General Inquiry",
                 message: message,
                 type: isBespoke ? "Bespoke" : "General inquiry",
                 sender_account_status: currentUser ? "Verified Registered Client" : "Guest Client",
@@ -3018,7 +3031,6 @@ function showCheckoutPane(stepNum) {
     checkoutState.step = stepNum;
     const p1 = document.getElementById("checkoutPaneStep1");
     const p2 = document.getElementById("checkoutPaneStep2");
-    const sim = document.getElementById("checkoutPaneMoMoSimulation");
     const p3 = document.getElementById("checkoutPaneStep3");
 
     const s1 = document.getElementById("checkoutStepIndicator1");
@@ -3027,7 +3039,6 @@ function showCheckoutPane(stepNum) {
 
     if (p1) p1.style.display = stepNum === 1 ? "block" : "none";
     if (p2) p2.style.display = stepNum === 2 ? "block" : "none";
-    if (sim) sim.style.display = stepNum === "sim" ? "block" : "none";
     if (p3) p3.style.display = stepNum === 3 ? "block" : "none";
 
     if (s1) s1.className = `checkout-step-pill ${stepNum >= 1 ? 'active' : ''}`;
