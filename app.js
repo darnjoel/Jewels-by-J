@@ -7,8 +7,8 @@
 // ── Configuration ──
 const SITE_CONFIG = {
     brandName: "Jewels by J",
-    phone: "+233 50 059 4879",
-    whatsappNumber: "233500594879",
+    phone: "+233 59 325 2913",
+    whatsappNumber: "233593252913",
     email: "mensahjerrilyn@gmail.com",
     snapchatUrl: "https://snapchat.com/t/9O7WC58U",
     instagramUrl: "https://www.instagram.com/Jewels.with_j",
@@ -388,7 +388,7 @@ if (!storeOrders) {
             id: "JBJ-20261029-001",
             date: "2026-10-29 14:20",
             customerName: "Ama Serwaa",
-            customerPhone: "+233 50 059 4879",
+            customerPhone: "+233 59 325 2913",
             customerEmail: "client@jewelsbyj.com",
             address: "East Legon, near Melcom, Accra",
             region: "accra-std",
@@ -410,7 +410,7 @@ if (!storeOrders) {
             id: "JBJ-20261028-084",
             date: "2026-10-28 11:05",
             customerName: "Kofi Owusu",
-            customerPhone: "0500594879",
+            customerPhone: "0593252913",
             customerEmail: "kofi@example.com",
             address: "KNUST Campus, Commercial Area, Kumasi",
             region: "kumasi",
@@ -449,7 +449,7 @@ if (!storeSettings) {
         freeDeliveryThreshold: SITE_CONFIG.freeDeliveryThreshold,
         adminPIN: "2023",
         paystackPublicKey: "",
-        momoMerchantNumber: "0500594879",
+        momoMerchantNumber: "0593252913",
         momoMerchantName: "Jewels by J (Jerrilyn Mensah)",
         cloudSyncUrl: "",
         web3Key: "",
@@ -474,7 +474,12 @@ if (!storeSettings) {
         storeSettings.adminPIN = "2023";
     }
     if (storeSettings.paystackPublicKey === undefined) storeSettings.paystackPublicKey = "";
-    if (!storeSettings.momoMerchantNumber) storeSettings.momoMerchantNumber = "0500594879";
+    if (!storeSettings.whatsappNumber || storeSettings.whatsappNumber === "233500594879") {
+        storeSettings.whatsappNumber = "233593252913";
+    }
+    if (!storeSettings.momoMerchantNumber || storeSettings.momoMerchantNumber === "0500594879") {
+        storeSettings.momoMerchantNumber = "0593252913";
+    }
     if (!storeSettings.momoMerchantName) storeSettings.momoMerchantName = "Jewels by J (Jerrilyn Mensah)";
     if (storeSettings.cloudSyncUrl === undefined) storeSettings.cloudSyncUrl = "";
     if (storeSettings.emailjsServiceId === undefined) storeSettings.emailjsServiceId = "service_0wy2cgh";
@@ -538,7 +543,7 @@ if (!registeredUsers || !Array.isArray(registeredUsers) || registeredUsers.lengt
             uid: "usr_admin_001",
             name: "Jerrilyn Mensah",
             email: "mensahjerrilyn@gmail.com",
-            phone: "+233 50 059 4879",
+            phone: "+233 59 325 2913",
             passwordHash: "jerrilyn2026",
             createdAt: "2026-10-01 09:00"
         },
@@ -771,7 +776,7 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
                 clean_subject: pieceOfInterest,
                 piece_of_interest: pieceOfInterest,
                 message: richBody,
-                raw_message: rawMessage,
+                raw_message: rawMessage || (fields.order_id ? richBody : "Customer inquiry submitted from store website."),
                 content: richBody,
                 inquiry_details: richBody,
                 order_id: fields.order_id || "",
@@ -2072,7 +2077,7 @@ function getRegisteredUsers() {
                 uid: "usr_admin_001",
                 name: "Jerrilyn Mensah",
                 email: "mensahjerrilyn@gmail.com",
-                phone: "+233 50 059 4879",
+                phone: "+233 59 325 2913",
                 passwordHash: "jerrilyn2026",
                 createdAt: "2026-10-01 09:00"
             },
@@ -2333,7 +2338,7 @@ function initAuthSystem() {
                     uid: user.uid,
                     name: user.name,
                     email: user.email,
-                    phone: user.phone || "+233 50 059 4879"
+                    phone: user.phone || "+233 59 325 2913"
                 };
 
                 localStorage.setItem("j_user", JSON.stringify(currentUser));
@@ -2660,7 +2665,7 @@ function updateAuthUI() {
         if (avatarLetter) avatarLetter.textContent = initial;
         if (accountName) accountName.textContent = currentUser.name;
         if (accountEmail) accountEmail.textContent = currentUser.email;
-        if (accountPhone) accountPhone.textContent = `Ghana • ${currentUser.phone || '+233 50 059 4879'}`;
+        if (accountPhone) accountPhone.textContent = `Ghana • ${currentUser.phone || '+233 59 325 2913'}`;
         if (accountOrders) {
             accountOrders.textContent = "Your profile is active. Ready to order your signature bespoke jewelry!";
         }
@@ -3235,7 +3240,7 @@ function updatePaystackBadge() {
 
 // ── Copy Helpers for Direct MoMo ──
 function copyDirectMoMoNumber() {
-    const num = storeSettings.momoMerchantNumber || "0500594879";
+    const num = storeSettings.momoMerchantNumber || "0593252913";
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(num).then(() => {
             showToast("Copied!", `MoMo Number ${num} copied to clipboard.`);
@@ -3474,7 +3479,7 @@ function finalizeOrderPlacement(paymentMethodName, paymentRef) {
     const orderId = `JBJ-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${Math.floor(100 + Math.random() * 900)}`;
     const cust = checkoutState.customerInfo || {
         name: "Valued Customer",
-        phone: "+233 50 059 4879",
+        phone: "+233 59 325 2913",
         email: "client@jewelsbyj.com",
         address: "Accra, Ghana",
         notes: ""
@@ -4402,10 +4407,10 @@ function renderOrderTrackingResult(order) {
                             <span class="track-courier-name"><i class="fa-solid fa-circle-check" style="color:var(--color-gold); font-size:0.8rem; margin-right:4px;"></i> Kweku Boateng (Express Dispatch)</span>
                             <span class="track-courier-sub">Jewels by J Logistics • Verified Rider #04</span>
                             <div style="margin-top:6px; font-size:0.75rem;">
-                                <a href="tel:+233500594879" style="color:var(--color-gold); font-weight:700; margin-right:14px;">
+                                <a href="tel:+233593252913" style="color:var(--color-gold); font-weight:700; margin-right:14px;">
                                     <i class="fa-solid fa-phone"></i> Call Rider
                                 </a>
-                                <a href="https://wa.me/233500594879?text=Hi%20Kweku,%20I'm%20inquiring%20about%20my%20delivery%20for%20order%20${encodeURIComponent(order.id)}" target="_blank" style="color:#25d366; font-weight:700;">
+                                <a href="https://wa.me/233593252913?text=Hi%20Kweku,%20I'm%20inquiring%20about%20my%20delivery%20for%20order%20${encodeURIComponent(order.id)}" target="_blank" style="color:#25d366; font-weight:700;">
                                     <i class="fa-brands fa-whatsapp"></i> WhatsApp Dispatch
                                 </a>
                             </div>
@@ -4616,7 +4621,7 @@ function initAdminPortal() {
         setPaystack.value = storeSettings.paystackPublicKey || "";
         _liveCheckPaystackKey(setPaystack.value);
     }
-    if (setMoMoNum) setMoMoNum.value = storeSettings.momoMerchantNumber || "0500594879";
+    if (setMoMoNum) setMoMoNum.value = storeSettings.momoMerchantNumber || "0593252913";
     if (setMoMoName) setMoMoName.value = storeSettings.momoMerchantName || "Jewels by J (Jerrilyn Mensah)";
     if (setCloudSync) setCloudSync.value = storeSettings.cloudSyncUrl || "";
 
@@ -5387,7 +5392,7 @@ function saveAdminSettings(event) {
 
     // Payment & Cloud Sync settings
     storeSettings.paystackPublicKey = (document.getElementById("settingPaystackKey")?.value || "").trim();
-    storeSettings.momoMerchantNumber = (document.getElementById("settingMoMoNumber")?.value || "").trim() || "0500594879";
+    storeSettings.momoMerchantNumber = (document.getElementById("settingMoMoNumber")?.value || "").trim() || "0593252913";
     storeSettings.momoMerchantName = (document.getElementById("settingMoMoName")?.value || "").trim() || "Jewels by J (Jerrilyn Mensah)";
     storeSettings.cloudSyncUrl = (document.getElementById("settingCloudSyncUrl")?.value || "").trim();
 
