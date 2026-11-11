@@ -676,7 +676,7 @@
                     <div class="contact-form-box">
                         <h3 class="contact-form-title">Send a Private Inquiry</h3>
                         <p class="contact-form-sub">
-                            Have a custom design idea, sizing question, or bespoke inquiry? Leave a message and it will be delivered directly to the admin's inbox.
+                            Have a custom design idea, sizing question, or bespoke inquiry? Send us your message and our atelier concierge will reply directly to your email.
                         </p>
 
                         <!-- Account Status Gate Banner -->
@@ -720,11 +720,11 @@
                                     placeholder="Write your custom text requirements, chain length preferences, or questions here..."></textarea>
                             </div>
                             <button type="submit" class="btn btn-primary btn-block" id="contactSubmitBtn">
-                                <i class="fa-solid fa-paper-plane"></i> Send to Admin Inbox
+                                <i class="fa-regular fa-paper-plane"></i> Send Inquiry
                             </button>
                             <span style="font-size:0.75rem; color:var(--color-text-subtle); display:block; text-align:center; margin-top:10px;">
                                 <i class="fa-solid fa-envelope-circle-check" style="color:var(--color-gold); margin-right:4px;"></i>
-                                Dispatches directly to store owner email (<span id="contactDisplayEmail">mensahjerrilyn@gmail.com</span>) &amp; logged in Admin Portal.
+                                Your inquiry is sent directly to our atelier concierge. We typically reply within a few hours.
                             </span>
                             <p class="form-status-msg" id="contactFormStatus"></p>
                         </form>
@@ -1565,6 +1565,29 @@
                                                     </div>
                                                     <span style="font-size:0.74rem; color:var(--color-text-muted); display:block; margin-top:4px;">
                                                         All website consultation inquiries and order notices dispatch here.
+                                                    </span>
+                                                </div>
+
+                                                <div class="form-group" style="margin-bottom:14px; background:rgba(201,168,76,0.06); padding:12px; border-radius:8px; border:1px solid rgba(201,168,76,0.2);">
+                                                    <label style="font-size:0.82rem; font-weight:700; display:block; margin-bottom:4px; color:var(--color-black);">
+                                                        <i class="fa-solid fa-envelope-circle-check" style="color:var(--color-gold); margin-right:4px;"></i> EmailJS Gateway (Direct Gmail to mensahjerrilyn@gmail.com)
+                                                    </label>
+                                                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
+                                                        <div>
+                                                            <span style="font-size:0.72rem; color:var(--color-text-muted); display:block; margin-bottom:2px;">Service ID</span>
+                                                            <input type="text" id="settingEmailjsServiceId" class="customizer-input-field" value="service_0wy2cgh" placeholder="service_0wy2cgh">
+                                                        </div>
+                                                        <div>
+                                                            <span style="font-size:0.72rem; color:var(--color-text-muted); display:block; margin-bottom:2px;">Template ID</span>
+                                                            <input type="text" id="settingEmailjsTemplateId" class="customizer-input-field" value="template_ocw57xp" placeholder="template_ocw57xp">
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <span style="font-size:0.72rem; color:var(--color-text-muted); display:block; margin-bottom:2px;">EmailJS Public Key (User ID)</span>
+                                                        <input type="text" id="settingEmailjsPublicKey" class="customizer-input-field" value="H29CgoFchjgsnL_0S" placeholder="e.g. H29CgoFchjgsnL_0S">
+                                                    </div>
+                                                    <span style="font-size:0.72rem; color:var(--color-text-muted); display:block; margin-top:4px;">
+                                                        Pre-configured with your service &amp; template. Paste your <strong>Public Key</strong> from <a href="https://dashboard.emailjs.com/admin/account" target="_blank" style="color:var(--color-gold); text-decoration:underline;">EmailJS Account &gt; API Keys</a> to activate instant client-side dispatch.
                                                     </span>
                                                 </div>
 
@@ -3100,6 +3123,9 @@
 
     <!-- Paystack Inline Popup SDK (Real Ghana MoMo & Card Payments) -->
     <script src="https://js.paystack.co/v1/inline.js"></script>
+
+    <!-- EmailJS SDK (Automated Customer Inquiries & Order Dispatch to mensahjerrilyn@gmail.com) -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
     <!-- Application Script -->
     <script src="app.js"></script>

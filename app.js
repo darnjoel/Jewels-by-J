@@ -15,6 +15,12 @@ const SITE_CONFIG = {
     tiktokUrl: "https://www.tiktok.com/@jewels.by_j4",
     currency: "GH₵",
     freeDeliveryThreshold: 30,
+    // ── EmailJS Dispatch & Reply Gateway (mensahjerrilyn@gmail.com) ──
+    emailjs: {
+        serviceId: "service_0wy2cgh",
+        templateId: "template_ocw57xp",
+        publicKey: "H29CgoFchjgsnL_0S"
+    },
     // ── Firebase Database Security & Auth Vault ──
     firebase: {
         apiKey: "AIzaSyB3_JewelsByJ_SecurityVault2026",
@@ -446,10 +452,10 @@ if (!storeSettings) {
         momoMerchantNumber: "0500594879",
         momoMerchantName: "Jewels by J (Jerrilyn Mensah)",
         cloudSyncUrl: "",
-        paystackPublicKey: "",
-        momoMerchantNumber: "0500594879",
-        momoMerchantName: "Jewels by J (Jerrilyn Mensah)",
-        cloudSyncUrl: "",
+        web3Key: "",
+        emailjsServiceId: "service_0wy2cgh",
+        emailjsTemplateId: "template_ocw57xp",
+        emailjsPublicKey: "H29CgoFchjgsnL_0S",
         preferences: {
             theme: "default",
             fontSize: "standard",
@@ -471,10 +477,9 @@ if (!storeSettings) {
     if (!storeSettings.momoMerchantNumber) storeSettings.momoMerchantNumber = "0500594879";
     if (!storeSettings.momoMerchantName) storeSettings.momoMerchantName = "Jewels by J (Jerrilyn Mensah)";
     if (storeSettings.cloudSyncUrl === undefined) storeSettings.cloudSyncUrl = "";
-    if (storeSettings.paystackPublicKey === undefined) storeSettings.paystackPublicKey = "";
-    if (!storeSettings.momoMerchantNumber) storeSettings.momoMerchantNumber = "0500594879";
-    if (!storeSettings.momoMerchantName) storeSettings.momoMerchantName = "Jewels by J (Jerrilyn Mensah)";
-    if (storeSettings.cloudSyncUrl === undefined) storeSettings.cloudSyncUrl = "";
+    if (storeSettings.emailjsServiceId === undefined) storeSettings.emailjsServiceId = "service_0wy2cgh";
+    if (storeSettings.emailjsTemplateId === undefined) storeSettings.emailjsTemplateId = "template_ocw57xp";
+    if (!storeSettings.emailjsPublicKey) storeSettings.emailjsPublicKey = "H29CgoFchjgsnL_0S";
     if (!storeSettings.preferences) {
         storeSettings.preferences = {
             theme: "default",
@@ -630,6 +635,15 @@ document.addEventListener("DOMContentLoaded", () => {
     updateAuthUI();
     updateAdminNotificationBadge();
 
+    // Initialize EmailJS if public key is configured
+    if (typeof emailjs !== "undefined" && storeSettings && storeSettings.emailjsPublicKey) {
+        try {
+            emailjs.init({ publicKey: storeSettings.emailjsPublicKey });
+        } catch (e) {
+            console.warn("EmailJS init warning:", e);
+        }
+    }
+
     // Check URL parameters for direct category navigation (like The Strand Brand ?category=...)
     const params = new URLSearchParams(window.location.search);
     const catParam = params.get("category");
@@ -683,6 +697,71 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
     if (fields.payment_method) payload.payment_method = fields.payment_method;
     if (fields.payment_ref) payload.payment_ref = fields.payment_ref;
     if (extra._autoresponse) payload._autoresponse = extra._autoresponse;
+
+    // ── 1. EmailJS Direct Dispatch (mensahjerrilyn@gmail.com) ──
+    const ejServiceId = (storeSettings && storeSettings.emailjsServiceId) || SITE_CONFIG.emailjs?.serviceId || "service_0wy2cgh";
+    const ejTemplateId = (storeSettings && storeSettings.emailjsTemplateId) || SITE_CONFIG.emailjs?.templateId || "template_ocw57xp";
+    const ejPublicKey = (storeSettings && storeSettings.emailjsPublicKey) || SITE_CONFIG.emailjs?.publicKey || "";
+
+    if (ejServiceId && ejTemplateId && ejPublicKey) {
+        try {
+            const formattedMessage = (fields.message || details || "Customer consultation inquiry submitted from Jewels by J store.").trim();
+            const clientDetailsSummary = `Client Name: ${fields.name || 'Valued Client'}\nEmail: ${fields.email || 'N/A'}\nPhone: ${fields.phone || 'N/A'}\nSubject: ${subject}\n\nInquiry / Notes:\n${formattedMessage}`;
+
+            const templateParams = {
+                to_name: "Jerrilyn Mensah",
+                to_email: targetEmail,
+                from_name: fields.name || "Valued Client",
+                user_name: fields.name || "Valued Client",
+                customer_name: fields.name || "Valued Client",
+                name: fields.name || "Valued Client",
+                from_email: fields.email || "no-reply@jewelsbyj.com",
+                user_email: fields.email || "no-reply@jewelsbyj.com",
+                customer_email: fields.email || "no-reply@jewelsbyj.com",
+                email: fields.email || "no-reply@jewelsbyj.com",
+                reply_to: fields.email || targetEmail,
+                phone: fields.phone || "Not provided",
+                customer_phone: fields.phone || "Not provided",
+                subject: subject,
+                message: formattedMessage,
+                content: formattedMessage,
+                inquiry_details: clientDetailsSummary,
+                order_id: fields.order_id || "",
+                items: fields.items || "",
+                grand_total: fields.grand_total || "",
+                total: fields.grand_total || "",
+                delivery_address: fields.delivery_address || "",
+                payment_method: fields.payment_method || "",
+                payment_ref: fields.payment_ref || "",
+                notes: fields.notes || "",
+                date: fields.order_date || new Date().toLocaleString()
+            };
+
+            // Use EmailJS browser SDK if available, or direct REST API
+            if (typeof emailjs !== "undefined" && typeof emailjs.send === "function") {
+                const ejRes = await emailjs.send(ejServiceId, ejTemplateId, templateParams, ejPublicKey);
+                if (ejRes && (ejRes.status === 200 || ejRes.text === "OK")) {
+                    return { ok: true, message: `Delivered directly to ${targetEmail} via EmailJS!` };
+                }
+            } else {
+                const ejHttpResp = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                    body: JSON.stringify({
+                        service_id: ejServiceId,
+                        template_id: ejTemplateId,
+                        user_id: ejPublicKey,
+                        template_params: templateParams
+                    })
+                });
+                if (ejHttpResp.ok) {
+                    return { ok: true, message: `Delivered directly to ${targetEmail} via EmailJS!` };
+                }
+            }
+        } catch (ejErr) {
+            console.warn("EmailJS gateway notice:", ejErr);
+        }
+    }
 
     // Check if Web3Forms access key is configured for guaranteed zero-downtime background dispatch
     if (storeSettings && storeSettings.web3Key) {
@@ -4522,6 +4601,9 @@ function initAdminPortal() {
     const setMoMoNum = document.getElementById("settingMoMoNumber");
     const setMoMoName = document.getElementById("settingMoMoName");
     const setCloudSync = document.getElementById("settingCloudSyncUrl");
+    const setEjService = document.getElementById("settingEmailjsServiceId");
+    const setEjTemplate = document.getElementById("settingEmailjsTemplateId");
+    const setEjKey = document.getElementById("settingEmailjsPublicKey");
 
     const activeEmail = storeSettings.email || SITE_CONFIG.email;
     if (setWa) setWa.value = storeSettings.whatsappNumber || SITE_CONFIG.whatsappNumber;
@@ -4529,6 +4611,9 @@ function initAdminPortal() {
     if (setFree) setFree.value = storeSettings.freeDeliveryThreshold || SITE_CONFIG.freeDeliveryThreshold;
     if (setPin) setPin.value = storeSettings.adminPIN || "2023";
     if (setWeb3) setWeb3.value = storeSettings.web3Key || "";
+    if (setEjService) setEjService.value = storeSettings.emailjsServiceId || "service_0wy2cgh";
+    if (setEjTemplate) setEjTemplate.value = storeSettings.emailjsTemplateId || "template_ocw57xp";
+    if (setEjKey) setEjKey.value = storeSettings.emailjsPublicKey || SITE_CONFIG.emailjs?.publicKey || "H29CgoFchjgsnL_0S";
     if (setPaystack) {
         setPaystack.value = storeSettings.paystackPublicKey || "";
         _liveCheckPaystackKey(setPaystack.value);
@@ -4572,25 +4657,6 @@ function initAdminPortal() {
     // ── Cloud & Paystack status badges ──
     updatePaystackBadge();
     _updateCloudStatusBadge();
-}
-
-// Dynamic cloud connection badge (reflects real Firebase state at load time)
-function _updateCloudStatusBadge() {
-    const badge = document.getElementById("cloudStatusBadge");
-    if (!badge) return;
-    const hasFirestore = typeof isFirebaseReady !== "undefined" && isFirebaseReady && !!firebaseDb;
-    const hasWebhook   = !!(storeSettings && storeSettings.cloudSyncUrl && storeSettings.cloudSyncUrl.trim());
-    if (hasFirestore || hasWebhook) {
-        badge.style.background = "#e8f5e9";
-        badge.style.color      = "#2e7d32";
-        badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Cloud Active';
-        badge.title = hasFirestore ? "Firebase Firestore connected — live sync enabled" : "Google Sheets webhook configured";
-    } else {
-        badge.style.background = "#fff3cd";
-        badge.style.color      = "#856404";
-        badge.innerHTML = '<i class="fa-solid fa-hard-drive"></i> Local Vault';
-        badge.title = "No cloud database configured — orders saved locally only. Configure Firebase or Google Sheets in Settings.";
-    }
 }
 
 // Dynamic cloud connection badge (reflects real Firebase state at load time)
@@ -5315,6 +5381,11 @@ function saveAdminSettings(event) {
     const pinField = document.getElementById("settingAdminPIN");
     if (pinField) storeSettings.adminPIN = pinField.value.trim() || storeSettings.adminPIN;
     storeSettings.web3Key = (document.getElementById("settingWeb3Key")?.value || "").trim();
+
+    // EmailJS (Direct Gmail Dispatch to mensahjerrilyn@gmail.com)
+    storeSettings.emailjsServiceId = (document.getElementById("settingEmailjsServiceId")?.value || "").trim() || "service_0wy2cgh";
+    storeSettings.emailjsTemplateId = (document.getElementById("settingEmailjsTemplateId")?.value || "").trim() || "template_ocw57xp";
+    storeSettings.emailjsPublicKey = (document.getElementById("settingEmailjsPublicKey")?.value || "").trim();
 
     // Payment & Cloud Sync settings
     storeSettings.paystackPublicKey = (document.getElementById("settingPaystackKey")?.value || "").trim();
