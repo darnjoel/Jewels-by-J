@@ -1419,7 +1419,10 @@
                                         from MoMo, Card, and WhatsApp. Update fulfillment statuses to keep customers
                                         notified.</p>
                                 </div>
-                                <div style="display:flex; gap:10px;">
+                                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                                    <button class="btn btn-outline btn-sm" onclick="pullRemoteOrdersFromCloud()" id="btnPullRemoteOrders" title="Fetch and sync orders from Firebase & Google Sheets">
+                                        <i class="fa-solid fa-cloud-arrow-down"></i> <span id="btnPullRemoteOrdersText">Pull Cloud Orders</span>
+                                    </button>
                                     <button class="btn btn-outline btn-sm" onclick="exportOrdersJSON()">
                                         <i class="fa-solid fa-download"></i> Export Orders Backup
                                     </button>
@@ -1575,6 +1578,36 @@
                                                     </span>
                                                 </div>
 
+                                                <div class="form-group" style="margin-bottom:14px;">
+                                                    <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">
+                                                        <i class="fa-solid fa-bolt" style="color:var(--color-gold); margin-right:4px;"></i> Paystack Public Key (Real GHS MoMo &amp; Cards)
+                                                    </label>
+                                                    <input type="text" id="settingPaystackKey" class="customizer-input-field" placeholder="e.g. pk_live_... or pk_test_...">
+                                                    <span style="font-size:0.74rem; color:var(--color-text-muted); display:block; margin-top:4px;">
+                                                        Obtain from your free <a href="https://dashboard.paystack.com/#/settings/developer" target="_blank" style="color:var(--color-gold); text-decoration:underline;">Paystack Dashboard</a>. Supports MTN MoMo, Telecel, AT Money &amp; Bank Cards.
+                                                    </span>
+                                                </div>
+
+                                                <div class="form-group" style="margin-bottom:14px;">
+                                                    <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">
+                                                        <i class="fa-solid fa-mobile-screen-button" style="color:#ffc000; margin-right:4px;"></i> Direct MoMo Merchant / Till Number
+                                                    </label>
+                                                    <input type="text" id="settingMoMoNumber" class="customizer-input-field" value="0500594879">
+                                                    <span style="font-size:0.74rem; color:var(--color-text-muted); display:block; margin-top:4px;">
+                                                        Phone number or merchant till shown to clients who choose Direct MoMo Transfer.
+                                                    </span>
+                                                </div>
+
+                                                <div class="form-group" style="margin-bottom:14px;">
+                                                    <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">
+                                                        Direct MoMo Account Name
+                                                    </label>
+                                                    <input type="text" id="settingMoMoName" class="customizer-input-field" value="Jewels by J (Jerrilyn Mensah)">
+                                                    <span style="font-size:0.74rem; color:var(--color-text-muted); display:block; margin-top:4px;">
+                                                        Official MoMo subscriber or merchant name verified before sending.
+                                                    </span>
+                                                </div>
+
                                                 <div class="form-group" style="margin-bottom:20px;">
                                                     <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">
                                                         Free Delivery Threshold (GH₵)
@@ -1583,9 +1616,48 @@
                                                 </div>
 
                                                 <button type="submit" class="btn btn-primary btn-block">
-                                                    <i class="fa-solid fa-floppy-disk"></i> Save Channels &amp; Delivery
+                                                    <i class="fa-solid fa-floppy-disk"></i> Save Channels, Payment &amp; Delivery
                                                 </button>
                                             </form>
+                                        </div>
+
+                                        <!-- Card: Cloud Database & Google Sheets Sync -->
+                                        <div style="background:#fff; border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:24px; box-shadow:var(--shadow-sm); margin-bottom:24px;">
+                                            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--color-border); padding-bottom:12px; margin-bottom:16px;">
+                                                <div>
+                                                    <h4 style="font-size:1.05rem; color:var(--color-black); margin-bottom:2px;">
+                                                        <i class="fa-solid fa-cloud" style="color:var(--color-gold); margin-right:6px;"></i> Cloud Database &amp; Google Sheets Sync
+                                                    </h4>
+                                                    <p style="font-size:0.78rem; color:var(--color-text-muted);">Enable live cross-device order tracking and Google Sheets backups.</p>
+                                                </div>
+                                                <span class="badge" id="cloudStatusBadge" style="background:#e8f5e9; color:#2e7d32; font-size:0.75rem; padding:4px 8px;">
+                                                    <i class="fa-solid fa-signal"></i> Cloud Active
+                                                </span>
+                                            </div>
+
+                                            <div class="form-group" style="margin-bottom:14px;">
+                                                <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">
+                                                    <i class="fa-brands fa-google" style="color:#ea4335; margin-right:4px;"></i> Google Sheets Webhook / REST Endpoint URL
+                                                </label>
+                                                <input type="url" id="settingCloudSyncUrl" class="customizer-input-field" placeholder="https://script.google.com/macros/s/.../exec">
+                                                <span style="font-size:0.74rem; color:var(--color-text-muted); display:block; margin-top:4px;">
+                                                    Orders automatically append as new rows in your Google Sheet, and customer tracking queries this endpoint.
+                                                </span>
+                                            </div>
+
+                                            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
+                                                <button type="button" class="btn btn-outline btn-sm" onclick="testCloudConnection()" id="btnTestCloudSync">
+                                                    <i class="fa-solid fa-plug"></i> Test Cloud Connection
+                                                </button>
+                                                <button type="button" class="btn btn-outline btn-sm" onclick="openGoogleSheetsTemplateModal()">
+                                                    <i class="fa-solid fa-file-code"></i> View Google Apps Script Code
+                                                </button>
+                                            </div>
+
+                                            <div style="background:var(--color-surface-soft); border:1px solid var(--color-border-light); border-radius:var(--radius-md); padding:12px 14px; font-size:0.78rem; color:var(--color-text-muted);">
+                                                <strong style="color:var(--color-black); display:block; margin-bottom:2px;"><i class="fa-solid fa-bolt" style="color:var(--color-gold);"></i> Dual-Layer Cloud Redundancy:</strong>
+                                                Orders sync to <strong>Firebase Firestore</strong> for real-time live customer status animations, plus your optional <strong>Google Sheet</strong> for store accounting and dispatch rider printouts.
+                                            </div>
                                         </div>
 
                                         <!-- Card: Security & Change Admin Password / PIN -->
@@ -2218,149 +2290,164 @@
                                 </button>
                             </div>
 
-                            <!-- Payment Tabs -->
+                            <!-- Real Payment Methods Tabs -->
                             <div class="payment-tabs-nav">
-                                <button type="button" class="payment-tab-btn active" id="tabBtnMoMo"
-                                    onclick="switchPaymentTab('momo')">
-                                    <i class="fa-solid fa-mobile-screen" style="color:#ffc000;"></i> Mobile Money (MoMo)
+                                <button type="button" class="payment-tab-btn active" id="tabBtnPaystack"
+                                    onclick="switchPaymentTab('paystack')">
+                                    <i class="fa-solid fa-bolt" style="color:var(--color-gold);"></i> Paystack Online (MoMo &amp; Card)
                                 </button>
-                                <button type="button" class="payment-tab-btn" id="tabBtnCard"
-                                    onclick="switchPaymentTab('card')">
-                                    <i class="fa-brands fa-cc-visa"></i> Card (Visa / Mastercard)
+                                <button type="button" class="payment-tab-btn" id="tabBtnDirectMoMo"
+                                    onclick="switchPaymentTab('direct_momo')">
+                                    <i class="fa-solid fa-mobile-screen-button" style="color:#ffc000;"></i> Direct MoMo Transfer
+                                </button>
+                                <button type="button" class="payment-tab-btn" id="tabBtnPOD"
+                                    onclick="switchPaymentTab('pod')">
+                                    <i class="fa-solid fa-hand-holding-dollar" style="color:#25d366;"></i> Pay on Delivery
                                 </button>
                             </div>
 
-                            <!-- MoMo Payment Panel -->
-                            <div class="payment-panel active" id="payPanelMoMo">
-                                <div style="margin-bottom:14px;">
-                                    <label
-                                        style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:6px; display:block;">Select
-                                        Mobile Money Network *</label>
-                                    <div class="momo-providers-row">
-                                        <div class="momo-provider-chip provider-mtn active" id="momoChipMTN"
-                                            onclick="selectMoMoProvider('mtn')">
-                                            <span class="momo-chip-icon" style="color:#ffc000;"><i
-                                                    class="fa-solid fa-circle-dot"></i></span>
-                                            <span class="momo-chip-name">MTN MoMo</span>
-                                        </div>
-                                        <div class="momo-provider-chip provider-telecel" id="momoChipTelecel"
-                                            onclick="selectMoMoProvider('telecel')">
-                                            <span class="momo-chip-icon" style="color:#e50000;"><i
-                                                    class="fa-solid fa-wallet"></i></span>
-                                            <span class="momo-chip-name">Telecel Cash</span>
-                                        </div>
-                                        <div class="momo-provider-chip provider-at" id="momoChipAT"
-                                            onclick="selectMoMoProvider('at')">
-                                            <span class="momo-chip-icon" style="color:#0056b3;"><i
-                                                    class="fa-solid fa-sim-card"></i></span>
-                                            <span class="momo-chip-name">AT Money</span>
-                                        </div>
+                            <!-- Panel 1: Paystack Automated Online Gateway (MoMo & Cards) -->
+                            <div class="payment-panel active" id="payPanelPaystack">
+                                <div class="paystack-info-box" style="background:#fdfcfb; border:1px solid var(--color-border); border-radius:var(--radius-md); padding:16px; margin-bottom:16px;">
+                                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                                        <span style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:var(--color-gold); letter-spacing:0.05em;">
+                                            <i class="fa-solid fa-shield-halved"></i> Automated Instant Gateway
+                                        </span>
+                                        <span id="paystackModeBadge" class="badge badge-gold" style="font-size:0.7rem; padding:2px 8px;">Paystack GHS</span>
+                                    </div>
+                                    <p style="font-size:0.84rem; color:var(--color-text-muted); line-height:1.45; margin:0 0 12px;">
+                                        Authorize payment in real-time. Pay directly using <strong>MTN MoMo, Telecel Cash, AT Money</strong>, or <strong>Visa / Mastercard</strong> with instant automated receipt.
+                                    </p>
+                                    <div class="paystack-badge-row">
+                                        <span class="paystack-network-pill"><i class="fa-solid fa-circle" style="color:#ffc000; font-size:0.6rem;"></i> MTN MoMo</span>
+                                        <span class="paystack-network-pill"><i class="fa-solid fa-circle" style="color:#e50000; font-size:0.6rem;"></i> Telecel</span>
+                                        <span class="paystack-network-pill"><i class="fa-solid fa-circle" style="color:#0056b3; font-size:0.6rem;"></i> AT Money</span>
+                                        <span class="paystack-network-pill"><i class="fa-brands fa-cc-visa"></i> Visa</span>
+                                        <span class="paystack-network-pill"><i class="fa-brands fa-cc-mastercard"></i> Mastercard</span>
                                     </div>
                                 </div>
 
-                                <div class="form-field" style="margin-bottom:12px;">
-                                    <label
-                                        style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">Mobile
-                                        Money Number *</label>
-                                    <input type="tel" id="chkMoMoNumber" required placeholder="e.g. 024 123 4567"
-                                        class="customizer-input-field" style="padding:10px 14px; font-size:0.92rem;">
+                                <div style="background:var(--color-surface-soft); border-radius:var(--radius-md); padding:12px 14px; margin-bottom:18px; font-size:0.78rem; color:var(--color-text-muted); display:flex; align-items:center; gap:8px;">
+                                    <i class="fa-solid fa-lock" style="color:var(--color-gold); font-size:1.1rem;"></i>
+                                    <span>256-Bit SSL Encrypted • PCI-DSS Level 1 Certified • Powered by Paystack Ghana</span>
                                 </div>
 
-                                <!-- Voucher code for Telecel Cash -->
-                                <div class="form-field" id="telecelVoucherWrap"
-                                    style="display:none; margin-bottom:12px;">
-                                    <label
-                                        style="font-size:0.75rem; font-weight:600; color:#e50000; margin-bottom:4px; display:block;">Telecel
-                                        Cash Voucher Code (Dial *110# to generate) *</label>
-                                    <input type="text" id="chkTelecelVoucher"
-                                        placeholder="Enter 6-digit Telecel voucher" class="customizer-input-field"
-                                        style="padding:10px 14px; font-size:0.92rem;">
-                                    <span
-                                        style="font-size:0.72rem; color:var(--color-text-muted); margin-top:2px; display:block;">To
-                                        generate a voucher on Telecel: Dial *110# &gt; Choose Generate Voucher &gt;
-                                        Enter PIN.</span>
+                                <button type="button" class="btn btn-primary btn-block btn-paystack-action"
+                                    style="padding:14px; font-size:1rem;" onclick="processPaystackPayment()" id="btnPaystackAction">
+                                    <i class="fa-solid fa-lock"></i> Pay <span id="paystackPayBtnAmount">GH₵ 0.00</span> Securely
+                                </button>
+                            </div>
+
+                            <!-- Panel 2: Direct MoMo Merchant Transfer (Till / Business Number) -->
+                            <div class="payment-panel" id="payPanelDirectMoMo" style="display:none;">
+                                <div class="direct-momo-card">
+                                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                        <span style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:#b78103; letter-spacing:0.05em;">
+                                            <i class="fa-solid fa-building-columns"></i> Official Merchant Details
+                                        </span>
+                                        <span class="badge" style="background:#fff3cd; color:#856404; font-size:0.7rem;">Direct Transfer</span>
+                                    </div>
+                                    <p style="font-size:0.8rem; color:var(--color-text-muted); margin:0 0 10px;">
+                                        Transfer the order amount directly to our official business MoMo account using your phone or MoMo app:
+                                    </p>
+                                    <div class="direct-momo-row">
+                                        <span style="color:var(--color-text-muted);">Account Name:</span>
+                                        <strong id="directMoMoNameDisplay" style="color:var(--color-black);">Jewels by J (Jerrilyn Mensah)</strong>
+                                    </div>
+                                    <div class="direct-momo-row">
+                                        <span style="color:var(--color-text-muted);">MoMo Number / Till:</span>
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <strong id="directMoMoNumDisplay" style="font-family:monospace; font-size:0.95rem; color:var(--color-black);">050 059 4879</strong>
+                                            <button type="button" class="btn-copy-mini" onclick="copyDirectMoMoNumber()" title="Copy Number">
+                                                <i class="fa-regular fa-copy"></i> Copy
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="direct-momo-row">
+                                        <span style="color:var(--color-text-muted);">Network:</span>
+                                        <strong style="color:var(--color-black);">MTN MoMo / Telecel Cash</strong>
+                                    </div>
+                                    <div class="direct-momo-row">
+                                        <span style="color:var(--color-text-muted);">Amount to Send:</span>
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <strong id="directMoMoAmountDisplay" style="color:var(--color-gold); font-size:1rem;">GH₵ 0.00</strong>
+                                            <button type="button" class="btn-copy-mini" onclick="copyDirectMoMoAmount()" title="Copy Amount">
+                                                <i class="fa-regular fa-copy"></i> Copy
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="direct-momo-row">
+                                        <span style="color:var(--color-text-muted);">Reference:</span>
+                                        <code id="directMoMoRefDisplay" style="font-family:monospace; background:#fff; padding:2px 6px; border-radius:4px; border:1px solid #ffe082;">JBJ-ORDER</code>
+                                    </div>
                                 </div>
 
-                                <div
-                                    style="background:var(--color-cream); border:1px solid var(--color-border); border-radius:var(--radius-md); padding:12px; margin-bottom:18px; font-size:0.78rem; color:var(--color-text-muted); display:flex; gap:8px;">
-                                    <i class="fa-solid fa-circle-info"
-                                        style="color:var(--color-gold); font-size:1.1rem; margin-top:2px;"></i>
-                                    <div>
-                                        <strong>Instant USSD Prompt:</strong> When you click Pay Now, an approval prompt
-                                        will be sent directly to your phone. Enter your Mobile Money PIN to approve the
-                                        transaction.
+                                <div style="margin-top:14px; margin-bottom:12px;">
+                                    <label style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:6px; display:block;">
+                                        Enter Your Payment Verification Details *
+                                    </label>
+                                    <div class="form-grid-2" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+                                        <div class="form-field">
+                                            <label style="font-size:0.72rem; color:var(--color-text-muted); display:block; margin-bottom:2px;">Your MoMo Phone *</label>
+                                            <input type="tel" id="chkDirectSenderPhone" placeholder="e.g. 024 123 4567" class="customizer-input-field" style="padding:9px 12px; font-size:0.88rem;">
+                                        </div>
+                                        <div class="form-field">
+                                            <label style="font-size:0.72rem; color:var(--color-text-muted); display:block; margin-bottom:2px;">Account Name on Phone</label>
+                                            <input type="text" id="chkDirectSenderName" placeholder="e.g. Ama Serwaa" class="customizer-input-field" style="padding:9px 12px; font-size:0.88rem;">
+                                        </div>
+                                    </div>
+                                    <div class="form-field" style="margin-bottom:14px;">
+                                        <label style="font-size:0.72rem; color:var(--color-text-muted); display:block; margin-bottom:2px;">
+                                            MoMo Transaction ID / Reference (From SMS) *
+                                        </label>
+                                        <input type="text" id="chkDirectTxId" placeholder="e.g. 28941823901" class="customizer-input-field" style="padding:9px 12px; font-size:0.88rem; font-family:monospace;">
+                                        <span style="font-size:0.7rem; color:var(--color-text-muted); margin-top:3px; display:block;">
+                                            Found in the SMS confirmation received from MTN (*170#) or Telecel (*110#) after transfer.
+                                        </span>
                                     </div>
                                 </div>
 
                                 <button type="button" class="btn btn-primary btn-block"
-                                    style="padding:14px; font-size:1rem;" onclick="processMoMoPayment()">
-                                    <i class="fa-solid fa-mobile-screen"></i> Pay <span id="momoPayBtnAmount">GH₵
-                                        0.00</span> with MoMo
+                                    style="padding:14px; font-size:1rem;" onclick="processDirectMoMoPayment()">
+                                    <i class="fa-solid fa-circle-check"></i> Submit MoMo Payment Verification
                                 </button>
                             </div>
 
-                            <!-- Card Payment Panel -->
-                            <div class="payment-panel" id="payPanelCard" style="display:none;">
-                                <div class="form-field" style="margin-bottom:12px;">
-                                    <label
-                                        style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">Name
-                                        on Card *</label>
-                                    <input type="text" id="chkCardName" placeholder="e.g. Ama Mensah"
-                                        class="customizer-input-field" style="padding:10px 14px; font-size:0.92rem;">
-                                </div>
-
-                                <div class="form-field" style="margin-bottom:12px;">
-                                    <label
-                                        style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">Card
-                                        Number *</label>
-                                    <div class="card-input-wrap">
-                                        <input type="text" id="chkCardNumber" maxlength="19"
-                                            oninput="formatCardNumber(this)" placeholder="4000 1234 5678 9010"
-                                            class="customizer-input-field"
-                                            style="padding:10px 14px; font-size:0.92rem;">
-                                        <div class="card-brands-icons">
-                                            <i class="fa-brands fa-cc-visa" id="cardBrandVisa"></i>
-                                            <i class="fa-brands fa-cc-mastercard" id="cardBrandMastercard"></i>
+                            <!-- Panel 3: Pay on Delivery (Accra Metro Only) -->
+                            <div class="payment-panel" id="payPanelPOD" style="display:none;">
+                                <div id="podAvailableWrap">
+                                    <div style="background:#f1f8e9; border:1.5px solid #c8e6c9; border-radius:var(--radius-md); padding:16px; margin-bottom:16px;">
+                                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                            <span style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:#2e7d32; letter-spacing:0.05em;">
+                                                <i class="fa-solid fa-hand-holding-dollar"></i> Greater Accra Dispatch
+                                            </span>
+                                            <span class="badge" style="background:#e8f5e9; color:#2e7d32; font-size:0.7rem;">Verified Courier</span>
+                                        </div>
+                                        <p style="font-size:0.84rem; color:var(--color-black); line-height:1.45; margin:0 0 10px;">
+                                            Pay in cash or transfer via Mobile Money directly to the dispatch courier upon delivery of your jewelry package.
+                                        </p>
+                                        <div style="font-size:0.78rem; color:var(--color-text-muted); line-height:1.4;">
+                                            • Inspect piece upon handover<br>
+                                            • Amount to pay rider: <strong id="podAmountDisplay" style="color:var(--color-black);">GH₵ 0.00</strong><br>
+                                            • Rider accepts Cash or MoMo on arrival
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="form-grid-2"
-                                    style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
-                                    <div class="form-field">
-                                        <label
-                                            style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">Expiry
-                                            Date (MM/YY) *</label>
-                                        <input type="text" id="chkCardExpiry" maxlength="5"
-                                            oninput="formatCardExpiry(this)" placeholder="12/28"
-                                            class="customizer-input-field"
-                                            style="padding:10px 14px; font-size:0.92rem;">
-                                    </div>
-                                    <div class="form-field">
-                                        <label
-                                            style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:4px; display:block;">CVV
-                                            / Security Code *</label>
-                                        <input type="password" id="chkCardCVV" maxlength="4" placeholder="123"
-                                            class="customizer-input-field"
-                                            style="padding:10px 14px; font-size:0.92rem;">
-                                    </div>
-                                </div>
-
-                                <div
-                                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-                                    <button type="button" class="btn btn-outline btn-sm" onclick="fillDemoCard()"
-                                        style="font-size:0.74rem;">
-                                        <i class="fa-solid fa-wand-magic-sparkles"></i> Fill Demo Test Card
+                                    <button type="button" class="btn btn-primary btn-block"
+                                        style="padding:14px; font-size:1rem;" onclick="processPayOnDelivery()">
+                                        <i class="fa-solid fa-truck-fast"></i> Confirm Order (Pay on Delivery)
                                     </button>
-                                    <span style="font-size:0.72rem; color:var(--color-text-muted);"><i
-                                            class="fa-solid fa-lock"></i> 256-Bit SSL Encrypted</span>
                                 </div>
-
-                                <button type="button" class="btn btn-primary btn-block"
-                                    style="padding:14px; font-size:1rem;" onclick="processCardPayment()">
-                                    <i class="fa-regular fa-credit-card"></i> Pay <span id="cardPayBtnAmount">GH₵
-                                        0.00</span> with Card
-                                </button>
+                                <div id="podRestrictedWrap" style="display:none; text-align:center; padding:20px 10px;">
+                                    <i class="fa-solid fa-location-dot" style="font-size:2rem; color:var(--color-gold); margin-bottom:10px;"></i>
+                                    <h4 style="font-size:1rem; margin-bottom:6px;">Regional Delivery Selected</h4>
+                                    <p style="font-size:0.82rem; color:var(--color-text-muted); max-width:380px; margin:0 auto 14px;">
+                                        Pay on Delivery is currently available exclusively for Greater Accra Central deliveries. For orders outside Accra, please pay securely via Paystack Online or Direct MoMo Transfer.
+                                    </p>
+                                    <button type="button" class="btn btn-outline btn-sm" onclick="switchPaymentTab('paystack')">
+                                        Switch to Paystack Online
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -2646,6 +2733,50 @@
         </div>
     </div>
 
+    <!-- Google Apps Script & Sheets Sync Template Modal -->
+    <div class="auth-modal-backdrop modal-backdrop" id="googleSheetsTemplateModal" style="display:none;" onclick="if(event.target === this) closeGoogleSheetsTemplateModal()">
+        <div class="auth-modal-card modal-card" style="max-width:680px;">
+            <button class="auth-close-btn" type="button" onclick="closeGoogleSheetsTemplateModal()" aria-label="Close modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div style="padding:28px 24px;">
+                <div style="border-bottom:1px solid var(--color-border); padding-bottom:12px; margin-bottom:16px;">
+                    <span class="badge badge-gold" style="font-size:0.7rem;">Free Google Cloud Backend</span>
+                    <h3 style="font-size:1.25rem; color:var(--color-black); margin-top:6px; font-family:var(--font-heading);">
+                        Google Sheets Live Sync Template
+                    </h3>
+                    <p style="font-size:0.8rem; color:var(--color-text-muted);">
+                        Deploy this Apps Script code in your Google Sheet to automatically log incoming customer orders and power live remote tracking lookups.
+                    </p>
+                </div>
+
+                <div style="font-size:0.82rem; color:var(--color-black); line-height:1.5; margin-bottom:14px;">
+                    <strong>3-Minute Setup:</strong>
+                    <ol style="padding-left:18px; margin:6px 0; color:var(--color-text-muted);">
+                        <li>Open <a href="https://sheets.new" target="_blank" style="color:var(--color-gold); font-weight:600;">sheets.new</a> to create a new spreadsheet named <em>Jewels by J Orders</em>.</li>
+                        <li>In the menu, go to <strong>Extensions &gt; Apps Script</strong>.</li>
+                        <li>Delete any existing code, paste the script below, and click <strong>Deploy &gt; New deployment</strong>.</li>
+                        <li>Select <strong>Web app</strong>, set <em>Who has access</em> to <strong>Anyone</strong>, and click <strong>Deploy</strong>.</li>
+                        <li>Copy the generated <strong>Web app URL</strong> and paste it into the <em>Google Sheets Sync URL</em> field in Admin Settings!</li>
+                    </ol>
+                </div>
+
+                <div style="position:relative; margin-bottom:18px;">
+                    <textarea id="googleAppsScriptCode" readonly style="width:100%; height:200px; font-family:monospace; font-size:0.75rem; background:#1e1e1e; color:#e0e0e0; padding:12px; border-radius:var(--radius-md); border:none; resize:vertical;"></textarea>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="copyGoogleAppsScriptCode()" style="position:absolute; top:8px; right:8px; padding:4px 10px; font-size:0.74rem;">
+                        <i class="fa-regular fa-copy"></i> Copy Script
+                    </button>
+                </div>
+
+                <div style="text-align:right;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="closeGoogleSheetsTemplateModal()">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ═══════════════════════════════════════════════════════════════════════
        8. SITE FOOTER (STRAND BRAND BLUSH WINE SIGNATURE)
        ═══════════════════════════════════════════════════════════════════════ -->
@@ -2745,6 +2876,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <!-- Paystack Inline Popup SDK (Real Ghana MoMo & Card Payments) -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
 
     <!-- Application Script -->
     <script src="app.js"></script>

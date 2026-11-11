@@ -442,6 +442,10 @@ if (!storeSettings) {
         email: SITE_CONFIG.email,
         freeDeliveryThreshold: SITE_CONFIG.freeDeliveryThreshold,
         adminPIN: "2023",
+        paystackPublicKey: "",
+        momoMerchantNumber: "0500594879",
+        momoMerchantName: "Jewels by J (Jerrilyn Mensah)",
+        cloudSyncUrl: "",
         preferences: {
             theme: "default",
             fontSize: "standard",
@@ -459,6 +463,10 @@ if (!storeSettings) {
     if (storeSettings.adminPIN === "1234") {
         storeSettings.adminPIN = "2023";
     }
+    if (storeSettings.paystackPublicKey === undefined) storeSettings.paystackPublicKey = "";
+    if (!storeSettings.momoMerchantNumber) storeSettings.momoMerchantNumber = "0500594879";
+    if (!storeSettings.momoMerchantName) storeSettings.momoMerchantName = "Jewels by J (Jerrilyn Mensah)";
+    if (storeSettings.cloudSyncUrl === undefined) storeSettings.cloudSyncUrl = "";
     if (!storeSettings.preferences) {
         storeSettings.preferences = {
             theme: "default",
@@ -471,8 +479,8 @@ if (!storeSettings) {
             currency: "GHS",
             waTemplate: "Hello! ✨ Thank you for contacting Jewels by J. How can we assist with your bespoke jewelry today?"
         };
-        localStorage.setItem("j_settings", JSON.stringify(storeSettings));
     }
+    localStorage.setItem("j_settings", JSON.stringify(storeSettings));
 }
 
 // ── Store Messages / Inquiries (Admin Customer Inbox) ──
@@ -578,7 +586,7 @@ let checkoutState = {
     deliveryFee: 0, // Delivery fee is NOT added to customer's price; arranged manually via phone/text
     deliveryTimeline: "24–48 Hours",
     grandTotal: 0,
-    paymentMethod: "momo",
+    paymentMethod: "paystack",
     momoProvider: "mtn",
     customerInfo: null,
     pendingOrder: null,
@@ -620,6 +628,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (catParam) {
         setCategory(catParam);
         navigateTo("shop");
+    }
+
+    // Check URL parameters for direct order tracking deep-links (?track=JBJ-... or ?order=JBJ-...)
+    const trackParam = params.get("track") || params.get("order");
+    if (trackParam) {
+        setTimeout(() => {
+            trackSpecificOrder(trackParam.trim(), "");
+        }, 150);
     }
 });
 
@@ -2963,6 +2979,9 @@ function updateCheckoutTotals() {
     const payGrandEl = document.getElementById("chkPayGrandTotalDisplay");
     const momoBtnEl = document.getElementById("momoPayBtnAmount");
     const cardBtnEl = document.getElementById("cardPayBtnAmount");
+    const paystackBtnEl = document.getElementById("paystackPayBtnAmount");
+    const directMoMoAmountEl = document.getElementById("directMoMoAmountDisplay");
+    const podAmountEl = document.getElementById("podAmountDisplay");
 
     const formattedSub = `${SITE_CONFIG.currency} ${subtotal.toFixed(2)}`;
     const formattedDel = `<span style="color:var(--color-gold); font-weight:600; font-size:0.78rem;"><i class="fa-solid fa-phone" style="font-size:0.7rem; margin-right:3px;"></i> Arranged via Phone / Text</span>`;
@@ -2978,6 +2997,9 @@ function updateCheckoutTotals() {
 
     if (momoBtnEl) momoBtnEl.textContent = formattedGrand;
     if (cardBtnEl) cardBtnEl.textContent = formattedGrand;
+    if (paystackBtnEl) paystackBtnEl.textContent = formattedGrand;
+    if (directMoMoAmountEl) directMoMoAmountEl.textContent = formattedGrand;
+    if (podAmountEl) podAmountEl.textContent = formattedGrand;
 }
 
 function renderCheckoutMiniItems() {
@@ -3024,12 +3046,47 @@ function proceedToCheckoutPayment(event) {
     const sumName = document.getElementById("chkSummaryRecipientName");
     const sumAddr = document.getElementById("chkSummaryAddress");
     const sumPhone = document.getElementById("chkSummaryPhone");
-    const momoPhoneInput = document.getElementById("chkMoMoNumber");
 
     if (sumName) sumName.textContent = name;
     if (sumAddr) sumAddr.textContent = `${address} (${DELIVERY_RATES[checkoutState.deliveryRegion]?.name || 'Accra'})`;
     if (sumPhone) sumPhone.textContent = phone;
-    if (momoPhoneInput && !momoPhoneInput.value) momoPhoneInput.value = phone;
+
+    // Update Direct MoMo Merchant displays
+    const momoNameEl = document.getElementById("directMoMoNameDisplay");
+    const momoNumEl = document.getElementById("directMoMoNumDisplay");
+    const momoAmtEl = document.getElementById("directMoMoAmountDisplay");
+    const momoRefEl = document.getElementById("directMoMoRefDisplay");
+    const senderPhoneInput = document.getElementById("chkDirectSenderPhone");
+    const senderNameInput = document.getElementById("chkDirectSenderName");
+
+    if (momoNameEl) momoNameEl.textContent = storeSettings.momoMerchantName || "Jewels by J (Jerrilyn Mensah)";
+    if (momoNumEl) momoNumEl.textContent = storeSettings.momoMerchantNumber || "050 059 4879";
+    if (momoAmtEl) momoAmtEl.textContent = `${SITE_CONFIG.currency} ${checkoutState.grandTotal.toFixed(2)}`;
+    if (momoRefEl) momoRefEl.textContent = `JBJ-${phone.replace(/\D/g, "").slice(-4) || 'GH'}-${Math.floor(100 + Math.random() * 900)}`;
+    if (senderPhoneInput && !senderPhoneInput.value) senderPhoneInput.value = phone;
+    if (senderNameInput && !senderNameInput.value) senderNameInput.value = name;
+
+    // Check Pay on Delivery availability based on region
+    const isAccra = ["accra-std", "accra-exp", "tema"].includes(checkoutState.deliveryRegion);
+    const podAvail = document.getElementById("podAvailableWrap");
+    const podRestricted = document.getElementById("podRestrictedWrap");
+    const tabPOD = document.getElementById("tabBtnPOD");
+
+    if (podAvail) podAvail.style.display = isAccra ? "block" : "none";
+    if (podRestricted) podRestricted.style.display = isAccra ? "none" : "block";
+    if (tabPOD) {
+        if (!isAccra) {
+            tabPOD.title = "Pay on Delivery is available for Greater Accra only";
+        } else {
+            tabPOD.title = "";
+        }
+    }
+
+    // Update Paystack badge
+    updatePaystackBadge();
+
+    // Default to Paystack
+    switchPaymentTab("paystack");
 
     showCheckoutPane(2);
 }
@@ -3038,164 +3095,226 @@ function backToCheckoutDelivery() {
     showCheckoutPane(1);
 }
 
-// ── MoMo Tab & Networks (Feature #3) ──
+// ── Real Payment Tabs & Switcher ──
 function switchPaymentTab(tabKey) {
     checkoutState.paymentMethod = tabKey;
-    const tabBtnMoMo = document.getElementById("tabBtnMoMo");
-    const tabBtnCard = document.getElementById("tabBtnCard");
-    const payPanelMoMo = document.getElementById("payPanelMoMo");
-    const payPanelCard = document.getElementById("payPanelCard");
+    const tabBtnPaystack = document.getElementById("tabBtnPaystack");
+    const tabBtnDirectMoMo = document.getElementById("tabBtnDirectMoMo");
+    const tabBtnPOD = document.getElementById("tabBtnPOD");
 
-    if (tabKey === "momo") {
-        tabBtnMoMo?.classList.add("active");
-        tabBtnCard?.classList.remove("active");
-        if (payPanelMoMo) payPanelMoMo.style.display = "block";
-        if (payPanelCard) payPanelCard.style.display = "none";
+    const payPanelPaystack = document.getElementById("payPanelPaystack");
+    const payPanelDirectMoMo = document.getElementById("payPanelDirectMoMo");
+    const payPanelPOD = document.getElementById("payPanelPOD");
+
+    [tabBtnPaystack, tabBtnDirectMoMo, tabBtnPOD].forEach(b => b?.classList.remove("active"));
+    [payPanelPaystack, payPanelDirectMoMo, payPanelPOD].forEach(p => {
+        if (p) p.style.display = "none";
+    });
+
+    if (tabKey === "paystack") {
+        tabBtnPaystack?.classList.add("active");
+        if (payPanelPaystack) payPanelPaystack.style.display = "block";
+    } else if (tabKey === "direct_momo") {
+        tabBtnDirectMoMo?.classList.add("active");
+        if (payPanelDirectMoMo) payPanelDirectMoMo.style.display = "block";
+    } else if (tabKey === "pod") {
+        tabBtnPOD?.classList.add("active");
+        if (payPanelPOD) payPanelPOD.style.display = "block";
+    }
+}
+
+function updatePaystackBadge() {
+    const badge = document.getElementById("paystackModeBadge");
+    if (!badge) return;
+    const key = (storeSettings.paystackPublicKey || "").trim();
+    if (key.startsWith("pk_live_")) {
+        badge.textContent = "Live Gateway (GHS)";
+        badge.className = "badge";
+        badge.style.background = "#e8f5e9";
+        badge.style.color = "#2e7d32";
+    } else if (key.startsWith("pk_test_")) {
+        badge.textContent = "Test Sandbox (GHS)";
+        badge.className = "badge";
+        badge.style.background = "#fff3cd";
+        badge.style.color = "#856404";
     } else {
-        tabBtnCard?.classList.add("active");
-        tabBtnMoMo?.classList.remove("active");
-        if (payPanelCard) payPanelCard.style.display = "block";
-        if (payPanelMoMo) payPanelMoMo.style.display = "none";
+        badge.textContent = "Paystack Ready (GHS)";
+        badge.className = "badge badge-gold";
+        badge.style.background = "";
+        badge.style.color = "";
     }
 }
 
-function selectMoMoProvider(providerKey) {
-    checkoutState.momoProvider = providerKey;
-    document.querySelectorAll(".momo-provider-chip").forEach(c => c.classList.remove("active"));
-    const selected = document.getElementById("momoChip" + providerKey.toUpperCase());
-    if (selected) selected.classList.add("active");
-
-    const telecelWrap = document.getElementById("telecelVoucherWrap");
-    if (telecelWrap) {
-        telecelWrap.style.display = providerKey === "telecel" ? "block" : "none";
+// ── Copy Helpers for Direct MoMo ──
+function copyDirectMoMoNumber() {
+    const num = storeSettings.momoMerchantNumber || "0500594879";
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(num).then(() => {
+            showToast("Copied!", `MoMo Number ${num} copied to clipboard.`);
+        }).catch(() => {
+            showToast("MoMo Number", num);
+        });
+    } else {
+        showToast("MoMo Number", num);
     }
 }
 
-function processMoMoPayment() {
-    const momoNumber = document.getElementById("chkMoMoNumber")?.value.trim();
-    if (!momoNumber) {
-        showToast("MoMo Number Required", "Please enter your Mobile Money phone number.");
+function copyDirectMoMoAmount() {
+    const amt = checkoutState.grandTotal.toFixed(2);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(amt).then(() => {
+            showToast("Copied!", `Amount GH₵ ${amt} copied to clipboard.`);
+        }).catch(() => {
+            showToast("Amount", `GH₵ ${amt}`);
+        });
+    } else {
+        showToast("Amount", `GH₵ ${amt}`);
+    }
+}
+
+// ── Paystack Real Gateway (Inline Popup) ──
+function processPaystackPayment() {
+    const cust = checkoutState.customerInfo;
+    if (!cust) {
+        showToast("Missing Details", "Please complete your delivery details first.");
+        showCheckoutPane(1);
         return;
     }
 
-    if (checkoutState.momoProvider === "telecel") {
-        const voucher = document.getElementById("chkTelecelVoucher")?.value.trim();
-        if (!voucher) {
-            showToast("Voucher Required", "Please enter your 6-digit Telecel Cash voucher code (dial *110#).");
-            return;
+    const payBtn = document.getElementById("btnPaystackAction");
+    const configuredKey = (storeSettings && storeSettings.paystackPublicKey) ? storeSettings.paystackPublicKey.trim() : "";
+
+    // If key not configured yet, use test sample key or prompt
+    const activeKey = configuredKey || "pk_test_b8e235a96860086eb297fc9ca5adfc8efaa67812";
+
+    if (typeof PaystackPop === "undefined") {
+        if (payBtn) {
+            payBtn.disabled = true;
+            payBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading Paystack...';
         }
+        showToast("Connecting Gateway", "Loading secure Paystack payment gateway...");
+
+        const script = document.createElement("script");
+        script.src = "https://js.paystack.co/v1/inline.js";
+        script.onload = () => {
+            if (payBtn) {
+                payBtn.disabled = false;
+                payBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Pay ${SITE_CONFIG.currency} ${checkoutState.grandTotal.toFixed(2)} Securely`;
+            }
+            initiatePaystackPop(activeKey, cust);
+        };
+        script.onerror = () => {
+            if (payBtn) {
+                payBtn.disabled = false;
+                payBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Pay ${SITE_CONFIG.currency} ${checkoutState.grandTotal.toFixed(2)} Securely`;
+            }
+            showToast("Gateway Unavailable", "Could not load Paystack online. You can pay via Direct MoMo Transfer.");
+            switchPaymentTab("direct_momo");
+        };
+        document.head.appendChild(script);
+        return;
     }
 
-    // Open USSD simulation screen
-    const simAmount = document.getElementById("simPromptAmount");
-    const simAmountInner = document.getElementById("simPromptAmountInner");
-    const simPhone = document.getElementById("simPromptPhone");
-    const simCountdown = document.getElementById("simCountdown");
+    initiatePaystackPop(activeKey, cust);
+}
 
-    const amountFormatted = `${SITE_CONFIG.currency} ${checkoutState.grandTotal.toFixed(2)}`;
-    if (simAmount) simAmount.textContent = amountFormatted;
-    if (simAmountInner) simAmountInner.textContent = checkoutState.grandTotal.toFixed(2);
-    if (simPhone) simPhone.textContent = momoNumber;
+function initiatePaystackPop(key, cust) {
+    const payBtn = document.getElementById("btnPaystackAction");
+    if (payBtn) {
+        payBtn.disabled = true;
+        payBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authorizing Gateway...';
+    }
 
-    showCheckoutPane("sim");
+    try {
+        const handler = PaystackPop.setup({
+            key: key,
+            email: cust.email || "client@jewelsbyj.com",
+            amount: Math.round(Number(checkoutState.grandTotal) * 100), // in Pesewas
+            currency: "GHS",
+            channels: ["mobile_money", "card"],
+            metadata: {
+                custom_fields: [
+                    { display_name: "Customer Name", variable_name: "customer_name", value: cust.name },
+                    { display_name: "Customer Phone", variable_name: "customer_phone", value: cust.phone },
+                    { display_name: "Delivery Address", variable_name: "delivery_address", value: `${cust.address} (${DELIVERY_RATES[checkoutState.deliveryRegion]?.name || 'Accra'})` }
+                ]
+            },
+            callback: function(response) {
+                if (payBtn) {
+                    payBtn.disabled = false;
+                    payBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Pay ${SITE_CONFIG.currency} ${checkoutState.grandTotal.toFixed(2)} Securely`;
+                }
+                const channelName = response.channel ? `Paystack (${response.channel.toUpperCase()})` : "Paystack Online (GHS)";
+                const ref = response.reference || response.trxref || `PSTK-${Date.now()}`;
+                finalizeOrderPlacement(channelName, ref);
+            },
+            onClose: function() {
+                if (payBtn) {
+                    payBtn.disabled = false;
+                    payBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Pay ${SITE_CONFIG.currency} ${checkoutState.grandTotal.toFixed(2)} Securely`;
+                }
+                showToast("Payment Cancelled", "Payment window closed without authorizing. You can try again or use Direct MoMo.");
+            }
+        });
 
-    // Countdown simulation
-    let timeLeft = 4;
-    if (simCountdown) simCountdown.textContent = timeLeft;
-
-    if (checkoutState.simTimer) clearInterval(checkoutState.simTimer);
-    checkoutState.simTimer = setInterval(() => {
-        timeLeft--;
-        if (simCountdown) simCountdown.textContent = timeLeft;
-        if (timeLeft <= 0) {
-            clearInterval(checkoutState.simTimer);
-            checkoutState.simTimer = null;
-            completeMoMoSimulation();
+        handler.openIframe();
+    } catch (err) {
+        console.error("Paystack Error:", err);
+        if (payBtn) {
+            payBtn.disabled = false;
+            payBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Pay ${SITE_CONFIG.currency} ${checkoutState.grandTotal.toFixed(2)} Securely`;
         }
-    }, 1000);
-}
-
-function completeMoMoSimulation() {
-    if (checkoutState.simTimer) {
-        clearInterval(checkoutState.simTimer);
-        checkoutState.simTimer = null;
-    }
-
-    const providerNames = { mtn: "MTN MoMo", telecel: "Telecel Cash", at: "AT Money" };
-    const network = providerNames[checkoutState.momoProvider] || "MTN MoMo";
-    const ref = `MOMO-${checkoutState.momoProvider.toUpperCase()}-${Math.floor(100000 + Math.random() * 900000)}`;
-
-    finalizeOrderPlacement(network, ref);
-}
-
-// ── Card Payments (Feature #4) ──
-function formatCardNumber(input) {
-    let value = input.value.replace(/\D/g, "");
-    let formatted = value.match(/.{1,4}/g)?.join(" ") || "";
-    input.value = formatted;
-
-    // Detect card type
-    const visaIcon = document.getElementById("cardBrandVisa");
-    const mcIcon = document.getElementById("cardBrandMastercard");
-
-    if (value.startsWith("4")) {
-        visaIcon?.classList.add("active");
-        mcIcon?.classList.remove("active");
-    } else if (/^(5[1-5]|2[2-7])/.test(value)) {
-        mcIcon?.classList.add("active");
-        visaIcon?.classList.remove("active");
-    } else {
-        visaIcon?.classList.remove("active");
-        mcIcon?.classList.remove("active");
+        showToast("Gateway Notice", "Could not open Paystack popup. Please use Direct MoMo Transfer to complete your order.");
+        switchPaymentTab("direct_momo");
     }
 }
 
-function formatCardExpiry(input) {
-    let value = input.value.replace(/\D/g, "");
-    if (value.length > 2) {
-        input.value = value.substring(0, 2) + "/" + value.substring(2, 4);
-    } else {
-        input.value = value;
-    }
-}
+// ── Direct MoMo Merchant Transfer (Till / Business Phone) ──
+function processDirectMoMoPayment() {
+    const senderPhone = document.getElementById("chkDirectSenderPhone")?.value.trim();
+    const senderName = document.getElementById("chkDirectSenderName")?.value.trim() || checkoutState.customerInfo?.name || "Valued Customer";
+    const txId = document.getElementById("chkDirectTxId")?.value.trim();
 
-function fillDemoCard() {
-    const nameEl = document.getElementById("chkCardName");
-    const numEl = document.getElementById("chkCardNumber");
-    const expEl = document.getElementById("chkCardExpiry");
-    const cvvEl = document.getElementById("chkCardCVV");
-
-    if (nameEl) nameEl.value = checkoutState.customerInfo?.name || "Ama Serwaa Mensah";
-    if (numEl) {
-        numEl.value = "4111 2222 3333 4444";
-        formatCardNumber(numEl);
-    }
-    if (expEl) expEl.value = "12/28";
-    if (cvvEl) cvvEl.value = "123";
-
-    showToast("Test Card Loaded", "Loaded verified demo Visa card for testing.");
-}
-
-function processCardPayment() {
-    const cardName = document.getElementById("chkCardName")?.value.trim();
-    const cardNum = document.getElementById("chkCardNumber")?.value.replace(/\s/g, "");
-    const cardExp = document.getElementById("chkCardExpiry")?.value.trim();
-    const cardCVV = document.getElementById("chkCardCVV")?.value.trim();
-
-    if (!cardName || !cardNum || !cardExp || !cardCVV) {
-        showToast("Missing Card Details", "Please fill in all card payment fields.");
+    if (!senderPhone) {
+        showToast("Phone Required", "Please enter the phone number you sent the Mobile Money from.");
+        document.getElementById("chkDirectSenderPhone")?.focus();
         return;
     }
 
-    if (cardNum.length < 15) {
-        showToast("Invalid Card Number", "Please enter a valid 16-digit card number.");
+    if (!txId) {
+        showToast("Transaction ID Required", "Please enter the Transaction ID received in your MoMo confirmation SMS.");
+        document.getElementById("chkDirectTxId")?.focus();
         return;
     }
 
-    const cardBrand = cardNum.startsWith("4") ? "Visa Card" : "Mastercard";
-    const ref = `CARD-${Math.floor(100000 + Math.random() * 900000)}`;
+    if (txId.length < 5) {
+        showToast("Invalid ID", "Please check your SMS and enter a valid MoMo Transaction ID.");
+        document.getElementById("chkDirectTxId")?.focus();
+        return;
+    }
 
-    finalizeOrderPlacement(cardBrand, ref);
+    const cleanTxId = txId.replace(/[^a-zA-Z0-9_-]/g, "").toUpperCase();
+    const cleanPhone = senderPhone.replace(/[\s+-]/g, "");
+
+    // Note in order details
+    if (checkoutState.customerInfo) {
+        const existingNotes = checkoutState.customerInfo.notes && checkoutState.customerInfo.notes !== "None" ? `${checkoutState.customerInfo.notes} | ` : "";
+        checkoutState.customerInfo.notes = `${existingNotes}Direct MoMo Sender: ${senderName} (${cleanPhone}), SMS TxID: ${cleanTxId}`;
+    }
+
+    finalizeOrderPlacement("Direct MoMo Transfer", cleanTxId);
+}
+
+// ── Pay on Delivery (Greater Accra Metro Only) ──
+function processPayOnDelivery() {
+    const isAccra = ["accra-std", "accra-exp", "tema"].includes(checkoutState.deliveryRegion);
+    if (!isAccra) {
+        showToast("Accra Only", "Pay on Delivery is available exclusively for deliveries within Greater Accra.");
+        return;
+    }
+
+    const podRef = `POD-${checkoutState.deliveryRegion.toUpperCase()}-${Math.floor(100000 + Math.random() * 900000)}`;
+    finalizeOrderPlacement("Pay on Delivery (Accra Metro)", podRef);
 }
 
 // ── Finalize Order & Trigger Notifications (Feature #6) ──
@@ -3208,6 +3327,12 @@ function finalizeOrderPlacement(paymentMethodName, paymentRef) {
         address: "Accra, Ghana",
         notes: ""
     };
+
+    const isPOD = paymentMethodName.includes("Pay on Delivery");
+    const isDirectMoMo = paymentMethodName.includes("Direct MoMo");
+
+    const orderStatusCode = isPOD ? "placed" : (isDirectMoMo ? "confirmed" : "confirmed");
+    const orderStatusName = isPOD ? "Order Placed (Pay on Delivery)" : (isDirectMoMo ? "Payment Awaiting Verification" : "Payment Confirmed");
 
     const newOrder = {
         id: orderId,
@@ -3231,15 +3356,18 @@ function finalizeOrderPlacement(paymentMethodName, paymentRef) {
         paymentMethod: paymentMethodName,
         paymentRef: paymentRef,
         notes: cust.notes || "None",
-        status: "Payment Confirmed",
-        statusCode: "confirmed",
+        status: orderStatusName,
+        statusCode: orderStatusCode,
         timeline: `Dispatches to ${cust.address} (${checkoutState.deliveryTimeline})`
     };
 
-    // Save order
+    // Save order locally
     lastPlacedOrderId = orderId;
     storeOrders.unshift(newOrder);
     localStorage.setItem("j_orders", JSON.stringify(storeOrders));
+
+    // Sync order to Cloud Database (Firebase Firestore & Google Sheets / REST Webhook)
+    syncOrderToCloud(newOrder);
 
     // Play subtle audio alert & trigger email notification
     playOrderNotificationSound();
@@ -3258,13 +3386,14 @@ function finalizeOrderPlacement(paymentMethodName, paymentRef) {
         waText += `*Customer:* ${cust.name} (${cust.phone})\n`;
         waText += `*Email:* ${cust.email}\n`;
         waText += `*Delivery Address:* ${cust.address} (${newOrder.regionName})\n`;
-        waText += `*Payment Method:* ${paymentMethodName} (Ref: ${paymentRef})\n`;
+        waText += `*Payment Method:* ${paymentMethodName}\n`;
+        waText += `*Payment Reference:* ${paymentRef}\n`;
         waText += `*Total Amount:* ${SITE_CONFIG.currency} ${newOrder.total.toFixed(2)}\n\n`;
         waText += `*Items Ordered:*\n`;
         newOrder.items.forEach((it, idx) => {
             waText += `${idx + 1}. ${it.title} ${it.option ? '(' + it.option + ')' : ''} × ${it.qty} = ${SITE_CONFIG.currency} ${(it.price * it.qty).toFixed(2)}\n`;
         });
-        if (cust.notes) waText += `\n*Custom Notes / Engraving:* ${cust.notes}\n`;
+        if (cust.notes && cust.notes !== "None") waText += `\n*Notes:* ${cust.notes}\n`;
         waText += `\nPlease confirm receiving my order!`;
 
         const waUrl = `https://wa.me/${storeSettings.whatsappNumber || SITE_CONFIG.whatsappNumber}?text=${encodeURIComponent(waText)}`;
@@ -3365,6 +3494,437 @@ function sendEmailOrderNotification(order) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// CLOUD SYNC & REMOTE DATABASE TRACKING SYSTEM (FIREBASE & GOOGLE SHEETS)
+// ═══════════════════════════════════════════════════════════════════════════
+
+let currentLiveTrackingUnsubscribe = null;
+
+const GOOGLE_APPS_SCRIPT_CODE_TEMPLATE = `// ═══════════════════════════════════════════════════════════════════════════
+// JEWELS BY J — GOOGLE SHEETS LIVE ORDER DATABASE & TRACKING BACKEND
+// ═══════════════════════════════════════════════════════════════════════════
+// Instructions:
+// 1. Create a Google Sheet named "Jewels by J Orders" (sheets.new)
+// 2. Go to Extensions > Apps Script
+// 3. Paste this code and click Deploy > New Deployment > Web App
+// 4. Set "Who has access" to "Anyone" and copy the Web App URL
+// ═══════════════════════════════════════════════════════════════════════════
+
+function doPost(e) {
+  try {
+    var sheet = getOrCreateOrdersSheet();
+    var data = JSON.parse(e.postData.contents);
+    var action = data.action || "create_order";
+
+    if (action === "create_order") {
+      sheet.appendRow([
+        data.order_id || "",
+        data.order_date || new Date().toISOString(),
+        data.customer_name || "",
+        data.customer_phone || "",
+        data.customer_email || "",
+        data.delivery_address || "",
+        data.region || "",
+        data.total || 0,
+        data.payment_method || "",
+        data.payment_ref || "",
+        data.status || "Payment Confirmed",
+        data.items_detail || "",
+        data.notes || ""
+      ]);
+      return createJsonResponse({ status: "success", message: "Order logged", id: data.order_id });
+    }
+
+    if (action === "update_status") {
+      var rows = sheet.getDataRange().getValues();
+      for (var i = 1; i < rows.length; i++) {
+        if (rows[i][0] == data.order_id) {
+          sheet.getRange(i + 1, 11).setValue(data.status);
+          return createJsonResponse({ status: "success", message: "Status updated" });
+        }
+      }
+      return createJsonResponse({ status: "not_found" });
+    }
+
+    return createJsonResponse({ status: "unknown_action" });
+  } catch (err) {
+    return createJsonResponse({ error: err.toString() });
+  }
+}
+
+function doGet(e) {
+  try {
+    var sheet = getOrCreateOrdersSheet();
+    var rows = sheet.getDataRange().getValues();
+    var action = (e && e.parameter && e.parameter.action) || "get_order";
+    var id = e && e.parameter && e.parameter.id;
+    var contact = e && e.parameter && e.parameter.contact;
+
+    if (action === "list_orders") {
+      var orders = [];
+      for (var i = 1; i < rows.length; i++) {
+        orders.push(formatOrderRow(rows[i]));
+      }
+      return createJsonResponse({ status: "success", orders: orders });
+    }
+
+    if (id || contact) {
+      for (var i = 1; i < rows.length; i++) {
+        var rowId = String(rows[i][0] || "").toUpperCase();
+        var rowPhone = String(rows[i][3] || "").replace(/\\D/g, "");
+        var rowEmail = String(rows[i][4] || "").toLowerCase();
+
+        if (id && rowId === String(id).toUpperCase()) {
+          return createJsonResponse({ status: "success", order: formatOrderRow(rows[i]) });
+        }
+        if (contact) {
+          var cleanContact = String(contact).replace(/\\D/g, "");
+          if (cleanContact && rowPhone.indexOf(cleanContact) !== -1) {
+            return createJsonResponse({ status: "success", order: formatOrderRow(rows[i]) });
+          }
+          if (rowEmail.indexOf(String(contact).toLowerCase()) !== -1) {
+            return createJsonResponse({ status: "success", order: formatOrderRow(rows[i]) });
+          }
+        }
+      }
+      return createJsonResponse({ status: "not_found", error: "Order not found" });
+    }
+
+    return createJsonResponse({ status: "online", store: "Jewels by J API" });
+  } catch (err) {
+    return createJsonResponse({ error: err.toString() });
+  }
+}
+
+function getOrCreateOrdersSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Orders");
+  if (!sheet) {
+    sheet = ss.insertSheet("Orders");
+    sheet.appendRow([
+      "Order ID", "Date", "Customer Name", "Phone", "Email",
+      "Delivery Address", "Region", "Total (GH₵)", "Payment Method",
+      "Payment Ref", "Status", "Items", "Notes"
+    ]);
+    sheet.getRange(1, 1, 1, 13).setFontWeight("bold").setBackground("#f7dbe3");
+  }
+  return sheet;
+}
+
+function formatOrderRow(row) {
+  var status = String(row[10] || "Payment Confirmed");
+  var statusCode = "confirmed";
+  if (status.toLowerCase().indexOf("deliver") !== -1) statusCode = "delivered";
+  else if (status.toLowerCase().indexOf("transit") !== -1) statusCode = "transit";
+  else if (status.toLowerCase().indexOf("craft") !== -1) statusCode = "crafting";
+  else if (status.toLowerCase().indexOf("placed") !== -1) statusCode = "placed";
+
+  return {
+    id: row[0],
+    date: row[1],
+    customerName: row[2],
+    customerPhone: row[3],
+    customerEmail: row[4],
+    address: row[5],
+    regionName: row[6],
+    total: parseFloat(row[7]) || 0,
+    subtotal: parseFloat(row[7]) || 0,
+    paymentMethod: row[8],
+    paymentRef: row[9],
+    status: status,
+    statusCode: statusCode,
+    notes: row[12] || "",
+    timeline: "Live status synchronized with studio records",
+    items: [{ title: row[11] || "Bespoke Jewelry Package", qty: 1, price: parseFloat(row[7]) || 0, img: "images/logo.jpg" }]
+  };
+}
+
+function createJsonResponse(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}`;
+
+async function syncOrderToCloud(order) {
+    let synced = false;
+
+    // 1. Firebase Firestore sync
+    if (isFirebaseReady && firebaseDb) {
+        try {
+            await firebaseDb.collection("orders").doc(order.id).set({
+                ...order,
+                cloudSyncedAt: new Date().toISOString()
+            }, { merge: true });
+            synced = true;
+            console.log("Order #" + order.id + " synchronized with Firebase Firestore cloud.");
+        } catch (err) {
+            console.warn("Firestore order sync notice:", err);
+        }
+    }
+
+    // 2. Google Sheets / Remote REST Webhook sync
+    const cloudUrl = (storeSettings && storeSettings.cloudSyncUrl) ? storeSettings.cloudSyncUrl.trim() : "";
+    if (cloudUrl) {
+        try {
+            const resp = await fetch(cloudUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "create_order",
+                    order_id: order.id,
+                    order_date: order.date,
+                    customer_name: order.customerName,
+                    customer_phone: order.customerPhone,
+                    customer_email: order.customerEmail,
+                    delivery_address: order.address,
+                    region: order.regionName || order.region,
+                    items_detail: (order.items || []).map(i => `${i.title} (${i.option || 'Standard'}) ×${i.qty}`).join(", "),
+                    total: Number(order.total || 0).toFixed(2),
+                    payment_method: order.paymentMethod,
+                    payment_ref: order.paymentRef,
+                    status: order.status,
+                    notes: order.notes || ""
+                })
+            });
+            if (resp.ok) {
+                synced = true;
+                console.log("Order #" + order.id + " appended to remote Google Sheet.");
+            }
+        } catch (err) {
+            console.warn("Google Sheets webhook sync notice:", err);
+        }
+    }
+
+    return synced;
+}
+
+async function fetchOrderFromCloud(orderNum, contact) {
+    let found = null;
+
+    // 1. Check Firebase Firestore
+    if (isFirebaseReady && firebaseDb) {
+        try {
+            if (orderNum) {
+                const doc = await firebaseDb.collection("orders").doc(orderNum).get();
+                if (doc.exists) {
+                    found = doc.data();
+                } else {
+                    const snap = await firebaseDb.collection("orders").where("id", "==", orderNum).limit(1).get();
+                    if (!snap.empty) found = snap.docs[0].data();
+                }
+            } else if (contact) {
+                const snapPhone = await firebaseDb.collection("orders").where("customerPhone", "==", contact).limit(1).get();
+                if (!snapPhone.empty) {
+                    found = snapPhone.docs[0].data();
+                } else {
+                    const snapEmail = await firebaseDb.collection("orders").where("customerEmail", "==", contact).limit(1).get();
+                    if (!snapEmail.empty) found = snapEmail.docs[0].data();
+                }
+            }
+        } catch (err) {
+            console.warn("Firestore lookup error:", err);
+        }
+    }
+
+    // 2. Check Google Sheets Webhook / REST Endpoint
+    if (!found) {
+        const cloudUrl = (storeSettings && storeSettings.cloudSyncUrl) ? storeSettings.cloudSyncUrl.trim() : "";
+        if (cloudUrl) {
+            try {
+                const param = orderNum ? `id=${encodeURIComponent(orderNum)}` : `contact=${encodeURIComponent(contact)}`;
+                const sep = cloudUrl.includes("?") ? "&" : "?";
+                const resp = await fetch(`${cloudUrl}${sep}action=get_order&${param}`, {
+                    method: "GET",
+                    headers: { "Accept": "application/json" }
+                });
+                if (resp.ok) {
+                    const resJson = await resp.json();
+                    if (resJson && resJson.status === "success" && resJson.order) {
+                        found = resJson.order;
+                    } else if (resJson && resJson.id) {
+                        found = resJson;
+                    }
+                }
+            } catch (err) {
+                console.warn("Google Sheets remote lookup notice:", err);
+            }
+        }
+    }
+
+    return found;
+}
+
+function attachLiveTrackingListener(orderId) {
+    if (currentLiveTrackingUnsubscribe) {
+        currentLiveTrackingUnsubscribe();
+        currentLiveTrackingUnsubscribe = null;
+    }
+
+    if (isFirebaseReady && firebaseDb) {
+        try {
+            currentLiveTrackingUnsubscribe = firebaseDb.collection("orders").doc(orderId).onSnapshot(doc => {
+                if (doc.exists) {
+                    const liveOrder = doc.data();
+                    const card = document.getElementById("trackResultCard");
+                    if (card && card.style.display !== "none") {
+                        // Merge into local cache
+                        const idx = storeOrders.findIndex(o => o.id === liveOrder.id);
+                        if (idx >= 0) storeOrders[idx] = { ...storeOrders[idx], ...liveOrder };
+                        localStorage.setItem("j_orders", JSON.stringify(storeOrders));
+
+                        renderOrderTrackingResult(liveOrder);
+                    }
+                }
+            }, err => {
+                console.warn("Live tracking snapshot notice:", err);
+            });
+        } catch (e) { }
+    }
+}
+
+async function pullRemoteOrdersFromCloud() {
+    const btn = document.getElementById("btnPullRemoteOrders");
+    const btnText = document.getElementById("btnPullRemoteOrdersText");
+    if (btn) btn.disabled = true;
+    if (btnText) btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Syncing...';
+
+    let pulledCount = 0;
+
+    // 1. Pull from Firestore
+    if (isFirebaseReady && firebaseDb) {
+        try {
+            const snap = await firebaseDb.collection("orders").get();
+            snap.forEach(doc => {
+                const rem = doc.data();
+                const idx = storeOrders.findIndex(o => o.id === rem.id);
+                if (idx >= 0) {
+                    storeOrders[idx] = { ...storeOrders[idx], ...rem };
+                } else {
+                    storeOrders.unshift(rem);
+                    pulledCount++;
+                }
+            });
+        } catch (err) {
+            console.warn("Firestore orders pull error:", err);
+        }
+    }
+
+    // 2. Pull from Google Sheets Webhook if configured
+    const cloudUrl = (storeSettings && storeSettings.cloudSyncUrl) ? storeSettings.cloudSyncUrl.trim() : "";
+    if (cloudUrl) {
+        try {
+            const sep = cloudUrl.includes("?") ? "&" : "?";
+            const resp = await fetch(`${cloudUrl}${sep}action=list_orders`);
+            if (resp.ok) {
+                const resJson = await resp.json();
+                if (resJson && resJson.orders && Array.isArray(resJson.orders)) {
+                    resJson.orders.forEach(rem => {
+                        const idx = storeOrders.findIndex(o => o.id === rem.id);
+                        if (idx >= 0) {
+                            storeOrders[idx] = { ...storeOrders[idx], ...rem };
+                        } else {
+                            storeOrders.unshift(rem);
+                            pulledCount++;
+                        }
+                    });
+                }
+            }
+        } catch (err) {
+            console.warn("Google Sheets pull error:", err);
+        }
+    }
+
+    localStorage.setItem("j_orders", JSON.stringify(storeOrders));
+    renderAdminOrders();
+    renderAdminDashboardStats();
+    updateAdminNotificationBadge();
+
+    if (btn) btn.disabled = false;
+    if (btnText) btnText.textContent = "Pull Cloud Orders";
+
+    showToast("Cloud Sync Complete", `Synchronized with remote database. ${pulledCount} new order(s) retrieved.`);
+}
+
+async function testCloudConnection() {
+    const btn = document.getElementById("btnTestCloudSync");
+    const originalHtml = btn ? btn.innerHTML : "";
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Testing Connection...';
+    }
+
+    let firestoreOk = isFirebaseReady && !!firebaseDb;
+    let endpointOk = false;
+    let endpointMessage = "";
+
+    const cloudUrl = (document.getElementById("settingCloudSyncUrl")?.value || storeSettings.cloudSyncUrl || "").trim();
+
+    if (cloudUrl) {
+        try {
+            const sep = cloudUrl.includes("?") ? "&" : "?";
+            const resp = await fetch(`${cloudUrl}${sep}action=ping`, { method: "GET" });
+            if (resp.ok) {
+                endpointOk = true;
+                endpointMessage = "Google Sheets / Webhook responded OK.";
+            } else {
+                endpointMessage = `Endpoint returned HTTP ${resp.status}`;
+            }
+        } catch (e) {
+            endpointMessage = "Could not reach endpoint (check URL or CORS).";
+        }
+    }
+
+    if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+    }
+
+    const badge = document.getElementById("cloudStatusBadge");
+    if (badge) {
+        if (firestoreOk || endpointOk) {
+            badge.style.background = "#e8f5e9";
+            badge.style.color = "#2e7d32";
+            badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Connected';
+        } else {
+            badge.style.background = "#fff3cd";
+            badge.style.color = "#856404";
+            badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Offline Vault';
+        }
+    }
+
+    let summary = `• Firebase Firestore: ${firestoreOk ? 'Connected & Active (Realtime)' : 'Local Fallback'}\n`;
+    summary += `• Google Sheets / Webhook: ${cloudUrl ? (endpointOk ? 'Connected (Verified)' : endpointMessage) : 'Not configured (Optional)'}`;
+
+    alert(`Cloud Database & Sync Diagnostics:\n\n${summary}`);
+}
+
+function openGoogleSheetsTemplateModal() {
+    const modal = document.getElementById("googleSheetsTemplateModal");
+    const codeArea = document.getElementById("googleAppsScriptCode");
+    if (codeArea) codeArea.value = GOOGLE_APPS_SCRIPT_CODE_TEMPLATE;
+    if (modal) modal.style.display = "flex";
+}
+
+function closeGoogleSheetsTemplateModal() {
+    const modal = document.getElementById("googleSheetsTemplateModal");
+    if (modal) modal.style.display = "none";
+}
+
+function copyGoogleAppsScriptCode() {
+    const codeArea = document.getElementById("googleAppsScriptCode");
+    if (codeArea) {
+        codeArea.select();
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(codeArea.value).then(() => {
+                showToast("Code Copied!", "Google Apps Script code copied to clipboard.");
+            }).catch(() => {
+                showToast("Code Selected", "Press Ctrl+C to copy.");
+            });
+        } else {
+            document.execCommand("copy");
+            showToast("Code Copied!", "Google Apps Script code copied to clipboard.");
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // ORDER TRACKING SYSTEM (LIVE PARCEL & STUDIO TRACKER)
 // ═══════════════════════════════════════════════════════════════════════════
 function initTrackOrder() {
@@ -3379,7 +3939,7 @@ function initTrackOrder() {
     }
 
     if (form) {
-        form.addEventListener("submit", (e) => {
+        form.addEventListener("submit", async (e) => {
             e.preventDefault();
             const orderNum = document.getElementById("trackOrderNumber")?.value.trim().toUpperCase();
             const contact = document.getElementById("trackOrderContact")?.value.trim().toLowerCase().replace(/[\s+-]/g, "");
@@ -3393,55 +3953,71 @@ function initTrackOrder() {
             const submitText = document.getElementById("btnTrackSubmitText");
             if (submitBtn) {
                 submitBtn.disabled = true;
-                if (submitText) submitText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locating Order...';
+                if (submitText) submitText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locating Order in Cloud...';
             }
 
-            setTimeout(() => {
-                let found = null;
+            let found = null;
 
-                if (orderNum) {
-                    found = storeOrders.find(ord => {
-                        const matchesId = ord.id.toUpperCase() === orderNum;
-                        if (!contact) return matchesId;
-                        const ordContactClean = (ord.customerEmail + " " + ord.customerPhone).toLowerCase().replace(/[\s+-]/g, "");
-                        const matchesContact = ordContactClean.includes(contact) || contact.includes(ord.customerPhone.replace(/[\s+-]/g, ""));
-                        return matchesId && matchesContact;
-                    });
-                } else if (contact) {
-                    // Search by contact if order number was not supplied
-                    found = storeOrders.find(ord => {
-                        const ordContactClean = (ord.customerEmail + " " + ord.customerPhone).toLowerCase().replace(/[\s+-]/g, "");
-                        return ordContactClean.includes(contact) || contact.includes(ord.customerPhone.replace(/[\s+-]/g, ""));
-                    });
-                }
+            // 1. Search local cache first
+            if (orderNum) {
+                found = storeOrders.find(ord => {
+                    const matchesId = ord.id.toUpperCase() === orderNum;
+                    if (!contact) return matchesId;
+                    const ordContactClean = (ord.customerEmail + " " + ord.customerPhone).toLowerCase().replace(/[\s+-]/g, "");
+                    const matchesContact = ordContactClean.includes(contact) || contact.includes(ord.customerPhone.replace(/[\s+-]/g, ""));
+                    return matchesId && matchesContact;
+                });
+            } else if (contact) {
+                found = storeOrders.find(ord => {
+                    const ordContactClean = (ord.customerEmail + " " + ord.customerPhone).toLowerCase().replace(/[\s+-]/g, "");
+                    return ordContactClean.includes(contact) || contact.includes(ord.customerPhone.replace(/[\s+-]/g, ""));
+                });
+            }
 
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    if (submitText) submitText.textContent = "Track My Order";
-                }
-
-                const emptyState = document.getElementById("trackEmptyState");
-                const resultCard = document.getElementById("trackResultCard");
-
-                if (found) {
-                    if (emptyState) emptyState.style.display = "none";
-                    renderOrderTrackingResult(found);
-                    if (resultCard) {
-                        resultCard.style.display = "block";
-                        resultCard.scrollIntoView({ behavior: "smooth" });
+            // 2. If not found locally, query remote Cloud Database & Google Sheets
+            if (!found) {
+                try {
+                    found = await fetchOrderFromCloud(orderNum, contact);
+                    if (found) {
+                        // Cache locally for fast future hits
+                        const idx = storeOrders.findIndex(o => o.id === found.id);
+                        if (idx >= 0) storeOrders[idx] = { ...storeOrders[idx], ...found };
+                        else storeOrders.unshift(found);
+                        localStorage.setItem("j_orders", JSON.stringify(storeOrders));
                     }
-                } else {
-                    if (resultCard) resultCard.style.display = "none";
-                    if (emptyState) {
-                        const msgEl = document.getElementById("trackEmptyMessage");
-                        if (msgEl) {
-                            msgEl.innerHTML = `We couldn't locate an order matching <strong>${escapeHTML(orderNum || contact)}</strong>. Please verify your order number and contact information.`;
-                        }
-                        emptyState.style.display = "block";
-                        emptyState.scrollIntoView({ behavior: "smooth" });
-                    }
+                } catch (err) {
+                    console.warn("Remote search notice:", err);
                 }
-            }, 260);
+            }
+
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                if (submitText) submitText.textContent = "Track My Order";
+            }
+
+            const emptyState = document.getElementById("trackEmptyState");
+            const resultCard = document.getElementById("trackResultCard");
+
+            if (found) {
+                if (emptyState) emptyState.style.display = "none";
+                renderOrderTrackingResult(found);
+                if (resultCard) {
+                    resultCard.style.display = "block";
+                    resultCard.scrollIntoView({ behavior: "smooth" });
+                }
+                // Attach live realtime snapshot listener
+                attachLiveTrackingListener(found.id);
+            } else {
+                if (resultCard) resultCard.style.display = "none";
+                if (emptyState) {
+                    const msgEl = document.getElementById("trackEmptyMessage");
+                    if (msgEl) {
+                        msgEl.innerHTML = `We couldn't locate an order matching <strong>${escapeHTML(orderNum || contact)}</strong> in our live studio records. Please check the tracking number (e.g. <strong>JBJ-20261029-001</strong>).`;
+                    }
+                    emptyState.style.display = "block";
+                    emptyState.scrollIntoView({ behavior: "smooth" });
+                }
+            }
         });
     }
 
@@ -3712,6 +4288,10 @@ function initAdminPortal() {
     const setFree = document.getElementById("settingFreeDelivery");
     const setPin = document.getElementById("settingAdminPIN");
     const setWeb3 = document.getElementById("settingWeb3Key");
+    const setPaystack = document.getElementById("settingPaystackKey");
+    const setMoMoNum = document.getElementById("settingMoMoNumber");
+    const setMoMoName = document.getElementById("settingMoMoName");
+    const setCloudSync = document.getElementById("settingCloudSyncUrl");
 
     const activeEmail = storeSettings.email || SITE_CONFIG.email;
     if (setWa) setWa.value = storeSettings.whatsappNumber || SITE_CONFIG.whatsappNumber;
@@ -3719,6 +4299,10 @@ function initAdminPortal() {
     if (setFree) setFree.value = storeSettings.freeDeliveryThreshold || SITE_CONFIG.freeDeliveryThreshold;
     if (setPin) setPin.value = storeSettings.adminPIN || "2023";
     if (setWeb3) setWeb3.value = storeSettings.web3Key || "";
+    if (setPaystack) setPaystack.value = storeSettings.paystackPublicKey || "";
+    if (setMoMoNum) setMoMoNum.value = storeSettings.momoMerchantNumber || "0500594879";
+    if (setMoMoName) setMoMoName.value = storeSettings.momoMerchantName || "Jewels by J (Jerrilyn Mensah)";
+    if (setCloudSync) setCloudSync.value = storeSettings.cloudSyncUrl || "";
 
     // Populate Preferences form & apply theme/font-size
     applyStoredPreferences();
@@ -4244,6 +4828,31 @@ function updateOrderStatus(orderId, newStatusCode) {
     ord.status = statusNames[newStatusCode] || newStatusCode;
     localStorage.setItem("j_orders", JSON.stringify(storeOrders));
 
+    // Sync status update to Firebase Firestore in real-time
+    if (isFirebaseReady && firebaseDb) {
+        firebaseDb.collection("orders").doc(orderId).set({
+            statusCode: newStatusCode,
+            status: ord.status,
+            updatedAt: new Date().toISOString()
+        }, { merge: true }).catch(err => console.warn("Firestore status update notice:", err));
+    }
+
+    // Sync status update to Google Sheets Webhook if configured
+    const cloudUrl = (storeSettings && storeSettings.cloudSyncUrl) ? storeSettings.cloudSyncUrl.trim() : "";
+    if (cloudUrl) {
+        fetch(cloudUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                action: "update_status",
+                order_id: orderId,
+                status: ord.status,
+                status_code: newStatusCode,
+                updated_at: new Date().toISOString()
+            })
+        }).catch(() => {});
+    }
+
     renderAdminOrders();
     renderAdminDashboardStats();
     updateAdminNotificationBadge();
@@ -4431,7 +5040,16 @@ function saveAdminSettings(event) {
     if (pinField) storeSettings.adminPIN = pinField.value.trim() || storeSettings.adminPIN;
     storeSettings.web3Key = (document.getElementById("settingWeb3Key")?.value || "").trim();
 
+    // Payment & Cloud Sync settings
+    storeSettings.paystackPublicKey = (document.getElementById("settingPaystackKey")?.value || "").trim();
+    storeSettings.momoMerchantNumber = (document.getElementById("settingMoMoNumber")?.value || "").trim() || "0500594879";
+    storeSettings.momoMerchantName = (document.getElementById("settingMoMoName")?.value || "").trim() || "Jewels by J (Jerrilyn Mensah)";
+    storeSettings.cloudSyncUrl = (document.getElementById("settingCloudSyncUrl")?.value || "").trim();
+
     localStorage.setItem("j_settings", JSON.stringify(storeSettings));
+
+    // Update Paystack badge
+    updatePaystackBadge();
 
     // Update email displays across the site
     const inboxEmailDisplay = document.getElementById("inboxStoreEmailDisplay");
@@ -4813,6 +5431,17 @@ window.selectThemePreference = selectThemePreference;
 window.applyFontSizePreview = applyFontSizePreview;
 window.applyHeadingFontPreview = applyHeadingFontPreview;
 window.applyStoredPreferences = applyStoredPreferences;
+window.switchPaymentTab = switchPaymentTab;
+window.processPaystackPayment = processPaystackPayment;
+window.processDirectMoMoPayment = processDirectMoMoPayment;
+window.processPayOnDelivery = processPayOnDelivery;
+window.copyDirectMoMoNumber = copyDirectMoMoNumber;
+window.copyDirectMoMoAmount = copyDirectMoMoAmount;
+window.pullRemoteOrdersFromCloud = pullRemoteOrdersFromCloud;
+window.testCloudConnection = testCloudConnection;
+window.openGoogleSheetsTemplateModal = openGoogleSheetsTemplateModal;
+window.closeGoogleSheetsTemplateModal = closeGoogleSheetsTemplateModal;
+window.copyGoogleAppsScriptCode = copyGoogleAppsScriptCode;
 
 // Initialize Preferences Immediately
 applyStoredPreferences();

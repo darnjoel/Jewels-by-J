@@ -3915,10 +3915,10 @@ body.modal-open {
     color: var(--color-gold);
 }
 
-/* Payment Method Tabs (MoMo vs Card) */
+/* Payment Method Tabs (Paystack vs Direct MoMo vs POD) */
 .payment-tabs-nav {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 10px;
     margin-bottom: 20px;
 }
@@ -3935,11 +3935,79 @@ body.modal-open {
     justify-content: center;
     gap: 8px;
     transition: var(--transition-fast);
+    cursor: pointer;
+    text-align: center;
+}
+.payment-tab-btn:hover {
+    border-color: var(--color-gold);
 }
 .payment-tab-btn.active {
     border-color: var(--color-black);
     background: #fff;
     box-shadow: var(--shadow-sm);
+    color: var(--color-black);
+}
+
+/* Paystack Badge Row */
+.paystack-badge-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+}
+.paystack-network-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--color-black);
+}
+
+/* Direct MoMo Transfer Card */
+.direct-momo-card {
+    background: #fffdf5;
+    border: 1.5px solid #ffe082;
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.08);
+}
+.direct-momo-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+    font-size: 0.84rem;
+}
+.direct-momo-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.btn-copy-mini {
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 3px 8px;
+    font-size: 0.72rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--color-black);
+    font-weight: 600;
+    transition: var(--transition-fast);
+}
+.btn-copy-mini:hover {
+    background: var(--color-gold);
+    color: #ffffff;
+    border-color: var(--color-gold);
 }
 
 /* Mobile Money Providers Selector */
