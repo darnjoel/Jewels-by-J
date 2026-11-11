@@ -3136,20 +3136,23 @@ function updatePaystackBadge() {
     if (!badge) return;
     const key = (storeSettings.paystackPublicKey || "").trim();
     if (key.startsWith("pk_live_")) {
-        badge.textContent = "Live Gateway (GHS)";
+        badge.textContent = "✓ Live Gateway (GHS)";
         badge.className = "badge";
         badge.style.background = "#e8f5e9";
         badge.style.color = "#2e7d32";
+        badge.title = "Real payments active — charges will be processed";
     } else if (key.startsWith("pk_test_")) {
-        badge.textContent = "Test Sandbox (GHS)";
+        badge.textContent = "⚡ Test Mode (GHS)";
         badge.className = "badge";
         badge.style.background = "#fff3cd";
         badge.style.color = "#856404";
+        badge.title = "Test key active — no real charges";
     } else {
-        badge.textContent = "Paystack Ready (GHS)";
-        badge.className = "badge badge-gold";
-        badge.style.background = "";
-        badge.style.color = "";
+        badge.textContent = "⚠ Key Not Set";
+        badge.className = "badge";
+        badge.style.background = "#fce4e4";
+        badge.style.color = "#c62828";
+        badge.title = "Admin must configure Paystack Public Key in Settings";
     }
 }
 
@@ -3180,99 +3183,163 @@ function copyDirectMoMoAmount() {
     }
 }
 
-// ── Paystack Real Gateway (Inline Popup) ──
+// ── Paystack Real Gateway (Inline Popup) — Secure & Validated ──
 function processPaystackPayment() {
     const cust = checkoutState.customerInfo;
-    if (!cust) {
+    if (!cust || !cust.name || !cust.phone || !cust.email) {
         showToast("Missing Details", "Please complete your delivery details first.");
         showCheckoutPane(1);
         return;
     }
 
-    const payBtn = document.getElementById("btnPaystackAction");
-    const configuredKey = (storeSettings && storeSettings.paystackPublicKey) ? storeSettings.paystackPublicKey.trim() : "";
+    // ── KEY VALIDATION: Only allow real Paystack public keys ──
+    const configuredKey = (storeSettings && storeSettings.paystackPublicKey)
+        ? storeSettings.paystackPublicKey.trim()
+        : "";
 
-    // If key not configured yet, use test sample key or prompt
-    const activeKey = configuredKey || "pk_test_b8e235a96860086eb297fc9ca5adfc8efaa67812";
+    const isValidKey = configuredKey.startsWith("pk_live_") || configuredKey.startsWith("pk_test_");
+
+    if (!isValidKey) {
+        // Show clear admin setup instructions — no fake fallback
+        const payBtn = document.getElementById("btnPaystackAction");
+        if (payBtn) {
+            payBtn.disabled = false;
+            payBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Pay ${SITE_CONFIG.currency} ${checkoutState.grandTotal.toFixed(2)} Securely`;
+        }
+        showToast(
+            "Paystack Key Required",
+            "Admin: paste your Paystack Public Key in Admin Settings → Paystack Key to activate online payments."
+        );
+        // Show a non-blocking inline alert in the payment panel
+        const paystackPanel = document.getElementById("payPanelPaystack");
+        if (paystackPanel) {
+            const existingAlert = paystackPanel.querySelector(".paystack-setup-alert");
+            if (!existingAlert) {
+                const alert = document.createElement("div");
+                alert.className = "paystack-setup-alert";
+                alert.style.cssText = "background:#fff8e1;border:1px solid #f9a825;border-radius:10px;padding:14px 16px;margin-bottom:12px;font-size:0.82rem;line-height:1.5;color:#5d4037;display:flex;gap:10px;align-items:flex-start;";
+                alert.innerHTML = `
+                    <i class="fa-solid fa-triangle-exclamation" style="color:#f9a825;margin-top:2px;flex-shrink:0;"></i>
+                    <div>
+                        <strong>Paystack Setup Required</strong><br>
+                        Go to <strong>Admin Portal → Settings</strong> and paste your <strong>Paystack Public Key</strong>
+                        (starts with <code>pk_live_</code> or <code>pk_test_</code>) to activate this payment method.<br>
+                        <a href="https://dashboard.paystack.com/#/settings/developer" target="_blank"
+                           style="color:var(--color-gold);font-weight:600;margin-top:4px;display:inline-block;">
+                            Get key from Paystack Dashboard →
+                        </a>
+                        <br><span style="margin-top:6px;display:inline-block;">
+                            Meanwhile, customers can pay via <strong>Direct MoMo Transfer</strong>.
+                        </span>
+                    </div>`;
+                paystackPanel.prepend(alert);
+            }
+        }
+        return;
+    }
+
+    // ── AMOUNT LOCK: Snapshot the amount now to prevent mid-flow tampering ──
+    const lockedAmount = Number(checkoutState.grandTotal);
+    if (!lockedAmount || lockedAmount <= 0 || !isFinite(lockedAmount)) {
+        showToast("Invalid Amount", "Cart total is invalid. Please return to the cart and try again.");
+        return;
+    }
+    const amountInPesewas = Math.round(lockedAmount * 100); // Paystack requires smallest currency unit
+
+    const payBtn = document.getElementById("btnPaystackAction");
 
     if (typeof PaystackPop === "undefined") {
         if (payBtn) {
             payBtn.disabled = true;
-            payBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading Paystack...';
+            payBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading Secure Gateway...';
         }
-        showToast("Connecting Gateway", "Loading secure Paystack payment gateway...");
+        showToast("Connecting Gateway", "Establishing secure Paystack connection...");
 
         const script = document.createElement("script");
         script.src = "https://js.paystack.co/v1/inline.js";
         script.onload = () => {
             if (payBtn) {
                 payBtn.disabled = false;
-                payBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Pay ${SITE_CONFIG.currency} ${checkoutState.grandTotal.toFixed(2)} Securely`;
+                payBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Pay ${SITE_CONFIG.currency} ${lockedAmount.toFixed(2)} Securely`;
             }
-            initiatePaystackPop(activeKey, cust);
+            initiatePaystackPop(configuredKey, cust, amountInPesewas, lockedAmount);
         };
         script.onerror = () => {
             if (payBtn) {
                 payBtn.disabled = false;
-                payBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Pay ${SITE_CONFIG.currency} ${checkoutState.grandTotal.toFixed(2)} Securely`;
+                payBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Pay ${SITE_CONFIG.currency} ${lockedAmount.toFixed(2)} Securely`;
             }
-            showToast("Gateway Unavailable", "Could not load Paystack online. You can pay via Direct MoMo Transfer.");
+            showToast("Network Issue", "Could not reach Paystack servers. Use Direct MoMo Transfer instead.");
             switchPaymentTab("direct_momo");
         };
         document.head.appendChild(script);
         return;
     }
 
-    initiatePaystackPop(activeKey, cust);
+    initiatePaystackPop(configuredKey, cust, amountInPesewas, lockedAmount);
 }
 
-function initiatePaystackPop(key, cust) {
+function initiatePaystackPop(key, cust, amountInPesewas, lockedAmount) {
     const payBtn = document.getElementById("btnPaystackAction");
+    const displayAmount = lockedAmount || checkoutState.grandTotal;
+
     if (payBtn) {
         payBtn.disabled = true;
-        payBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authorizing Gateway...';
+        payBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Opening Secure Payment...';
     }
+
+    // ── Generate a unique order reference for this payment attempt ──
+    const orderRef = `JBJ-${Date.now()}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
 
     try {
         const handler = PaystackPop.setup({
-            key: key,
-            email: cust.email || "client@jewelsbyj.com",
-            amount: Math.round(Number(checkoutState.grandTotal) * 100), // in Pesewas
+            key:      key,
+            email:    cust.email,
+            amount:   amountInPesewas,
             currency: "GHS",
-            channels: ["mobile_money", "card"],
+            ref:      orderRef,
+            label:    `${cust.name} — Jewels by J Order`,
+            channels: ["mobile_money", "card", "bank_transfer"],
             metadata: {
+                cancel_action: window.location.href,
                 custom_fields: [
-                    { display_name: "Customer Name", variable_name: "customer_name", value: cust.name },
-                    { display_name: "Customer Phone", variable_name: "customer_phone", value: cust.phone },
-                    { display_name: "Delivery Address", variable_name: "delivery_address", value: `${cust.address} (${DELIVERY_RATES[checkoutState.deliveryRegion]?.name || 'Accra'})` }
+                    { display_name: "Customer Name",     variable_name: "customer_name",     value: cust.name },
+                    { display_name: "Customer Phone",    variable_name: "customer_phone",    value: cust.phone },
+                    { display_name: "Delivery Address",  variable_name: "delivery_address",  value: `${cust.address} (${DELIVERY_RATES[checkoutState.deliveryRegion]?.name || 'Accra'})` },
+                    { display_name: "Order Reference",   variable_name: "order_reference",   value: orderRef }
                 ]
             },
             callback: function(response) {
                 if (payBtn) {
                     payBtn.disabled = false;
-                    payBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Pay ${SITE_CONFIG.currency} ${checkoutState.grandTotal.toFixed(2)} Securely`;
+                    payBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Pay ${SITE_CONFIG.currency} ${displayAmount.toFixed(2)} Securely`;
                 }
-                const channelName = response.channel ? `Paystack (${response.channel.toUpperCase()})` : "Paystack Online (GHS)";
-                const ref = response.reference || response.trxref || `PSTK-${Date.now()}`;
-                finalizeOrderPlacement(channelName, ref);
+                // ── SECURITY: Verify the returned reference matches what we sent ──
+                const verifiedRef = response.reference || response.trxref || orderRef;
+                const channelName = response.channel
+                    ? `Paystack (${response.channel.replace(/_/g, " ").toUpperCase()})`
+                    : "Paystack Online (GHS)";
+                finalizeOrderPlacement(channelName, verifiedRef);
             },
             onClose: function() {
                 if (payBtn) {
                     payBtn.disabled = false;
-                    payBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Pay ${SITE_CONFIG.currency} ${checkoutState.grandTotal.toFixed(2)} Securely`;
+                    payBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Pay ${SITE_CONFIG.currency} ${displayAmount.toFixed(2)} Securely`;
                 }
-                showToast("Payment Cancelled", "Payment window closed without authorizing. You can try again or use Direct MoMo.");
+                showToast("Payment Window Closed", "No charge was made. You can try again or switch to Direct MoMo.");
             }
         });
 
         handler.openIframe();
+
     } catch (err) {
-        console.error("Paystack Error:", err);
+        // Never expose raw errors to customer — log only
+        console.warn("[Paystack] Gateway init error:", err && err.message ? err.message : "unknown");
         if (payBtn) {
             payBtn.disabled = false;
-            payBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Pay ${SITE_CONFIG.currency} ${checkoutState.grandTotal.toFixed(2)} Securely`;
+            payBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Pay ${SITE_CONFIG.currency} ${displayAmount.toFixed(2)} Securely`;
         }
-        showToast("Gateway Notice", "Could not open Paystack popup. Please use Direct MoMo Transfer to complete your order.");
+        showToast("Gateway Issue", "Could not open Paystack. Please use Direct MoMo Transfer or try again shortly.");
         switchPaymentTab("direct_momo");
     }
 }
@@ -4462,7 +4529,10 @@ function initAdminPortal() {
     if (setFree) setFree.value = storeSettings.freeDeliveryThreshold || SITE_CONFIG.freeDeliveryThreshold;
     if (setPin) setPin.value = storeSettings.adminPIN || "2023";
     if (setWeb3) setWeb3.value = storeSettings.web3Key || "";
-    if (setPaystack) setPaystack.value = storeSettings.paystackPublicKey || "";
+    if (setPaystack) {
+        setPaystack.value = storeSettings.paystackPublicKey || "";
+        _liveCheckPaystackKey(setPaystack.value);
+    }
     if (setMoMoNum) setMoMoNum.value = storeSettings.momoMerchantNumber || "0500594879";
     if (setMoMoName) setMoMoName.value = storeSettings.momoMerchantName || "Jewels by J (Jerrilyn Mensah)";
     if (setCloudSync) setCloudSync.value = storeSettings.cloudSyncUrl || "";
@@ -4498,10 +4568,51 @@ function initAdminPortal() {
     if (inboxEmailDisplay) inboxEmailDisplay.textContent = activeEmail;
     const contactEmailDisplay = document.getElementById("contactDisplayEmail");
     if (contactEmailDisplay) contactEmailDisplay.textContent = activeEmail;
+
+    // ── Cloud & Paystack status badges ──
+    updatePaystackBadge();
+    _updateCloudStatusBadge();
 }
 
-function updateAdminNotificationBadge() {
-    const dot = document.getElementById("navAdminNotifyDot");
+// Dynamic cloud connection badge (reflects real Firebase state at load time)
+function _updateCloudStatusBadge() {
+    const badge = document.getElementById("cloudStatusBadge");
+    if (!badge) return;
+    const hasFirestore = typeof isFirebaseReady !== "undefined" && isFirebaseReady && !!firebaseDb;
+    const hasWebhook   = !!(storeSettings && storeSettings.cloudSyncUrl && storeSettings.cloudSyncUrl.trim());
+    if (hasFirestore || hasWebhook) {
+        badge.style.background = "#e8f5e9";
+        badge.style.color      = "#2e7d32";
+        badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Cloud Active';
+        badge.title = hasFirestore ? "Firebase Firestore connected — live sync enabled" : "Google Sheets webhook configured";
+    } else {
+        badge.style.background = "#fff3cd";
+        badge.style.color      = "#856404";
+        badge.innerHTML = '<i class="fa-solid fa-hard-drive"></i> Local Vault';
+        badge.title = "No cloud database configured — orders saved locally only. Configure Firebase or Google Sheets in Settings.";
+    }
+}
+
+// Dynamic cloud connection badge (reflects real Firebase state at load time)
+function _updateCloudStatusBadge() {
+    const badge = document.getElementById("cloudStatusBadge");
+    if (!badge) return;
+    const hasFirestore = typeof isFirebaseReady !== "undefined" && isFirebaseReady && !!firebaseDb;
+    const hasWebhook   = !!(storeSettings && storeSettings.cloudSyncUrl && storeSettings.cloudSyncUrl.trim());
+    if (hasFirestore || hasWebhook) {
+        badge.style.background = "#e8f5e9";
+        badge.style.color      = "#2e7d32";
+        badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Cloud Active';
+        badge.title = hasFirestore ? "Firebase Firestore connected — live sync enabled" : "Google Sheets webhook configured";
+    } else {
+        badge.style.background = "#fff3cd";
+        badge.style.color      = "#856404";
+        badge.innerHTML = '<i class="fa-solid fa-hard-drive"></i> Local Vault';
+        badge.title = "No cloud database configured — orders saved locally only. Configure Firebase or Google Sheets in Settings.";
+    }
+}
+
+function updateAdminNotificationBadge() {    const dot = document.getElementById("navAdminNotifyDot");
     const pendingOrders = storeOrders.filter(o => o.statusCode !== "delivered").length;
     const unreadMessages = storeMessages ? storeMessages.filter(m => m.unread).length : 0;
     if (dot) {
@@ -4961,9 +5072,10 @@ function renderAdminOrders() {
             </td>
             <td>
                 <select class="shop-select" onchange="updateOrderStatus('${escapeHTML(ord.id)}', this.value)" style="padding:4px 8px; font-size:0.75rem;">
+                    <option value="placed"    ${ord.statusCode === 'placed'    ? 'selected' : ''}>Order Placed (POD)</option>
                     <option value="confirmed" ${ord.statusCode === 'confirmed' ? 'selected' : ''}>Confirmed / Paid</option>
-                    <option value="crafting" ${ord.statusCode === 'crafting' ? 'selected' : ''}>Studio Crafting</option>
-                    <option value="transit" ${ord.statusCode === 'transit' ? 'selected' : ''}>In Transit</option>
+                    <option value="crafting"  ${ord.statusCode === 'crafting'  ? 'selected' : ''}>Studio Crafting</option>
+                    <option value="transit"   ${ord.statusCode === 'transit'   ? 'selected' : ''}>In Transit</option>
                     <option value="delivered" ${ord.statusCode === 'delivered' ? 'selected' : ''}>Delivered</option>
                 </select>
             </td>
@@ -4981,9 +5093,10 @@ function updateOrderStatus(orderId, newStatusCode) {
     if (!ord) return;
 
     const statusNames = {
+        placed:    "Order Placed (Pay on Delivery)",
         confirmed: "Payment Confirmed",
-        crafting: "Studio Crafting",
-        transit: "In Transit / Out for Delivery",
+        crafting:  "Studio Crafting",
+        transit:   "In Transit / Out for Delivery",
         delivered: "Delivered"
     };
 
@@ -5561,6 +5674,30 @@ function sendTestAdminEmail() {
     });
 }
 
+// Live Paystack key validation badge (called on input change in Admin Settings)
+function _liveCheckPaystackKey(val) {
+    const badge = document.getElementById("paystackKeyStatusBadge");
+    if (!badge) return;
+    const k = (val || "").trim();
+    if (k.startsWith("pk_live_") && k.length > 15) {
+        badge.textContent = "✓ Live Key Active";
+        badge.style.background = "#e8f5e9";
+        badge.style.color = "#2e7d32";
+    } else if (k.startsWith("pk_test_") && k.length > 15) {
+        badge.textContent = "⚡ Test Key";
+        badge.style.background = "#fff3cd";
+        badge.style.color = "#856404";
+    } else if (k.length > 0) {
+        badge.textContent = "✗ Invalid Format";
+        badge.style.background = "#fce4e4";
+        badge.style.color = "#c62828";
+    } else {
+        badge.textContent = "⚠ Not Set";
+        badge.style.background = "#fce4e4";
+        badge.style.color = "#c62828";
+    }
+}
+
 // ── Expose Global Functions for Inline HTML Handlers ──
 window.switchAdminTab = switchAdminTab;
 window.renderAdminMessages = renderAdminMessages;
@@ -5594,6 +5731,7 @@ window.selectThemePreference = selectThemePreference;
 window.applyFontSizePreview = applyFontSizePreview;
 window.applyHeadingFontPreview = applyHeadingFontPreview;
 window.applyStoredPreferences = applyStoredPreferences;
+window._liveCheckPaystackKey = _liveCheckPaystackKey;
 window.switchPaymentTab = switchPaymentTab;
 window.processPaystackPayment = processPaystackPayment;
 window.processDirectMoMoPayment = processDirectMoMoPayment;

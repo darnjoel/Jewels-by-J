@@ -1581,8 +1581,9 @@
                                                 <div class="form-group" style="margin-bottom:14px;">
                                                     <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">
                                                         <i class="fa-solid fa-bolt" style="color:var(--color-gold); margin-right:4px;"></i> Paystack Public Key (Real GHS MoMo &amp; Cards)
+                                                        <span id="paystackKeyStatusBadge" style="font-size:0.7rem;font-weight:600;padding:2px 8px;border-radius:20px;margin-left:6px;background:#fce4e4;color:#c62828;vertical-align:middle;">⚠ Not Set</span>
                                                     </label>
-                                                    <input type="text" id="settingPaystackKey" class="customizer-input-field" placeholder="e.g. pk_live_... or pk_test_...">
+                                                    <input type="text" id="settingPaystackKey" class="customizer-input-field" placeholder="e.g. pk_live_... or pk_test_..." oninput="window._liveCheckPaystackKey(this.value)">
                                                     <span style="font-size:0.74rem; color:var(--color-text-muted); display:block; margin-top:4px;">
                                                         Obtain from your free <a href="https://dashboard.paystack.com/#/settings/developer" target="_blank" style="color:var(--color-gold); text-decoration:underline;">Paystack Dashboard</a>. Supports MTN MoMo, Telecel, AT Money &amp; Bank Cards.
                                                     </span>

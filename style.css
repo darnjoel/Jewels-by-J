@@ -4010,6 +4010,29 @@ body.modal-open {
     border-color: var(--color-gold);
 }
 
+/* Paystack Setup Alert (shown when key not configured) */
+.paystack-setup-alert {
+    background: #fff8e1;
+    border: 1px solid #f9a825;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: #5d4037;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    animation: fadeIn 0.3s ease;
+}
+.paystack-setup-alert code {
+    background: rgba(0,0,0,0.07);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-family: monospace;
+}
+
 /* Mobile Money Providers Selector */
 .momo-providers-row {
     display: grid;
