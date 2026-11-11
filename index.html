@@ -1970,6 +1970,50 @@
         </div>
     </div>
 
+    <!-- Google Apps Script & Sheets Sync Template Modal -->
+    <div class="auth-modal-backdrop modal-backdrop" id="googleSheetsTemplateModal" style="display:none;" onclick="if(event.target === this) closeGoogleSheetsTemplateModal()">
+        <div class="auth-modal-card modal-card" style="max-width:680px;">
+            <button class="auth-close-btn" type="button" onclick="closeGoogleSheetsTemplateModal()" aria-label="Close modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div style="padding:28px 24px;">
+                <div style="border-bottom:1px solid var(--color-border); padding-bottom:12px; margin-bottom:16px;">
+                    <span class="badge badge-gold" style="font-size:0.7rem;">Free Google Cloud Backend</span>
+                    <h3 style="font-size:1.25rem; color:var(--color-black); margin-top:6px; font-family:var(--font-heading);">
+                        Google Sheets Live Sync Template
+                    </h3>
+                    <p style="font-size:0.8rem; color:var(--color-text-muted);">
+                        Deploy this Apps Script code in your Google Sheet to automatically log incoming customer orders and power live remote tracking lookups.
+                    </p>
+                </div>
+
+                <div style="font-size:0.82rem; color:var(--color-black); line-height:1.5; margin-bottom:14px;">
+                    <strong>3-Minute Setup:</strong>
+                    <ol style="padding-left:18px; margin:6px 0; color:var(--color-text-muted);">
+                        <li>Open <a href="https://sheets.new" target="_blank" style="color:var(--color-gold); font-weight:600;">sheets.new</a> to create a new spreadsheet named <em>Jewels by J Orders</em>.</li>
+                        <li>In the menu, go to <strong>Extensions &gt; Apps Script</strong>.</li>
+                        <li>Delete any existing code, paste the script below, and click <strong>Deploy &gt; New deployment</strong>.</li>
+                        <li>Select <strong>Web app</strong>, set <em>Who has access</em> to <strong>Anyone</strong>, and click <strong>Deploy</strong>.</li>
+                        <li>Copy the generated <strong>Web app URL</strong> and paste it into the <em>Google Sheets Sync URL</em> field in Admin Settings!</li>
+                    </ol>
+                </div>
+
+                <div style="position:relative; margin-bottom:18px;">
+                    <textarea id="googleAppsScriptCode" readonly style="width:100%; height:200px; font-family:monospace; font-size:0.75rem; background:#1e1e1e; color:#e0e0e0; padding:12px; border-radius:var(--radius-md); border:none; resize:vertical;"></textarea>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="copyGoogleAppsScriptCode()" style="position:absolute; top:8px; right:8px; padding:4px 10px; font-size:0.74rem;">
+                        <i class="fa-regular fa-copy"></i> Copy Script
+                    </button>
+                </div>
+
+                <div style="text-align:right;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="closeGoogleSheetsTemplateModal()">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ═══════════════════════════════════════════════════════════════════════
        7. GENERAL VIDEO & IMAGE LIGHTBOX MODAL
        ═══════════════════════════════════════════════════════════════════════ -->
@@ -1980,6 +2024,50 @@
             </button>
             <div class="lightbox-body" id="lightboxBody">
                 <!-- Video or image injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Apps Script & Sheets Sync Template Modal -->
+    <div class="auth-modal-backdrop modal-backdrop" id="googleSheetsTemplateModal" style="display:none;" onclick="if(event.target === this) closeGoogleSheetsTemplateModal()">
+        <div class="auth-modal-card modal-card" style="max-width:680px;">
+            <button class="auth-close-btn" type="button" onclick="closeGoogleSheetsTemplateModal()" aria-label="Close modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div style="padding:28px 24px;">
+                <div style="border-bottom:1px solid var(--color-border); padding-bottom:12px; margin-bottom:16px;">
+                    <span class="badge badge-gold" style="font-size:0.7rem;">Free Google Cloud Backend</span>
+                    <h3 style="font-size:1.25rem; color:var(--color-black); margin-top:6px; font-family:var(--font-heading);">
+                        Google Sheets Live Sync Template
+                    </h3>
+                    <p style="font-size:0.8rem; color:var(--color-text-muted);">
+                        Deploy this Apps Script code in your Google Sheet to automatically log incoming customer orders and power live remote tracking lookups.
+                    </p>
+                </div>
+
+                <div style="font-size:0.82rem; color:var(--color-black); line-height:1.5; margin-bottom:14px;">
+                    <strong>3-Minute Setup:</strong>
+                    <ol style="padding-left:18px; margin:6px 0; color:var(--color-text-muted);">
+                        <li>Open <a href="https://sheets.new" target="_blank" style="color:var(--color-gold); font-weight:600;">sheets.new</a> to create a new spreadsheet named <em>Jewels by J Orders</em>.</li>
+                        <li>In the menu, go to <strong>Extensions &gt; Apps Script</strong>.</li>
+                        <li>Delete any existing code, paste the script below, and click <strong>Deploy &gt; New deployment</strong>.</li>
+                        <li>Select <strong>Web app</strong>, set <em>Who has access</em> to <strong>Anyone</strong>, and click <strong>Deploy</strong>.</li>
+                        <li>Copy the generated <strong>Web app URL</strong> and paste it into the <em>Google Sheets Sync URL</em> field in Admin Settings!</li>
+                    </ol>
+                </div>
+
+                <div style="position:relative; margin-bottom:18px;">
+                    <textarea id="googleAppsScriptCode" readonly style="width:100%; height:200px; font-family:monospace; font-size:0.75rem; background:#1e1e1e; color:#e0e0e0; padding:12px; border-radius:var(--radius-md); border:none; resize:vertical;"></textarea>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="copyGoogleAppsScriptCode()" style="position:absolute; top:8px; right:8px; padding:4px 10px; font-size:0.74rem;">
+                        <i class="fa-regular fa-copy"></i> Copy Script
+                    </button>
+                </div>
+
+                <div style="text-align:right;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="closeGoogleSheetsTemplateModal()">
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -2142,6 +2230,50 @@
                             <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Apps Script & Sheets Sync Template Modal -->
+    <div class="auth-modal-backdrop modal-backdrop" id="googleSheetsTemplateModal" style="display:none;" onclick="if(event.target === this) closeGoogleSheetsTemplateModal()">
+        <div class="auth-modal-card modal-card" style="max-width:680px;">
+            <button class="auth-close-btn" type="button" onclick="closeGoogleSheetsTemplateModal()" aria-label="Close modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div style="padding:28px 24px;">
+                <div style="border-bottom:1px solid var(--color-border); padding-bottom:12px; margin-bottom:16px;">
+                    <span class="badge badge-gold" style="font-size:0.7rem;">Free Google Cloud Backend</span>
+                    <h3 style="font-size:1.25rem; color:var(--color-black); margin-top:6px; font-family:var(--font-heading);">
+                        Google Sheets Live Sync Template
+                    </h3>
+                    <p style="font-size:0.8rem; color:var(--color-text-muted);">
+                        Deploy this Apps Script code in your Google Sheet to automatically log incoming customer orders and power live remote tracking lookups.
+                    </p>
+                </div>
+
+                <div style="font-size:0.82rem; color:var(--color-black); line-height:1.5; margin-bottom:14px;">
+                    <strong>3-Minute Setup:</strong>
+                    <ol style="padding-left:18px; margin:6px 0; color:var(--color-text-muted);">
+                        <li>Open <a href="https://sheets.new" target="_blank" style="color:var(--color-gold); font-weight:600;">sheets.new</a> to create a new spreadsheet named <em>Jewels by J Orders</em>.</li>
+                        <li>In the menu, go to <strong>Extensions &gt; Apps Script</strong>.</li>
+                        <li>Delete any existing code, paste the script below, and click <strong>Deploy &gt; New deployment</strong>.</li>
+                        <li>Select <strong>Web app</strong>, set <em>Who has access</em> to <strong>Anyone</strong>, and click <strong>Deploy</strong>.</li>
+                        <li>Copy the generated <strong>Web app URL</strong> and paste it into the <em>Google Sheets Sync URL</em> field in Admin Settings!</li>
+                    </ol>
+                </div>
+
+                <div style="position:relative; margin-bottom:18px;">
+                    <textarea id="googleAppsScriptCode" readonly style="width:100%; height:200px; font-family:monospace; font-size:0.75rem; background:#1e1e1e; color:#e0e0e0; padding:12px; border-radius:var(--radius-md); border:none; resize:vertical;"></textarea>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="copyGoogleAppsScriptCode()" style="position:absolute; top:8px; right:8px; padding:4px 10px; font-size:0.74rem;">
+                        <i class="fa-regular fa-copy"></i> Copy Script
+                    </button>
+                </div>
+
+                <div style="text-align:right;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="closeGoogleSheetsTemplateModal()">
+                        Close
+                    </button>
                 </div>
             </div>
         </div>
@@ -2548,6 +2680,50 @@
         </div>
     </div>
 
+    <!-- Google Apps Script & Sheets Sync Template Modal -->
+    <div class="auth-modal-backdrop modal-backdrop" id="googleSheetsTemplateModal" style="display:none;" onclick="if(event.target === this) closeGoogleSheetsTemplateModal()">
+        <div class="auth-modal-card modal-card" style="max-width:680px;">
+            <button class="auth-close-btn" type="button" onclick="closeGoogleSheetsTemplateModal()" aria-label="Close modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div style="padding:28px 24px;">
+                <div style="border-bottom:1px solid var(--color-border); padding-bottom:12px; margin-bottom:16px;">
+                    <span class="badge badge-gold" style="font-size:0.7rem;">Free Google Cloud Backend</span>
+                    <h3 style="font-size:1.25rem; color:var(--color-black); margin-top:6px; font-family:var(--font-heading);">
+                        Google Sheets Live Sync Template
+                    </h3>
+                    <p style="font-size:0.8rem; color:var(--color-text-muted);">
+                        Deploy this Apps Script code in your Google Sheet to automatically log incoming customer orders and power live remote tracking lookups.
+                    </p>
+                </div>
+
+                <div style="font-size:0.82rem; color:var(--color-black); line-height:1.5; margin-bottom:14px;">
+                    <strong>3-Minute Setup:</strong>
+                    <ol style="padding-left:18px; margin:6px 0; color:var(--color-text-muted);">
+                        <li>Open <a href="https://sheets.new" target="_blank" style="color:var(--color-gold); font-weight:600;">sheets.new</a> to create a new spreadsheet named <em>Jewels by J Orders</em>.</li>
+                        <li>In the menu, go to <strong>Extensions &gt; Apps Script</strong>.</li>
+                        <li>Delete any existing code, paste the script below, and click <strong>Deploy &gt; New deployment</strong>.</li>
+                        <li>Select <strong>Web app</strong>, set <em>Who has access</em> to <strong>Anyone</strong>, and click <strong>Deploy</strong>.</li>
+                        <li>Copy the generated <strong>Web app URL</strong> and paste it into the <em>Google Sheets Sync URL</em> field in Admin Settings!</li>
+                    </ol>
+                </div>
+
+                <div style="position:relative; margin-bottom:18px;">
+                    <textarea id="googleAppsScriptCode" readonly style="width:100%; height:200px; font-family:monospace; font-size:0.75rem; background:#1e1e1e; color:#e0e0e0; padding:12px; border-radius:var(--radius-md); border:none; resize:vertical;"></textarea>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="copyGoogleAppsScriptCode()" style="position:absolute; top:8px; right:8px; padding:4px 10px; font-size:0.74rem;">
+                        <i class="fa-regular fa-copy"></i> Copy Script
+                    </button>
+                </div>
+
+                <div style="text-align:right;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="closeGoogleSheetsTemplateModal()">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ═══════════════════════════════════════════════════════════════════════
        7D. ADMIN ADD / EDIT PRODUCT MODAL (FEATURE #8)
        ═══════════════════════════════════════════════════════════════════════ -->
@@ -2673,6 +2849,50 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Apps Script & Sheets Sync Template Modal -->
+    <div class="auth-modal-backdrop modal-backdrop" id="googleSheetsTemplateModal" style="display:none;" onclick="if(event.target === this) closeGoogleSheetsTemplateModal()">
+        <div class="auth-modal-card modal-card" style="max-width:680px;">
+            <button class="auth-close-btn" type="button" onclick="closeGoogleSheetsTemplateModal()" aria-label="Close modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div style="padding:28px 24px;">
+                <div style="border-bottom:1px solid var(--color-border); padding-bottom:12px; margin-bottom:16px;">
+                    <span class="badge badge-gold" style="font-size:0.7rem;">Free Google Cloud Backend</span>
+                    <h3 style="font-size:1.25rem; color:var(--color-black); margin-top:6px; font-family:var(--font-heading);">
+                        Google Sheets Live Sync Template
+                    </h3>
+                    <p style="font-size:0.8rem; color:var(--color-text-muted);">
+                        Deploy this Apps Script code in your Google Sheet to automatically log incoming customer orders and power live remote tracking lookups.
+                    </p>
+                </div>
+
+                <div style="font-size:0.82rem; color:var(--color-black); line-height:1.5; margin-bottom:14px;">
+                    <strong>3-Minute Setup:</strong>
+                    <ol style="padding-left:18px; margin:6px 0; color:var(--color-text-muted);">
+                        <li>Open <a href="https://sheets.new" target="_blank" style="color:var(--color-gold); font-weight:600;">sheets.new</a> to create a new spreadsheet named <em>Jewels by J Orders</em>.</li>
+                        <li>In the menu, go to <strong>Extensions &gt; Apps Script</strong>.</li>
+                        <li>Delete any existing code, paste the script below, and click <strong>Deploy &gt; New deployment</strong>.</li>
+                        <li>Select <strong>Web app</strong>, set <em>Who has access</em> to <strong>Anyone</strong>, and click <strong>Deploy</strong>.</li>
+                        <li>Copy the generated <strong>Web app URL</strong> and paste it into the <em>Google Sheets Sync URL</em> field in Admin Settings!</li>
+                    </ol>
+                </div>
+
+                <div style="position:relative; margin-bottom:18px;">
+                    <textarea id="googleAppsScriptCode" readonly style="width:100%; height:200px; font-family:monospace; font-size:0.75rem; background:#1e1e1e; color:#e0e0e0; padding:12px; border-radius:var(--radius-md); border:none; resize:vertical;"></textarea>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="copyGoogleAppsScriptCode()" style="position:absolute; top:8px; right:8px; padding:4px 10px; font-size:0.74rem;">
+                        <i class="fa-regular fa-copy"></i> Copy Script
+                    </button>
+                </div>
+
+                <div style="text-align:right;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="closeGoogleSheetsTemplateModal()">
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
     </div>

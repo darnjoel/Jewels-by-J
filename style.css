@@ -5048,6 +5048,164 @@ body.modal-open {
     flex-wrap: wrap;
 }
 
+/* Live Courier & Rider Card */
+.track-courier-card {
+    background: #fdfcfb;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 18px 22px;
+    margin: 20px 28px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+.track-courier-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.track-courier-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--color-surface-soft);
+    border: 2px solid var(--color-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: var(--color-gold);
+    flex-shrink: 0;
+}
+.track-courier-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-black);
+    display: block;
+}
+.track-courier-sub {
+    font-size: 0.76rem;
+    color: var(--color-text-muted);
+}
+.track-courier-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.track-pin-badge {
+    background: var(--color-blush-soft);
+    border: 1px dashed var(--color-gold);
+    border-radius: var(--radius-sm);
+    padding: 6px 12px;
+    text-align: center;
+}
+.track-pin-lbl {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    font-weight: 700;
+    display: block;
+}
+.track-pin-code {
+    font-family: monospace;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--color-black);
+    letter-spacing: 0.1em;
+}
+
+/* Event Milestone History Timeline */
+.track-events-box {
+    padding: 22px 28px;
+    border-bottom: 1px solid var(--color-border);
+    background: #ffffff;
+}
+.track-events-header {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    color: var(--color-black);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.track-events-list {
+    position: relative;
+    padding-left: 20px;
+    border-left: 2px solid var(--color-border);
+    margin-left: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.track-event-item {
+    position: relative;
+}
+.track-event-dot {
+    position: absolute;
+    left: -27px;
+    top: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2px solid var(--color-border);
+}
+.track-event-item.active .track-event-dot {
+    background: var(--color-gold);
+    border-color: var(--color-gold);
+    box-shadow: 0 0 0 3px var(--color-gold-glow);
+}
+.track-event-item.completed .track-event-dot {
+    background: var(--color-black);
+    border-color: var(--color-black);
+}
+.track-event-title {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: var(--color-black);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.track-event-time {
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+    font-weight: normal;
+}
+.track-event-desc {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+    line-height: 1.4;
+}
+
+/* Print View for Tracking Receipt */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #section-track, #section-track * {
+        visibility: visible;
+    }
+    #section-track {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: #fff;
+    }
+    .track-form, .track-actions-bar, .track-sample-bar, .whatsapp-fab, .announcement-bar, .navbar {
+        display: none !important;
+    }
+}
+
 /* Responsive Rules for Order Tracker */
 @media (max-width: 768px) {
     .track-order-card {

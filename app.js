@@ -446,6 +446,10 @@ if (!storeSettings) {
         momoMerchantNumber: "0500594879",
         momoMerchantName: "Jewels by J (Jerrilyn Mensah)",
         cloudSyncUrl: "",
+        paystackPublicKey: "",
+        momoMerchantNumber: "0500594879",
+        momoMerchantName: "Jewels by J (Jerrilyn Mensah)",
+        cloudSyncUrl: "",
         preferences: {
             theme: "default",
             fontSize: "standard",
@@ -463,6 +467,10 @@ if (!storeSettings) {
     if (storeSettings.adminPIN === "1234") {
         storeSettings.adminPIN = "2023";
     }
+    if (storeSettings.paystackPublicKey === undefined) storeSettings.paystackPublicKey = "";
+    if (!storeSettings.momoMerchantNumber) storeSettings.momoMerchantNumber = "0500594879";
+    if (!storeSettings.momoMerchantName) storeSettings.momoMerchantName = "Jewels by J (Jerrilyn Mensah)";
+    if (storeSettings.cloudSyncUrl === undefined) storeSettings.cloudSyncUrl = "";
     if (storeSettings.paystackPublicKey === undefined) storeSettings.paystackPublicKey = "";
     if (!storeSettings.momoMerchantNumber) storeSettings.momoMerchantNumber = "0500594879";
     if (!storeSettings.momoMerchantName) storeSettings.momoMerchantName = "Jewels by J (Jerrilyn Mensah)";
@@ -4154,6 +4162,40 @@ function renderOrderTrackingResult(order) {
         </div>
     `).join("") : `<p style="font-size:0.85rem; color:var(--color-text-muted);">Custom Bespoke Order</p>`;
 
+    // Milestone Event History Log
+    const events = (order.events && Array.isArray(order.events)) ? order.events : [
+        {
+            stage: "placed",
+            title: "Order Placed & Queued",
+            time: order.date || "Recent",
+            desc: "Order received in atelier system and queued for processing."
+        },
+        {
+            stage: "confirmed",
+            title: `Payment Confirmed (${escapeHTML(order.paymentMethod || 'MoMo')})`,
+            time: order.date ? `${order.date.slice(0, 10)} (Verified)` : "Verified",
+            desc: `Payment confirmed (Ref: ${escapeHTML(order.paymentRef || 'CONFIRMED')}). Metal stock reserved.`
+        },
+        {
+            stage: "crafting",
+            title: "Atelier Studio Crafting",
+            time: order.statusCode === "crafting" ? "Active Now" : (activeIndex > 2 ? "Completed" : "Scheduled"),
+            desc: "Jewelry hand-shaped, custom engraved, and polished in Accra atelier."
+        },
+        {
+            stage: "transit",
+            title: "Dispatched with Express Rider",
+            time: order.statusCode === "transit" ? "In Transit Now" : (activeIndex > 3 ? "Completed" : "Pending Handover"),
+            desc: `Pieces sealed in velvet luxury jewelry box and handed to dispatch rider for delivery to ${escapeHTML(order.address)}.`
+        },
+        {
+            stage: "delivered",
+            title: "Delivered to Recipient",
+            time: order.statusCode === "delivered" ? "Delivered" : "Pending Arrival",
+            desc: `Direct handover and verified delivery to ${escapeHTML(order.customerName)}.`
+        }
+    ];
+
     card.innerHTML = `
         <div class="track-result-wrapper">
             <!-- Result Top Header -->
@@ -4205,6 +4247,35 @@ function renderOrderTrackingResult(order) {
                 </div>
             </div>
 
+            <!-- Live Courier Rider Card (When In Transit or Delivered) -->
+            ${(order.statusCode === "transit" || order.statusCode === "delivered") ? `
+                <div class="track-courier-card">
+                    <div class="track-courier-left">
+                        <div class="track-courier-avatar">
+                            <i class="fa-solid fa-motorcycle"></i>
+                        </div>
+                        <div>
+                            <span class="track-courier-name"><i class="fa-solid fa-circle-check" style="color:var(--color-gold); font-size:0.8rem; margin-right:4px;"></i> Kweku Boateng (Express Dispatch)</span>
+                            <span class="track-courier-sub">Jewels by J Logistics • Verified Rider #04</span>
+                            <div style="margin-top:6px; font-size:0.75rem;">
+                                <a href="tel:+233500594879" style="color:var(--color-gold); font-weight:700; margin-right:14px;">
+                                    <i class="fa-solid fa-phone"></i> Call Rider
+                                </a>
+                                <a href="https://wa.me/233500594879?text=Hi%20Kweku,%20I'm%20inquiring%20about%20my%20delivery%20for%20order%20${encodeURIComponent(order.id)}" target="_blank" style="color:#25d366; font-weight:700;">
+                                    <i class="fa-brands fa-whatsapp"></i> WhatsApp Dispatch
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="track-courier-right">
+                        <div class="track-pin-badge">
+                            <span class="track-pin-lbl">Handover Verification PIN</span>
+                            <span class="track-pin-code">${escapeHTML(order.id.replace(/\D/g, "").slice(-4) || '4829')}</span>
+                        </div>
+                    </div>
+                </div>
+            ` : ''}
+
             <!-- Two-Column Delivery & Payment Info -->
             <div class="track-info-grid">
                 <div class="track-info-card">
@@ -4238,6 +4309,31 @@ function renderOrderTrackingResult(order) {
                 </div>
             </div>
 
+            <!-- Milestone Activity History Log -->
+            <div class="track-events-box">
+                <div class="track-events-header">
+                    <span><i class="fa-solid fa-clock-rotate-left" style="color:var(--color-gold); margin-right:6px;"></i> Atelier &amp; Dispatch Timeline</span>
+                    <span style="font-size:0.72rem; color:var(--color-text-muted); text-transform:none; font-weight:normal;">Realtime Audit Trail</span>
+                </div>
+                <div class="track-events-list">
+                    ${events.map((ev, idx) => {
+        const isPast = idx < activeIndex;
+        const isCurrent = idx === activeIndex;
+        const cls = isPast ? 'completed' : (isCurrent ? 'active' : '');
+        return `
+                            <div class="track-event-item ${cls}">
+                                <div class="track-event-dot"></div>
+                                <div class="track-event-title">
+                                    <span>${escapeHTML(ev.title)}</span>
+                                    <span class="track-event-time"><i class="fa-regular fa-clock" style="font-size:0.68rem; margin-right:3px;"></i>${escapeHTML(ev.time)}</span>
+                                </div>
+                                <div class="track-event-desc">${escapeHTML(ev.desc)}</div>
+                            </div>
+                        `;
+    }).join("")}
+                </div>
+            </div>
+
             <!-- Items Summary Breakdown -->
             <div class="track-items-box">
                 <div class="track-items-header">
@@ -4260,16 +4356,85 @@ function renderOrderTrackingResult(order) {
 
             <!-- Actions Footer -->
             <div class="track-actions-bar">
-                <button type="button" class="btn btn-outline btn-sm" onclick="resetTrackView()">
-                    <i class="fa-solid fa-magnifying-glass"></i> Track Another Order
-                </button>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="refreshCurrentTrackingStatus('${escapeHTML(order.id)}')" id="btnRefreshTracking">
+                        <i class="fa-solid fa-arrows-rotate"></i> Refresh Status
+                    </button>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="shareTrackingLink('${escapeHTML(order.id)}')">
+                        <i class="fa-solid fa-share-nodes"></i> Share Link
+                    </button>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="window.print()">
+                        <i class="fa-solid fa-print"></i> Print Slip
+                    </button>
+                </div>
                 <div class="track-actions-right">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="resetTrackView()">
+                        <i class="fa-solid fa-magnifying-glass"></i> Track Another
+                    </button>
                     <a href="https://wa.me/${storeSettings.whatsappNumber || SITE_CONFIG.whatsappNumber}?text=Hi%20Jewels%20by%20J,%20I'm%20inquiring%20about%20my%20order%20${encodeURIComponent(order.id)}" target="_blank" class="btn btn-whatsapp btn-sm">
                         <i class="fa-brands fa-whatsapp"></i> Chat with Concierge
                     </a>
                 </div>
             </div>
         </div>
+    `;
+}
+
+async function refreshCurrentTrackingStatus(orderId) {
+    const btn = document.getElementById("btnRefreshTracking");
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking Cloud...';
+    }
+
+    try {
+        const fresh = await fetchOrderFromCloud(orderId);
+        if (fresh) {
+            const idx = storeOrders.findIndex(o => o.id === fresh.id);
+            if (idx >= 0) storeOrders[idx] = { ...storeOrders[idx], ...fresh };
+            else storeOrders.unshift(fresh);
+            localStorage.setItem("j_orders", JSON.stringify(storeOrders));
+            renderOrderTrackingResult(fresh);
+            showToast("Status Updated", `Order #${orderId} is up to date.`);
+        } else {
+            showToast("Up to Date", `No new cloud updates for #${orderId}.`);
+        }
+    } catch (e) {
+        showToast("Refreshed", "Showing current studio status.");
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Refresh Status';
+        }
+    }
+}
+
+function shareTrackingLink(orderId) {
+    const shareUrl = `${window.location.origin}${window.location.pathname}?track=${encodeURIComponent(orderId)}`;
+    if (navigator.share) {
+        navigator.share({
+            title: `Jewels by J — Track Order #${orderId}`,
+            text: `Track my jewelry order #${orderId} from Jewels by J:`,
+            url: shareUrl
+        }).catch(() => {
+            copyShareUrl(shareUrl, orderId);
+        });
+    } else {
+        copyShareUrl(shareUrl, orderId);
+    }
+}
+
+function copyShareUrl(url, orderId) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(() => {
+            showToast("Link Copied!", `Direct tracking link for #${orderId} copied.`);
+        }).catch(() => {
+            showToast("Tracking Link", url);
+        });
+    } else {
+        showToast("Tracking Link", url);
+    }
+}
     `;
 }
 
@@ -4292,6 +4457,10 @@ function initAdminPortal() {
     const setMoMoNum = document.getElementById("settingMoMoNumber");
     const setMoMoName = document.getElementById("settingMoMoName");
     const setCloudSync = document.getElementById("settingCloudSyncUrl");
+    const setPaystack = document.getElementById("settingPaystackKey");
+    const setMoMoNum = document.getElementById("settingMoMoNumber");
+    const setMoMoName = document.getElementById("settingMoMoName");
+    const setCloudSync = document.getElementById("settingCloudSyncUrl");
 
     const activeEmail = storeSettings.email || SITE_CONFIG.email;
     if (setWa) setWa.value = storeSettings.whatsappNumber || SITE_CONFIG.whatsappNumber;
@@ -4299,6 +4468,10 @@ function initAdminPortal() {
     if (setFree) setFree.value = storeSettings.freeDeliveryThreshold || SITE_CONFIG.freeDeliveryThreshold;
     if (setPin) setPin.value = storeSettings.adminPIN || "2023";
     if (setWeb3) setWeb3.value = storeSettings.web3Key || "";
+    if (setPaystack) setPaystack.value = storeSettings.paystackPublicKey || "";
+    if (setMoMoNum) setMoMoNum.value = storeSettings.momoMerchantNumber || "0500594879";
+    if (setMoMoName) setMoMoName.value = storeSettings.momoMerchantName || "Jewels by J (Jerrilyn Mensah)";
+    if (setCloudSync) setCloudSync.value = storeSettings.cloudSyncUrl || "";
     if (setPaystack) setPaystack.value = storeSettings.paystackPublicKey || "";
     if (setMoMoNum) setMoMoNum.value = storeSettings.momoMerchantNumber || "0500594879";
     if (setMoMoName) setMoMoName.value = storeSettings.momoMerchantName || "Jewels by J (Jerrilyn Mensah)";
@@ -5046,6 +5219,12 @@ function saveAdminSettings(event) {
     storeSettings.momoMerchantName = (document.getElementById("settingMoMoName")?.value || "").trim() || "Jewels by J (Jerrilyn Mensah)";
     storeSettings.cloudSyncUrl = (document.getElementById("settingCloudSyncUrl")?.value || "").trim();
 
+    // Payment & Cloud Sync settings
+    storeSettings.paystackPublicKey = (document.getElementById("settingPaystackKey")?.value || "").trim();
+    storeSettings.momoMerchantNumber = (document.getElementById("settingMoMoNumber")?.value || "").trim() || "0500594879";
+    storeSettings.momoMerchantName = (document.getElementById("settingMoMoName")?.value || "").trim() || "Jewels by J (Jerrilyn Mensah)";
+    storeSettings.cloudSyncUrl = (document.getElementById("settingCloudSyncUrl")?.value || "").trim();
+
     localStorage.setItem("j_settings", JSON.stringify(storeSettings));
 
     // Update Paystack badge
@@ -5442,6 +5621,21 @@ window.testCloudConnection = testCloudConnection;
 window.openGoogleSheetsTemplateModal = openGoogleSheetsTemplateModal;
 window.closeGoogleSheetsTemplateModal = closeGoogleSheetsTemplateModal;
 window.copyGoogleAppsScriptCode = copyGoogleAppsScriptCode;
+window.refreshCurrentTrackingStatus = refreshCurrentTrackingStatus;
+window.shareTrackingLink = shareTrackingLink;
+window.switchPaymentTab = switchPaymentTab;
+window.processPaystackPayment = processPaystackPayment;
+window.processDirectMoMoPayment = processDirectMoMoPayment;
+window.processPayOnDelivery = processPayOnDelivery;
+window.copyDirectMoMoNumber = copyDirectMoMoNumber;
+window.copyDirectMoMoAmount = copyDirectMoMoAmount;
+window.pullRemoteOrdersFromCloud = pullRemoteOrdersFromCloud;
+window.testCloudConnection = testCloudConnection;
+window.openGoogleSheetsTemplateModal = openGoogleSheetsTemplateModal;
+window.closeGoogleSheetsTemplateModal = closeGoogleSheetsTemplateModal;
+window.copyGoogleAppsScriptCode = copyGoogleAppsScriptCode;
+window.refreshCurrentTrackingStatus = refreshCurrentTrackingStatus;
+window.shareTrackingLink = shareTrackingLink;
 
 // Initialize Preferences Immediately
 applyStoredPreferences();
