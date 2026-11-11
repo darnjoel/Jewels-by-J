@@ -2635,35 +2635,6 @@
                     </div>
                 </div>
 
-                <!-- USSD MOMO SIMULATION SCREEN -->
-                <div class="checkout-ussd-simulator" id="checkoutPaneMoMoSimulation" style="display:none;">
-                    <div class="ussd-phone-graphic">
-                        <div class="ussd-pulse-ring"></div>
-                        <i class="fa-solid fa-mobile-screen"></i>
-                    </div>
-                    <h3 style="font-size:1.3rem; margin-bottom:6px; color:var(--color-black);">Authorizing Mobile Money
-                    </h3>
-                    <p style="font-size:0.88rem; color:var(--color-text-muted); max-width:440px; margin:0 auto 16px;">
-                        A payment prompt of <strong id="simPromptAmount" style="color:var(--color-black);">GH₵
-                            0.00</strong> was sent to your phone (<span id="simPromptPhone">024 XXX XXXX</span>).
-                    </p>
-                    <div
-                        style="background:var(--color-cream); border:1px solid var(--color-border); border-radius:var(--radius-md); padding:16px; max-width:380px; margin:0 auto 20px; font-size:0.82rem;">
-                        <span
-                            style="display:block; font-weight:700; color:var(--color-black); margin-bottom:4px;">Mobile
-                            Prompt:</span>
-                        <em>"Authorize payment of GH₵ <span id="simPromptAmountInner">0.00</span> to Jewels by J? Enter
-                            MM PIN to approve."</em>
-                    </div>
-                    <p style="font-size:0.78rem; color:var(--color-text-subtle); margin-bottom:18px;">
-                        Waiting for authorization... <span id="simCountdown">5</span>s
-                    </p>
-                    <button type="button" class="btn btn-primary btn-sm" onclick="completeMoMoSimulation()"
-                        style="padding:10px 24px;">
-                        <i class="fa-solid fa-check"></i> I Have Entered My PIN
-                    </button>
-                </div>
-
                 <!-- STEP 3: ORDER SUCCESS / RECEIPT & OWNER NOTIFICATION -->
                 <div class="checkout-success-view" id="checkoutPaneStep3" style="display:none;">
                     <div class="success-icon-box">

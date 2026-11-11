@@ -705,27 +705,63 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
 
     if (ejServiceId && ejTemplateId && ejPublicKey) {
         try {
-            const formattedMessage = (fields.message || details || "Customer consultation inquiry submitted from Jewels by J store.").trim();
-            const clientDetailsSummary = `Client Name: ${fields.name || 'Valued Client'}\nEmail: ${fields.email || 'N/A'}\nPhone: ${fields.phone || 'N/A'}\nSubject: ${subject}\n\nInquiry / Notes:\n${formattedMessage}`;
+            const rawMessage = (fields.message || details || "").trim();
+            const clientName = fields.name || "Valued Client";
+            const clientEmail = fields.email || "no-reply@jewelsbyj.com";
+            const clientPhone = fields.phone || "Not provided";
+            const cleanSubject = (subject || (fields.order_id ? `New Order #${fields.order_id}` : "Customer Consultation")).replace(/^💎\s*/, "");
+
+            // Build an elegant, structured notification body
+            let richBody = "";
+            if (fields.order_id) {
+                richBody = `💎 NEW ORDER #${fields.order_id}\n` +
+                    `──────────────────────────────────────────────\n` +
+                    `• Customer Name:  ${clientName}\n` +
+                    `• Customer Email: ${clientEmail}\n` +
+                    `• Phone / MoMo:   ${clientPhone}\n` +
+                    `• Delivery To:    ${fields.delivery_address || 'Accra'}\n` +
+                    `• Payment Method: ${fields.payment_method || 'Mobile Money'}\n` +
+                    `• Reference:      ${fields.payment_ref || 'CONFIRMED'}\n` +
+                    `• Total Paid:     ${fields.grand_total || fields.total || 'GH₵ 0.00'}\n` +
+                    `──────────────────────────────────────────────\n` +
+                    `Items Ordered:\n${fields.items || 'Bespoke Jewelry Package'}\n` +
+                    (fields.notes && fields.notes !== "None" ? `\nCustomer Notes:\n${fields.notes}\n` : '') +
+                    `──────────────────────────────────────────────\n` +
+                    `👉 Reply directly to this email to contact ${clientName} (${clientEmail}).`;
+            } else {
+                richBody = `💎 BESPOKE JEWELRY INQUIRY\n` +
+                    `──────────────────────────────────────────────\n` +
+                    `• Client Name:    ${clientName}\n` +
+                    `• Client Email:   ${clientEmail}\n` +
+                    `• Phone / WA:     ${clientPhone}\n` +
+                    `• Interested In:  ${fields.subject || cleanSubject}\n` +
+                    `──────────────────────────────────────────────\n` +
+                    `Client Message:\n` +
+                    `"${rawMessage || 'Customer inquiry submitted from store website.'}"\n\n` +
+                    `──────────────────────────────────────────────\n` +
+                    `👉 Click "Reply" in your email to respond directly to ${clientName} (${clientEmail}).`;
+            }
 
             const templateParams = {
                 to_name: "Jerrilyn Mensah",
                 to_email: targetEmail,
-                from_name: fields.name || "Valued Client",
-                user_name: fields.name || "Valued Client",
-                customer_name: fields.name || "Valued Client",
-                name: fields.name || "Valued Client",
-                from_email: fields.email || "no-reply@jewelsbyj.com",
-                user_email: fields.email || "no-reply@jewelsbyj.com",
-                customer_email: fields.email || "no-reply@jewelsbyj.com",
-                email: fields.email || "no-reply@jewelsbyj.com",
-                reply_to: fields.email || targetEmail,
-                phone: fields.phone || "Not provided",
-                customer_phone: fields.phone || "Not provided",
-                subject: subject,
-                message: formattedMessage,
-                content: formattedMessage,
-                inquiry_details: clientDetailsSummary,
+                from_name: clientName,
+                user_name: clientName,
+                customer_name: clientName,
+                name: clientName,
+                from_email: clientEmail,
+                user_email: clientEmail,
+                customer_email: clientEmail,
+                email: clientEmail,
+                reply_to: clientEmail,
+                phone: clientPhone,
+                customer_phone: clientPhone,
+                subject: `💎 [Jewels by J] ${cleanSubject} — ${clientName}`,
+                clean_subject: cleanSubject,
+                message: richBody,
+                raw_message: rawMessage,
+                content: richBody,
+                inquiry_details: richBody,
                 order_id: fields.order_id || "",
                 items: fields.items || "",
                 grand_total: fields.grand_total || "",
@@ -1725,15 +1761,15 @@ function updateContactAuthGate() {
                     </div>
                     <div>
                         <h4 class="contact-auth-gate-title">
-                            Signed In: <span>${escapeHTML(currentUser.name)}</span>
+                            Signed In as <span>${escapeHTML(currentUser.name)}</span>
                         </h4>
                         <p class="contact-auth-gate-desc">
-                            Inquiry will dispatch directly to <strong>${escapeHTML(getAdminEmail())}</strong> &amp; link to your account profile (<strong>${escapeHTML(currentUser.email)}</strong>).
+                            Our atelier concierge will reply directly to your email (<strong>${escapeHTML(currentUser.email)}</strong>).
                         </p>
                     </div>
                 </div>
                 <div class="contact-auth-gate-badge">
-                    <span class="auth-pill"><i class="fa-solid fa-shield-halved"></i> Registered Client</span>
+                    <span class="auth-pill"><i class="fa-solid fa-shield-halved"></i> Verified Client</span>
                 </div>
             </div>
         `;
@@ -1760,9 +1796,9 @@ function updateContactAuthGate() {
                         <i class="fa-regular fa-envelope"></i>
                     </div>
                     <div>
-                        <h4 class="contact-auth-gate-title">Direct Studio Inbox — Open to All</h4>
+                        <h4 class="contact-auth-gate-title">Direct Atelier Consultation</h4>
                         <p class="contact-auth-gate-desc">
-                            Leave a message, custom order request, or question below. Messages deliver directly to <strong>${escapeHTML(getAdminEmail())}</strong>. No account required!
+                            Send your custom jewelry inquiry, sizing question, or bespoke idea below. Our atelier concierge will reply directly to your email.
                         </p>
                     </div>
                 </div>
@@ -1785,8 +1821,8 @@ function updateContactAuthGate() {
     if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.classList.remove("btn-locked");
-        submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send to Admin Inbox`;
-        submitBtn.title = "Send inquiry directly to admin inbox";
+        submitBtn.innerHTML = `<i class="fa-regular fa-paper-plane"></i> Send Inquiry`;
+        submitBtn.title = "Send your inquiry to our atelier concierge";
     }
 }
 
@@ -1889,18 +1925,8 @@ function initContactForm() {
             console.warn("Iframe dispatch note:", frameErr);
         }
 
-        // Direct web client compose links for 100% deliverability
-        const clientStatusStr = currentUser ? "Registered Client" : "Guest Visitor";
-        const gmailDirectUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(targetEmail)}&su=${encodeURIComponent("💎 [Jewels by J Inquiry] " + (subject || "Consultation"))}&body=${encodeURIComponent("Hello Jerrilyn,\n\n" + message + "\n\n---\nClient Name: " + name + "\nClient Email: " + email + "\nClient Phone: " + (phone || "N/A") + "\nClient Status: " + clientStatusStr)}`;
-        const mailtoDirectUrl = `mailto:${encodeURIComponent(targetEmail)}?subject=${encodeURIComponent("💎 [Jewels by J Inquiry] " + (subject || "Consultation"))}&body=${encodeURIComponent("Hello Jerrilyn,\n\n" + message + "\n\n---\nClient Name: " + name + "\nClient Email: " + email + "\nClient Phone: " + (phone || "N/A"))}`;
+        // Direct concierge links
         const waDirectUrl = `https://wa.me/${storeSettings.whatsappNumber || SITE_CONFIG.whatsappNumber}?text=${encodeURIComponent("Hello Jerrilyn! Inquiry from " + name + " (" + (subject || "Consultation") + "): " + message)}`;
-
-        // Open Gmail composer in a new tab immediately (allowed within user submit gesture)
-        try {
-            window.open(gmailDirectUrl, "_blank");
-        } catch (popupErr) {
-            console.warn("Popup notice:", popupErr);
-        }
 
         // Reset subject and message input fields; clear guest credentials while preserving verified user identity
         if (!currentUser) {
@@ -1916,7 +1942,7 @@ function initContactForm() {
             `💎 [Jewels by J Inquiry] ${subject || "Consultation"} — ${name}`,
             {
                 name: name,
-                email: email, // FormSubmit uses this as Reply-To
+                email: email, // EmailJS uses this as Reply-To
                 phone: phone || "Not provided",
                 subject: subject || "Consultation",
                 message: message,
@@ -1934,92 +1960,53 @@ function initContactForm() {
                         <div class="inquiry-delivery-header">
                             <i class="fa-solid fa-circle-check" style="font-size:1.8rem; color:var(--color-emerald, #2e7d32);"></i>
                             <div>
-                                <strong style="color:var(--color-black); font-size:0.95rem; display:block;">
-                                    Inquiry Dispatched Directly to Jerrilyn's Inbox
-                                </strong>
-                                <p style="font-size:0.82rem; color:var(--color-text-muted); margin:2px 0 0 0;">
-                                    Delivered to <strong>${escapeHTML(targetEmail)}</strong> &amp; logged in Admin Portal. Jerrilyn will reply to <strong>${escapeHTML(email)}</strong> shortly!
-                                </p>
-                            </div>
-                        </div>
-                        <div class="inquiry-delivery-actions">
-                            <a href="${gmailDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
-                                <i class="fa-brands fa-google" style="color:#ea4335;"></i> Open in Gmail
-                            </a>
-                            <a href="${waDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-sm">
-                                <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
-                            </a>
-                        </div>
-                    </div>
-                `;
-                statusEl.className = "form-status-msg";
-                showToast("Inquiry Delivered", `Sent to ${targetEmail}`);
-            } else if (result.needsActivation) {
-                statusEl.innerHTML = `
-                    <div class="inquiry-delivery-card" style="border-color:var(--color-gold);">
-                        <div class="inquiry-delivery-header">
-                            <i class="fa-solid fa-bell" style="font-size:1.8rem; color:var(--color-gold);"></i>
-                            <div>
-                                <strong style="color:var(--color-black); font-size:0.95rem; display:block;">
-                                    One-Time Admin Inbox Activation Needed
-                                </strong>
-                                <p style="font-size:0.82rem; color:var(--color-text-muted); margin:2px 0 0 0;">
-                                    FormSubmit forwarded your request and sent a one-time activation link to <strong>${escapeHTML(targetEmail)}</strong>. Jerrilyn must click "Activate Form" in Gmail once to enable automatic forwarding.
-                                </p>
-                            </div>
-                        </div>
-                        <div class="inquiry-delivery-actions">
-                            <a href="https://mail.google.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
-                                <i class="fa-brands fa-google"></i> Open Gmail to Activate
-                            </a>
-                            <a href="${gmailDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
-                                <i class="fa-solid fa-paper-plane"></i> Send Direct via Gmail
-                            </a>
-                            <a href="${waDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-sm">
-                                <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
-                            </a>
-                        </div>
-                    </div>
-                `;
-                statusEl.className = "form-status-msg";
-                showToast("Activation Email Sent", `Check ${targetEmail}`);
-            } else {
-                statusEl.innerHTML = `
-                    <div class="inquiry-delivery-card" style="border: 2px solid var(--color-gold); background: #ffffff;">
-                        <div class="inquiry-delivery-header">
-                            <i class="fa-solid fa-envelope-circle-check" style="font-size:2rem; color:var(--color-gold);"></i>
-                            <div>
-                                <strong style="color:var(--color-black); font-size:1.02rem; display:block;">
-                                    Inquiry Recorded in Studio Portal!
+                                <strong style="color:var(--color-black); font-size:1rem; display:block;">
+                                    Your Inquiry Has Been Sent!
                                 </strong>
                                 <p style="font-size:0.85rem; color:var(--color-text-muted); margin:4px 0 0 0; line-height:1.5;">
-                                    Your message has been saved in our store records. We also opened your <strong>Gmail composer tab</strong> addressed to <strong>${escapeHTML(targetEmail)}</strong>. Please click <strong>"Send"</strong> in Gmail to deliver directly into Jerrilyn's inbox!
+                                    Thank you, <strong>${escapeHTML(name)}</strong>. We have received your message. Jerrilyn will review your request and reply directly to <strong>${escapeHTML(email)}</strong> shortly.
                                 </p>
                             </div>
                         </div>
-                        <div style="margin-top:12px; padding:10px 14px; background:var(--color-blush-soft); border-radius:6px; font-size:0.82rem; color:var(--color-black);">
-                            <i class="fa-solid fa-circle-info" style="color:var(--color-gold); margin-right:6px;"></i>
-                            If your Gmail tab didn't open automatically, use the direct buttons below:
+                        <div class="inquiry-delivery-actions">
+                            <a href="${waDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-sm">
+                                <i class="fa-brands fa-whatsapp"></i> Also Chat on WhatsApp
+                            </a>
                         </div>
-                        <div class="inquiry-delivery-actions" style="margin-top:12px;">
-                            <a href="${gmailDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" style="font-weight:600; padding:8px 16px;">
-                                <i class="fa-brands fa-google"></i> Open &amp; Send in Gmail
-                            </a>
-                            <a href="${mailtoDirectUrl}" class="btn btn-outline btn-sm" style="padding:8px 14px;">
-                                <i class="fa-solid fa-envelope"></i> Send via Mail App
-                            </a>
-                            <a href="${waDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-sm" style="padding:8px 14px;">
+                    </div>
+                `;
+                statusEl.className = "form-status-msg";
+                showToast("Inquiry Sent!", "Thank you! We will reply to your email shortly.");
+            } else {
+                statusEl.innerHTML = `
+                    <div class="inquiry-delivery-card" style="border:1px solid var(--color-gold);">
+                        <div class="inquiry-delivery-header">
+                            <i class="fa-solid fa-circle-check" style="font-size:1.8rem; color:var(--color-gold);"></i>
+                            <div>
+                                <strong style="color:var(--color-black); font-size:1rem; display:block;">
+                                    Inquiry Received!
+                                </strong>
+                                <p style="font-size:0.85rem; color:var(--color-text-muted); margin:4px 0 0 0; line-height:1.5;">
+                                    Your message has been safely logged in our atelier system. You can also chat with Jerrilyn directly on WhatsApp for an immediate response!
+                                </p>
+                            </div>
+                        </div>
+                        <div class="inquiry-delivery-actions">
+                            <a href="${waDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-sm">
                                 <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
                             </a>
                         </div>
                     </div>
                 `;
                 statusEl.className = "form-status-msg";
-                showToast("Inquiry Saved in Portal", `Click Send in Gmail to reach ${targetEmail}`);
+                showToast("Inquiry Received!", "Logged in studio records.");
             }
 
             submitBtn.disabled = false;
-            submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send to Admin Inbox`;
+            submitBtn.innerHTML = `<i class="fa-regular fa-paper-plane"></i> Send Inquiry`;
+        }).catch(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<i class="fa-regular fa-paper-plane"></i> Send Inquiry`;
         });
     });
 }
