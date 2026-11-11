@@ -4435,8 +4435,6 @@ function copyShareUrl(url, orderId) {
         showToast("Tracking Link", url);
     }
 }
-    `;
-}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // FEATURE 8: ADMIN PORTAL & DASHBOARD (PRODUCTS & ORDERS MANAGEMENT)
@@ -4457,10 +4455,6 @@ function initAdminPortal() {
     const setMoMoNum = document.getElementById("settingMoMoNumber");
     const setMoMoName = document.getElementById("settingMoMoName");
     const setCloudSync = document.getElementById("settingCloudSyncUrl");
-    const setPaystack = document.getElementById("settingPaystackKey");
-    const setMoMoNum = document.getElementById("settingMoMoNumber");
-    const setMoMoName = document.getElementById("settingMoMoName");
-    const setCloudSync = document.getElementById("settingCloudSyncUrl");
 
     const activeEmail = storeSettings.email || SITE_CONFIG.email;
     if (setWa) setWa.value = storeSettings.whatsappNumber || SITE_CONFIG.whatsappNumber;
@@ -4468,10 +4462,6 @@ function initAdminPortal() {
     if (setFree) setFree.value = storeSettings.freeDeliveryThreshold || SITE_CONFIG.freeDeliveryThreshold;
     if (setPin) setPin.value = storeSettings.adminPIN || "2023";
     if (setWeb3) setWeb3.value = storeSettings.web3Key || "";
-    if (setPaystack) setPaystack.value = storeSettings.paystackPublicKey || "";
-    if (setMoMoNum) setMoMoNum.value = storeSettings.momoMerchantNumber || "0500594879";
-    if (setMoMoName) setMoMoName.value = storeSettings.momoMerchantName || "Jewels by J (Jerrilyn Mensah)";
-    if (setCloudSync) setCloudSync.value = storeSettings.cloudSyncUrl || "";
     if (setPaystack) setPaystack.value = storeSettings.paystackPublicKey || "";
     if (setMoMoNum) setMoMoNum.value = storeSettings.momoMerchantNumber || "0500594879";
     if (setMoMoName) setMoMoName.value = storeSettings.momoMerchantName || "Jewels by J (Jerrilyn Mensah)";
@@ -5219,12 +5209,6 @@ function saveAdminSettings(event) {
     storeSettings.momoMerchantName = (document.getElementById("settingMoMoName")?.value || "").trim() || "Jewels by J (Jerrilyn Mensah)";
     storeSettings.cloudSyncUrl = (document.getElementById("settingCloudSyncUrl")?.value || "").trim();
 
-    // Payment & Cloud Sync settings
-    storeSettings.paystackPublicKey = (document.getElementById("settingPaystackKey")?.value || "").trim();
-    storeSettings.momoMerchantNumber = (document.getElementById("settingMoMoNumber")?.value || "").trim() || "0500594879";
-    storeSettings.momoMerchantName = (document.getElementById("settingMoMoName")?.value || "").trim() || "Jewels by J (Jerrilyn Mensah)";
-    storeSettings.cloudSyncUrl = (document.getElementById("settingCloudSyncUrl")?.value || "").trim();
-
     localStorage.setItem("j_settings", JSON.stringify(storeSettings));
 
     // Update Paystack badge
@@ -5610,19 +5594,6 @@ window.selectThemePreference = selectThemePreference;
 window.applyFontSizePreview = applyFontSizePreview;
 window.applyHeadingFontPreview = applyHeadingFontPreview;
 window.applyStoredPreferences = applyStoredPreferences;
-window.switchPaymentTab = switchPaymentTab;
-window.processPaystackPayment = processPaystackPayment;
-window.processDirectMoMoPayment = processDirectMoMoPayment;
-window.processPayOnDelivery = processPayOnDelivery;
-window.copyDirectMoMoNumber = copyDirectMoMoNumber;
-window.copyDirectMoMoAmount = copyDirectMoMoAmount;
-window.pullRemoteOrdersFromCloud = pullRemoteOrdersFromCloud;
-window.testCloudConnection = testCloudConnection;
-window.openGoogleSheetsTemplateModal = openGoogleSheetsTemplateModal;
-window.closeGoogleSheetsTemplateModal = closeGoogleSheetsTemplateModal;
-window.copyGoogleAppsScriptCode = copyGoogleAppsScriptCode;
-window.refreshCurrentTrackingStatus = refreshCurrentTrackingStatus;
-window.shareTrackingLink = shareTrackingLink;
 window.switchPaymentTab = switchPaymentTab;
 window.processPaystackPayment = processPaystackPayment;
 window.processDirectMoMoPayment = processDirectMoMoPayment;
