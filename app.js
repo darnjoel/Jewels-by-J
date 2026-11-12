@@ -46,7 +46,7 @@ const INITIAL_PRODUCTS = [
         img: "images/jerrilyn.jpg",
         metal: "Sterling Silver & 18k Gold Plated",
         options: ["16\"", "18\"", "20\""],
-        description: "Bespoke duo nameplate necklaces in classic cursive calligraphy script, crowned with radiant butterfly accent charms. Handcrafted in luminous 18k gold plate and 925 sterling silver.",
+        description: "Custom duo nameplate necklaces in classic cursive calligraphy script, crowned with radiant butterfly accent charms. Handcrafted in luminous 18k gold plate and 925 sterling silver.",
         isNew: false
     },
     {
@@ -87,7 +87,7 @@ const INITIAL_PRODUCTS = [
         price: 320,
         originalPrice: null,
         badge: "Classic",
-        badgeType: "bespoke",
+        badgeType: "custom",
         img: "images/kimberry.jpg",
         metal: "18k Gold Plated / Fine Link Chain",
         options: ["16\"", "18\""],
@@ -176,8 +176,8 @@ const INITIAL_PRODUCTS = [
         categoryName: "Bracelets & Bangles",
         price: 380,
         originalPrice: null,
-        badge: "Bespoke",
-        badgeType: "bespoke",
+        badge: "Custom",
+        badgeType: "custom",
         img: "images/C1.jpg",
         metal: "18k Gold Vermeil / Diamond-Cut Rope",
         options: ["6.5\"", "7.0\"", "7.5\""],
@@ -207,7 +207,7 @@ const INITIAL_PRODUCTS = [
         price: 180,
         originalPrice: null,
         badge: "Gift Idea",
-        badgeType: "bespoke",
+        badgeType: "custom",
         img: "images/box.jpg",
         metal: "Premium Leatherette & Soft Velvet",
         options: ["Standard Ring Box", "Luxury Gift Packaging"],
@@ -252,7 +252,7 @@ const INITIAL_PRODUCTS = [
         price: 340,
         originalPrice: null,
         badge: "Custom",
-        badgeType: "bespoke",
+        badgeType: "custom",
         img: "images/nam.jpg",
         metal: "14k Gold Vermeil / Fine Link",
         options: ["16\"", "18\""],
@@ -296,8 +296,8 @@ const INITIAL_PRODUCTS = [
         categoryName: "Nameplate Necklaces",
         price: 310,
         originalPrice: null,
-        badge: "Bespoke",
-        badgeType: "bespoke",
+        badge: "Custom",
+        badgeType: "custom",
         img: "images/bet.jpg",
         metal: "18k Gold Plated / Ultra-fine Link",
         options: ["16\"", "18\""],
@@ -331,7 +331,7 @@ const INITIAL_PRODUCTS = [
         img: "images/new1.jpg",
         metal: "18k Gold Vermeil / Layered Links",
         options: ["16\"", "18\"", "20\""],
-        description: "Fresh from the atelier — our latest multi-chain curation featuring harmonized lengths and subtle charm drops.",
+        description: "Fresh from the studio — our latest multi-chain curation featuring harmonized lengths and subtle charm drops.",
         isNew: true
     },
     {
@@ -342,7 +342,7 @@ const INITIAL_PRODUCTS = [
         price: 290,
         originalPrice: null,
         badge: "Dainty",
-        badgeType: "bespoke",
+        badgeType: "custom",
         img: "images/cat.jpg",
         metal: "14k Gold Plated / Cable Chain",
         options: ["16\"", "18\""],
@@ -357,18 +357,18 @@ const CLIENT_VIDEOS = [
     { title: "Custom Signature Nameplate Drop", tag: "Nameplate Necklace", video: "videos/five.MP4" },
     { title: "Heirloom Presentation Keepsake Box", tag: "Unboxing Moments", video: "videos/gift1.MP4" },
     { title: "Luxury Ring Box Opening", tag: "Engagement Moment", video: "videos/gift2.MP4" },
-    { title: "Duo Tone Calligraphy Script", tag: "Bespoke Jewelry", video: "videos/gift3.MOV" },
+    { title: "Duo Tone Calligraphy Script", tag: "Custom Jewelry", video: "videos/gift3.MOV" },
     { title: "Gold Vermeil Layering Chain", tag: "Layering Set", video: "videos/gift4.MP4" },
     { title: "Empress Monogram Necklace", tag: "Custom Monogram", video: "videos/her eyes.MOV" },
     { title: "Founder's Studio Polish", tag: "Behind the Scenes", video: "videos/missj.MOV" },
     { title: "Twin Butterfly Wrist Stack", tag: "Client Wrist Cam", video: "videos/one.MP4" },
     { title: "Sterling Silver Cuban ID Bracelet", tag: "Silver Collection", video: "videos/six.MP4" },
-    { title: "Royal Crown Cuban Nameplate", tag: "Bespoke Crafting", video: "videos/three.MP4" },
+    { title: "Royal Crown Cuban Nameplate", tag: "Custom Crafting", video: "videos/three.MP4" },
     { title: "Dainty Initial Shimmer Chain", tag: "Minimalist Luxe", video: "videos/two.MP4" },
     { title: "Client Unboxing Reaction", tag: "Client Experience", video: "videos/vid1.MP4" },
     { title: "Artisan Quality Inspection", tag: "Quality Check", video: "videos/vid2.MOV" },
     { title: "Gold Figaro Initial Bracelet", tag: "Custom Figaro", video: "videos/asante.MOV" },
-    { title: "Full Collection Atelier Showcase", tag: "Seasonal Drop", video: "videos/four.MOV" }
+    { title: "Full Collection Studio Showcase", tag: "Seasonal Drop", video: "videos/four.MOV" }
 ];
 
 // ── Complete Product Catalog (Dynamic Storage Support — Feature #1 & #8) ──
@@ -484,7 +484,7 @@ if (!storeSettings) {
             autoMarkRead: true,
             lowStockThreshold: 3,
             currency: "GHS",
-            waTemplate: "Hello! ✨ Thank you for contacting Jewels by J. How can we assist with your bespoke jewelry today?"
+            waTemplate: "Hello! ✨ Thank you for contacting Jewels by J. How can we assist with your custom jewelry today?"
         }
     };
     localStorage.setItem("j_settings", JSON.stringify(storeSettings));
@@ -514,7 +514,7 @@ if (!storeSettings) {
             autoMarkRead: true,
             lowStockThreshold: 3,
             currency: "GHS",
-            waTemplate: "Hello! ✨ Thank you for contacting Jewels by J. How can we assist with your bespoke jewelry today?"
+            waTemplate: "Hello! ✨ Thank you for contacting Jewels by J. How can we assist with your custom jewelry today?"
         };
     }
     localStorage.setItem("j_settings", JSON.stringify(storeSettings));
@@ -529,9 +529,9 @@ if (!storeMessages || !Array.isArray(storeMessages) || storeMessages.length === 
             name: "Nana Akua Frimpong",
             email: "nana.akua@gmail.com",
             phone: "+233 24 412 3890",
-            subject: "Bespoke Bridal Suite Consultation",
-            message: "Hello Jerrilyn, I am getting married in December at Kempinski Gold Coast City and would love a custom 18k gold bridal necklace with matching ear cuffs for my bridal party of 6. Could we schedule a bespoke design appointment?",
-            type: "bespoke",
+            subject: "Custom Bridal Suite Consultation",
+            message: "Hello Jerrilyn, I am getting married in December at Kempinski Gold Coast City and would love a custom 18k gold bridal necklace with matching ear cuffs for my bridal party of 6. Could we schedule a custom design appointment?",
+            type: "custom",
             date: "2026-10-31 16:42",
             unread: true
         },
@@ -596,7 +596,7 @@ let quickViewSelectedOption = null;
 let quickViewQuantity = 1;
 let lastPlacedOrderId = null;
 
-// Bespoke Customizer Studio State (Feature #5)
+// Custom Jewelry Studio State (Feature #5)
 let customDesign = {
     text: "Jerrilyn",
     font: "calligraphy",
@@ -761,12 +761,12 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
                     `• Reference:      ${fields.payment_ref || 'CONFIRMED'}\n` +
                     `• Total Paid:     ${fields.grand_total || fields.total || 'GH₵ 0.00'}\n` +
                     `──────────────────────────────────────────────\n` +
-                    `Items Ordered:\n${fields.items || 'Bespoke Jewelry Package'}\n` +
+                    `Items Ordered:\n${fields.items || 'Custom Jewelry Package'}\n` +
                     (fields.notes && fields.notes !== "None" ? `\nCustomer Notes:\n${fields.notes}\n` : '') +
                     `──────────────────────────────────────────────\n` +
                     `👉 Reply directly to this email to contact ${clientName} (${clientEmail}).`;
             } else {
-                richBody = `💎 BESPOKE JEWELRY INQUIRY\n` +
+                richBody = `💎 CUSTOM JEWELRY INQUIRY\n` +
                     `──────────────────────────────────────────────\n` +
                     `• Client Name:    ${clientName}\n` +
                     `• Client Email:   ${clientEmail}\n` +
@@ -1160,7 +1160,7 @@ function setCategory(cat) {
     if (titleEl) {
         if (cat === "all") titleEl.textContent = "All Pieces";
         else if (cat === "necklaces") titleEl.textContent = "Nameplate & Initial Necklaces";
-        else if (cat === "bracelets") titleEl.textContent = "Bespoke Bracelets & Bangles";
+        else if (cat === "bracelets") titleEl.textContent = "Custom Bracelets & Bangles";
         else if (cat === "giftsets") titleEl.textContent = "Gift Sets & Keepsakes";
         else if (cat === "favorites") titleEl.textContent = "My Saved Favorites";
         else titleEl.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
@@ -1214,7 +1214,7 @@ function renderProducts() {
                 <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--color-text-muted);">
                     <i class="fa-regular fa-heart" style="font-size: 2.5rem; color: var(--color-gold); margin-bottom: 14px; display: block;"></i>
                     <h3 style="font-size: 1.3rem; margin-bottom: 8px; color: var(--color-black); font-family: var(--font-heading);">No Favorites Saved Yet</h3>
-                    <p style="font-size: 0.95rem; max-width: 440px; margin: 0 auto 20px; line-height: 1.6;">Click the heart icon on any jewelry piece to save your favorite bespoke necklaces, bracelets, and keepsakes.</p>
+                    <p style="font-size: 0.95rem; max-width: 440px; margin: 0 auto 20px; line-height: 1.6;">Click the heart icon on any jewelry piece to save your favorite custom necklaces, bracelets, and keepsakes.</p>
                     <button class="btn btn-primary btn-sm" onclick="setCategory('all')">Browse All Pieces</button>
                 </div>
             `;
@@ -1846,7 +1846,7 @@ function updateContactAuthGate() {
                             Signed In as <span>${escapeHTML(currentUser.name)}</span>
                         </h4>
                         <p class="contact-auth-gate-desc">
-                            Our atelier concierge will reply directly to your email (<strong>${escapeHTML(currentUser.email)}</strong>).
+                            Our studio concierge will reply directly to your email (<strong>${escapeHTML(currentUser.email)}</strong>).
                         </p>
                     </div>
                 </div>
@@ -1878,9 +1878,9 @@ function updateContactAuthGate() {
                         <i class="fa-regular fa-envelope"></i>
                     </div>
                     <div>
-                        <h4 class="contact-auth-gate-title">Direct Atelier Consultation</h4>
+                        <h4 class="contact-auth-gate-title">Direct Studio Consultation</h4>
                         <p class="contact-auth-gate-desc">
-                            Send your custom jewelry inquiry, sizing question, or bespoke idea below. Our atelier concierge will reply directly to your email.
+                            Send your custom jewelry inquiry, sizing question, or custom idea below. Our studio concierge will reply directly to your email.
                         </p>
                     </div>
                 </div>
@@ -1904,7 +1904,7 @@ function updateContactAuthGate() {
         submitBtn.disabled = false;
         submitBtn.classList.remove("btn-locked");
         submitBtn.innerHTML = `<i class="fa-regular fa-paper-plane"></i> Send Inquiry`;
-        submitBtn.title = "Send your inquiry to our atelier concierge";
+        submitBtn.title = "Send your inquiry to our studio concierge";
     }
 }
 
@@ -1965,7 +1965,7 @@ function initContactForm() {
         const targetEmail = getAdminEmail();
 
         // Build inquiry record for in-app Customer Inbox (open to both registered clients and guests)
-        const isBespoke = (subject.toLowerCase().includes("bespoke") || message.toLowerCase().includes("bespoke") || subject.toLowerCase().includes("custom"));
+        const isBespoke = (subject.toLowerCase().includes("bespoke") || message.toLowerCase().includes("bespoke") || subject.toLowerCase().includes("custom") || message.toLowerCase().includes("custom"));
         const newMsgRecord = {
             id: "msg_" + Date.now(),
             userId: currentUser ? (currentUser.uid || ("user_" + Date.now())) : ("guest_" + Date.now()),
@@ -2029,7 +2029,7 @@ function initContactForm() {
                 piece_of_interest: subject || "General Inquiry",
                 subject: subject || "General Inquiry",
                 message: message,
-                type: isBespoke ? "Bespoke" : "General inquiry",
+                type: isCustom ? "Custom" : "General inquiry",
                 sender_account_status: currentUser ? "Verified Registered Client" : "Guest Client",
                 sender_account_uid: (currentUser && currentUser.uid) || "Guest"
             },
@@ -2070,7 +2070,7 @@ function initContactForm() {
                                     Inquiry Received!
                                 </strong>
                                 <p style="font-size:0.85rem; color:var(--color-text-muted); margin:4px 0 0 0; line-height:1.5;">
-                                    Your message has been safely logged in our atelier system. You can also chat with Jerrilyn directly on WhatsApp for an immediate response!
+                                    Your message has been safely logged in our studio system. You can also chat with Jerrilyn directly on WhatsApp for an immediate response!
                                 </p>
                             </div>
                         </div>
@@ -2108,7 +2108,7 @@ function initNewsletterForm() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// CUSTOMER REVIEWS & ATELIER SERVICE SYSTEM
+// CUSTOMER REVIEWS & STUDIO SERVICE SYSTEM
 // ═══════════════════════════════════════════════════════════════════════════
 let currentSelectedRating = 5;
 
@@ -2241,7 +2241,7 @@ function handleCustomerReviewSubmit(event) {
         email: email,
         location: "Verified Client",
         rating: rating,
-        title: title || `${rating}-Star Atelier Experience`,
+        title: title || `${rating}-Star Studio Experience`,
         review: review,
         date: "Just now",
         verified: true
@@ -2972,7 +2972,7 @@ function updateAuthUI() {
         if (accountEmail) accountEmail.textContent = currentUser.email;
         if (accountPhone) accountPhone.textContent = `Ghana • ${currentUser.phone || '+233 59 325 2913'}`;
         if (accountOrders) {
-            accountOrders.textContent = "Your profile is active. Ready to order your signature bespoke jewelry!";
+            accountOrders.textContent = "Your profile is active. Ready to order your signature custom jewelry!";
         }
     } else {
         // Guest mode
@@ -3061,7 +3061,7 @@ function updateCategoryCounts() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// FEATURE 5: BESPOKE CUSTOMIZATION STUDIO
+// FEATURE 5: CUSTOM JEWELRY STUDIO
 // ═══════════════════════════════════════════════════════════════════════════
 function initCustomizer() {
     const textInput = document.getElementById("customTextInput");
@@ -3235,7 +3235,7 @@ function addCustomPieceToCart() {
 
     cart.push(customItem);
     saveCart();
-    showToast("Bespoke Piece Added", `Custom nameplate "${customDesign.text}" added to your bag.`);
+    showToast("Custom Piece Added", `Custom nameplate "${customDesign.text}" added to your bag.`);
     openCartDrawer();
 }
 
@@ -4096,7 +4096,7 @@ function formatOrderRow(row) {
     statusCode: statusCode,
     notes: row[12] || "",
     timeline: "Live status synchronized with studio records",
-    items: [{ title: row[11] || "Bespoke Jewelry Package", qty: 1, price: parseFloat(row[7]) || 0, img: "images/logo.jpg" }]
+    items: [{ title: row[11] || "Custom Jewelry Package", qty: 1, price: parseFloat(row[7]) || 0, img: "images/logo.jpg" }]
   };
 }
 
@@ -4614,7 +4614,7 @@ function renderOrderTrackingResult(order) {
                 ${SITE_CONFIG.currency} ${(it.price * it.qty).toFixed(2)}
             </div>
         </div>
-    `).join("") : `<p style="font-size:0.85rem; color:var(--color-text-muted);">Custom Bespoke Order</p>`;
+    `).join("") : `<p style="font-size:0.85rem; color:var(--color-text-muted);">Handcrafted Custom Order</p>`;
 
     // Milestone Event History Log
     const events = (order.events && Array.isArray(order.events)) ? order.events : [
@@ -4622,7 +4622,7 @@ function renderOrderTrackingResult(order) {
             stage: "placed",
             title: "Order Placed & Queued",
             time: order.date || "Recent",
-            desc: "Order received in atelier system and queued for processing."
+            desc: "Order received in studio system and queued for processing."
         },
         {
             stage: "confirmed",
@@ -4766,7 +4766,7 @@ function renderOrderTrackingResult(order) {
             <!-- Milestone Activity History Log -->
             <div class="track-events-box">
                 <div class="track-events-header">
-                    <span><i class="fa-solid fa-clock-rotate-left" style="color:var(--color-gold); margin-right:6px;"></i> Atelier &amp; Dispatch Timeline</span>
+                    <span><i class="fa-solid fa-clock-rotate-left" style="color:var(--color-gold); margin-right:6px;"></i> Studio &amp; Dispatch Timeline</span>
                     <span style="font-size:0.72rem; color:var(--color-text-muted); text-transform:none; font-weight:normal;">Realtime Audit Trail</span>
                 </div>
                 <div class="track-events-list">
@@ -4955,7 +4955,7 @@ function initAdminPortal() {
     if (currSelect) currSelect.value = pref.currency || "GHS";
 
     const waTemplateInput = document.getElementById("prefWaTemplate");
-    if (waTemplateInput) waTemplateInput.value = pref.waTemplate || "Hello! ✨ Thank you for contacting Jewels by J. How can we assist with your bespoke jewelry today?";
+    if (waTemplateInput) waTemplateInput.value = pref.waTemplate || "Hello! ✨ Thank you for contacting Jewels by J. How can we assist with your custom jewelry today?";
 
     const inboxEmailDisplay = document.getElementById("inboxStoreEmailDisplay");
     if (inboxEmailDisplay) inboxEmailDisplay.textContent = activeEmail;
@@ -5361,7 +5361,7 @@ function saveAdminProduct(event) {
         bracelets: "Bracelets & Bangles",
         giftsets: "Gift Sets & Keepsakes",
         pendants: "Initial Pendants",
-        custom: "Bespoke Jewelry"
+        custom: "Custom Jewelry"
     };
 
     if (id) {
@@ -5774,8 +5774,8 @@ function renderAdminMessages() {
         filtered = filtered.filter(m => m.unread);
     } else if (currentAdminMessageFilter === "inquiry") {
         filtered = filtered.filter(m => m.type === "inquiry");
-    } else if (currentAdminMessageFilter === "bespoke") {
-        filtered = filtered.filter(m => m.type === "bespoke");
+    } else if (currentAdminMessageFilter === "bespoke" || currentAdminMessageFilter === "custom") {
+        filtered = filtered.filter(m => m.type === "bespoke" || m.type === "custom");
     }
 
     // Apply Search Query
@@ -5806,7 +5806,8 @@ function renderAdminMessages() {
     }
 
     const typeBadges = {
-        bespoke: '<span class="badge badge-sale" style="font-size:0.7rem; padding:3px 8px;">Bespoke</span>',
+        bespoke: '<span class="badge badge-sale" style="font-size:0.7rem; padding:3px 8px;">Custom</span>',
+        custom: '<span class="badge badge-sale" style="font-size:0.7rem; padding:3px 8px;">Custom</span>',
         inquiry: '<span class="badge badge-bestseller" style="font-size:0.7rem; padding:3px 8px;">Inquiry</span>',
         order: '<span class="badge badge-gold" style="font-size:0.7rem; padding:3px 8px; background:var(--color-gold); color:#000;">Order Notice</span>'
     };
@@ -5874,7 +5875,8 @@ function filterAdminMessages(type) {
         all: "btnMsgFilterAll",
         unread: "btnMsgFilterUnread",
         inquiry: "btnMsgFilterInquiries",
-        bespoke: "btnMsgFilterBespoke"
+        bespoke: "btnMsgFilterBespoke",
+        custom: "btnMsgFilterBespoke"
     };
 
     Object.keys(filterBtns).forEach(k => {
@@ -5919,8 +5921,8 @@ function openAdminMessageModal(msgId) {
     const toggleReadBtn = document.getElementById("adminMsgModalToggleReadBtn");
 
     if (badgeEl) {
-        badgeEl.textContent = (msg.type === "bespoke" ? "Bespoke Jewelry" : (msg.type === "order" ? "Order Notice" : "Consultation Inquiry"));
-        badgeEl.className = msg.type === "bespoke" ? "badge badge-sale" : (msg.type === "order" ? "badge badge-gold" : "badge badge-bestseller");
+        badgeEl.textContent = ((msg.type === "bespoke" || msg.type === "custom") ? "Custom Jewelry" : (msg.type === "order" ? "Order Notice" : "Consultation Inquiry"));
+        badgeEl.className = (msg.type === "bespoke" || msg.type === "custom") ? "badge badge-sale" : (msg.type === "order" ? "badge badge-gold" : "badge badge-bestseller");
     }
 
     if (subjectEl) subjectEl.textContent = msg.subject || "Consultation Inquiry";

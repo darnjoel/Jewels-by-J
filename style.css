@@ -1343,7 +1343,8 @@ button {
     color: #ffffff;
 }
 
-.badge-bespoke {
+.badge-bespoke,
+.badge-custom {
     background: #ffffff;
     color: var(--color-black);
     border: 1px solid var(--color-border);
@@ -3417,7 +3418,7 @@ body.modal-open {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   FEATURE 5: BESPOKE CUSTOMIZATION STUDIO
+   FEATURE 5: CUSTOM JEWELRY STUDIO
    ═══════════════════════════════════════════════════════════════════════════ */
 .customizer-section {
     padding: 60px 0 90px;
@@ -5410,7 +5411,7 @@ body.modal-open {
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   CUSTOMER REVIEWS & ATELIER SERVICE EXPERIENCE
+   CUSTOMER REVIEWS & STUDIO SERVICE EXPERIENCE
    ═══════════════════════════════════════════════════════════════════════════ */
 .reviews-section {
     background: #0b0f17;
@@ -5780,7 +5781,7 @@ body.modal-open {
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   CUSTOMER REVIEWS & ATELIER SERVICE EXPERIENCE
+   CUSTOMER REVIEWS & STUDIO SERVICE EXPERIENCE
    ═══════════════════════════════════════════════════════════════════════════ */
 .reviews-section {
     background: #0b0f17;
