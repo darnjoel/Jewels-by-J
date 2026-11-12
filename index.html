@@ -2275,7 +2275,7 @@
                                     <!-- Populated dynamically via JS -->
                                 </div>
                                 <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; padding-top:10px; border-top:1px dashed var(--color-border);">
-                                    <input type="email" id="admNewSubEmail" placeholder="Add customer or test email..." class="customizer-input-field" style="padding:6px 12px; font-size:0.8rem; max-width:260px;">
+                                    <input type="email" id="admNewSubEmail" placeholder="Add customer or test email..." class="customizer-input-field" style="padding:6px 12px; font-size:0.8rem; max-width:260px;" onkeydown="if(event.key==='Enter'){event.preventDefault();addSubscriberManual();}">
                                     <button type="button" class="btn btn-outline btn-sm" onclick="addSubscriberManual()" style="padding:6px 14px; font-size:0.78rem;">
                                         <i class="fa-solid fa-plus"></i> Add to Audience
                                     </button>

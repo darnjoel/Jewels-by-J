@@ -1,4 +1,4 @@
-/* ═══════════════════════════════════════════════════════════════════════════
+﻿/* ═══════════════════════════════════════════════════════════════════════════
    JEWELS BY J — E-COMMERCE APPLICATION JAVASCRIPT
    Inspired by The Strand Brand Architecture & Features
    (Email system updated: central sender, activation-safe, auto-reply, spam trap)
