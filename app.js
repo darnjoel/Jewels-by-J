@@ -2094,15 +2094,125 @@ function initContactForm() {
     });
 }
 
+function openWelcomeJoinModal(email) {
+    const backdrop = document.getElementById("welcomeJoinModalBackdrop");
+    const emailEl = document.getElementById("welcomeJoinEmail");
+    if (emailEl && email) {
+        emailEl.textContent = email;
+    }
+    if (backdrop) {
+        backdrop.style.display = "flex";
+        setTimeout(() => backdrop.classList.add("active"), 10);
+        document.body.style.overflow = "hidden";
+    }
+}
+
+function closeWelcomeJoinModal() {
+    const backdrop = document.getElementById("welcomeJoinModalBackdrop");
+    if (!backdrop) return;
+    backdrop.classList.remove("active");
+    setTimeout(() => {
+        backdrop.style.display = "none";
+        document.body.style.overflow = "";
+    }, 250);
+}
+
 function initNewsletterForm() {
     const form = document.getElementById("newsletterForm");
+    const closeBtn = document.getElementById("welcomeJoinCloseBtn");
+    const backdrop = document.getElementById("welcomeJoinModalBackdrop");
+
+    if (closeBtn) closeBtn.addEventListener("click", closeWelcomeJoinModal);
+    if (backdrop) {
+        backdrop.addEventListener("click", (e) => {
+            if (e.target === backdrop) closeWelcomeJoinModal();
+        });
+    }
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeWelcomeJoinModal();
+    });
+
     if (!form) return;
-    form.addEventListener("submit", (e) => {
+    form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const input = form.querySelector("input");
-        if (input && input.value) {
-            showToast("Subscribed!", "Thank you for joining the Jewels by J family. Check your inbox soon!");
-            input.value = "";
+        const submitBtn = form.querySelector("button");
+        if (!input) return;
+
+        const email = (input.value || "").trim().toLowerCase();
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            showToast("Invalid Email", "Please enter a valid email address to join.");
+            input.focus();
+            return;
+        }
+
+        const originalBtnHTML = submitBtn ? submitBtn.innerHTML : "Join";
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Joining...`;
+        }
+
+        // 1. Save subscriber in localStorage vault
+        let subscribers = [];
+        try {
+            subscribers = JSON.parse(localStorage.getItem("j_subscribers") || "[]");
+        } catch (_) {
+            subscribers = [];
+        }
+        const existingIdx = subscribers.findIndex(s => (typeof s === "string" ? s : s.email).toLowerCase() === email);
+        const subData = {
+            email: email,
+            date: new Date().toISOString(),
+            status: "active",
+            notifications: {
+                seasonalDrops: true,
+                newArrivals: true,
+                stylingInspirations: true
+            }
+        };
+        if (existingIdx >= 0) {
+            subscribers[existingIdx] = subData;
+        } else {
+            subscribers.push(subData);
+        }
+        localStorage.setItem("j_subscribers", JSON.stringify(subscribers));
+
+        // 2. Add VIP notification message into store inbox
+        const newMsgRecord = {
+            id: "sub_" + Date.now(),
+            userId: currentUser ? (currentUser.uid || ("user_" + Date.now())) : ("guest_" + Date.now()),
+            name: "VIP Family Member",
+            email: email,
+            phone: "Newsletter Subscriber",
+            subject: "✨ New Jewels Family VIP Subscription",
+            message: `Customer (${email}) joined the Jewels by J family for exclusive seasonal drops, new arrival notifications, and styling inspirations.`,
+            type: "inquiry",
+            date: new Date().toISOString().replace("T", " ").slice(0, 16),
+            unread: true,
+            verifiedAccount: false
+        };
+        storeMessages.unshift(newMsgRecord);
+        localStorage.setItem("j_messages_db", JSON.stringify(storeMessages));
+        if (typeof renderAdminInbox === "function") renderAdminInbox();
+
+        // 3. Dispatch store email notification to Jerrilyn (and FormSubmit autoresponse)
+        sendStoreEmail("✨ New Jewels Family Member — VIP Newsletter", {
+            name: "VIP Family Member",
+            email: email,
+            subject: "VIP Family Member — Exclusive Drops & Styling Inspirations",
+            message: `New VIP subscriber joined the Jewels by J family.\nEmail: ${email}\nSubscribed for: Exclusive Seasonal Drops, New Arrival Notifications, and Styling Inspirations.\nTimestamp: ${new Date().toLocaleString()}`,
+            _autoresponse: "Welcome to the Jewels by J family! ✨ You are now officially subscribed to receive our exclusive seasonal drops, new arrival notifications, and styling inspirations directly from our Accra jewelry studio."
+        }).catch(() => {});
+
+        // 4. Show VIP notification modal & toast
+        showToast("Welcome to the Family! ✨", "You'll now receive exclusive seasonal drops, new arrivals & styling inspirations.");
+        openWelcomeJoinModal(email);
+
+        input.value = "";
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnHTML;
         }
     });
 }
@@ -2764,6 +2874,25 @@ function initAuthSystem() {
             // Save to persistent database vault
             saveRegisteredUser(newUser);
 
+            // Automatically enroll new account into Jewels Family VIP subscription
+            try {
+                let subs = JSON.parse(localStorage.getItem("j_subscribers") || "[]");
+                if (!subs.some(s => (typeof s === "string" ? s : s.email).toLowerCase() === newUser.email.toLowerCase())) {
+                    subs.push({
+                        email: newUser.email,
+                        name: newUser.name,
+                        date: new Date().toISOString(),
+                        status: "active",
+                        notifications: {
+                            seasonalDrops: true,
+                            newArrivals: true,
+                            stylingInspirations: true
+                        }
+                    });
+                    localStorage.setItem("j_subscribers", JSON.stringify(subs));
+                }
+            } catch (_) {}
+
             // Sync with Firebase Auth and Firestore if initialized
             if (isFirebaseReady && firebaseAuth) {
                 firebaseAuth.createUserWithEmailAndPassword(email, password)
@@ -2812,6 +2941,7 @@ function initAuthSystem() {
 
                 setTimeout(() => {
                     closeAuthModal();
+                    openWelcomeJoinModal(newUser.email);
                     signupForm.reset();
                     clearAuthFeedback();
                     if (submitBtn) {
@@ -6178,6 +6308,8 @@ window.handleCustomerReviewSubmit = handleCustomerReviewSubmit;
 window.scrollToReviews = scrollToReviews;
 window.renderAdminReviews = renderAdminReviews;
 window.deleteAdminReview = deleteAdminReview;
+window.openWelcomeJoinModal = openWelcomeJoinModal;
+window.closeWelcomeJoinModal = closeWelcomeJoinModal;
 
 // Initialize Preferences Immediately
 applyStoredPreferences();

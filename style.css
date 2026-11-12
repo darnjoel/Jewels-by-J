@@ -6148,3 +6148,13 @@ body.modal-open {
         gap: 8px;
     }
 }
+
+/* VIP Welcome Join Modal Responsive */
+@media (max-width: 480px) {
+    .welcome-join-card {
+        padding: 28px 18px 24px !important;
+    }
+    .welcome-join-card h3 {
+        font-size: 1.7rem !important;
+    }
+}

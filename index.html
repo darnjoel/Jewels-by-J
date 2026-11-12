@@ -2702,6 +2702,89 @@
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════════════
+       7B-2. WELCOME TO THE JEWELS FAMILY (VIP JOIN & NOTIFICATIONS MODAL)
+       ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="auth-modal-backdrop modal-backdrop" id="welcomeJoinModalBackdrop" style="display:none;"
+        onclick="if(event.target===this) closeWelcomeJoinModal()">
+        <div class="auth-modal-card modal-card" id="welcomeJoinModalCard"
+            style="max-width:520px; text-align:center; padding:36px 28px 30px; position:relative;">
+            <button class="auth-close-btn" id="welcomeJoinCloseBtn" aria-label="Close welcome modal"
+                onclick="closeWelcomeJoinModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Luxury Gold Icon -->
+            <div style="width:68px; height:68px; border-radius:50%; background:linear-gradient(135deg, rgba(200, 149, 44, 0.22), rgba(160, 110, 20, 0.12)); border:1.5px solid var(--color-gold); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:var(--color-gold); font-size:1.85rem; box-shadow:0 8px 24px rgba(200, 149, 44, 0.28);">
+                <i class="fa-solid fa-crown"></i>
+            </div>
+
+            <span class="shop-eyebrow" style="color:var(--color-gold); font-size:0.75rem; letter-spacing:2.5px; text-transform:uppercase; font-weight:700; display:block; margin-bottom:6px;">
+                VIP Membership Confirmed
+            </span>
+
+            <h3 style="font-family:var(--font-serif); font-size:2.05rem; margin:0 0 10px; color:var(--color-text-main); font-weight:600; line-height:1.2;">
+                Welcome to the Jewels Family!
+            </h3>
+
+            <p style="font-size:0.92rem; color:var(--color-text-muted); line-height:1.6; margin:0 auto 22px; max-width:440px;">
+                Thank you for joining our inner circle. We have registered <strong id="welcomeJoinEmail" style="color:var(--color-gold);">your email</strong> to receive our VIP alerts and handcrafted updates.
+            </p>
+
+            <!-- 3 Notification Pillars (Explicitly requested by user) -->
+            <div style="background:var(--color-surface-soft); border:1px solid var(--color-border); border-radius:12px; padding:18px 16px; text-align:left; margin-bottom:22px; display:flex; flex-direction:column; gap:14px;">
+                
+                <div style="display:flex; align-items:flex-start; gap:14px;">
+                    <div style="width:38px; height:38px; border-radius:8px; background:rgba(200, 149, 44, 0.16); color:var(--color-gold); display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; border:1px solid rgba(200, 149, 44, 0.35);">
+                        <i class="fa-solid fa-sparkles"></i>
+                    </div>
+                    <div>
+                        <strong style="display:block; font-size:0.92rem; color:var(--color-text-main); margin-bottom:2px;">Exclusive Seasonal Drops</strong>
+                        <span style="font-size:0.83rem; color:var(--color-text-muted); line-height:1.45; display:block;">Enjoy 24-hour advance VIP access to limited-edition seasonal releases before public availability.</span>
+                    </div>
+                </div>
+
+                <div style="display:flex; align-items:flex-start; gap:14px;">
+                    <div style="width:38px; height:38px; border-radius:8px; background:rgba(200, 149, 44, 0.16); color:var(--color-gold); display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; border:1px solid rgba(200, 149, 44, 0.35);">
+                        <i class="fa-solid fa-bell"></i>
+                    </div>
+                    <div>
+                        <strong style="display:block; font-size:0.92rem; color:var(--color-text-main); margin-bottom:2px;">New Arrival Notifications</strong>
+                        <span style="font-size:0.83rem; color:var(--color-text-muted); line-height:1.45; display:block;">Be first to know when new custom cursive nameplates, chains, and pendants leave our Accra studio.</span>
+                    </div>
+                </div>
+
+                <div style="display:flex; align-items:flex-start; gap:14px;">
+                    <div style="width:38px; height:38px; border-radius:8px; background:rgba(200, 149, 44, 0.16); color:var(--color-gold); display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; border:1px solid rgba(200, 149, 44, 0.35);">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div>
+                        <strong style="display:block; font-size:0.92rem; color:var(--color-text-main); margin-bottom:2px;">Styling Inspirations</strong>
+                        <span style="font-size:0.83rem; color:var(--color-text-muted); line-height:1.45; display:block;">Curated layering guides, precious metal pairing advice, and personalized jewelry care direct from Jerrilyn.</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Welcome Perk Notice -->
+            <div style="background:rgba(200, 149, 44, 0.08); border:1px dashed var(--color-gold); border-radius:10px; padding:12px 14px; margin-bottom:22px; font-size:0.84rem; color:var(--color-text-main); display:flex; align-items:center; justify-content:center; gap:8px;">
+                <i class="fa-solid fa-gift" style="color:var(--color-gold); font-size:1rem;"></i>
+                <span><strong>VIP Welcome Privilege:</strong> Priority crafting queue &amp; complimentary luxury gift packaging on your orders.</span>
+            </div>
+
+            <!-- Actions -->
+            <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                <button type="button" class="btn btn-primary" onclick="closeWelcomeJoinModal(); navigateToSection('shop');" style="padding:12px 24px; font-size:0.92rem;">
+                    <i class="fa-solid fa-gem"></i> Explore New Arrivals
+                </button>
+                <a href="https://wa.me/233593252913?text=Hi%20Jerrilyn,%20I%20just%20joined%20the%20Jewels%20by%20J%20family!%20Looking%20forward%20to%20exclusive%20drops%20and%20styling%20inspirations.%20✨"
+                    target="_blank" class="btn btn-whatsapp" style="padding:12px 20px; font-size:0.92rem; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="fa-brands fa-whatsapp"></i> Chat VIP Concierge
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
        7C. ONLINE CHECKOUT MODAL (GHANA MOMO & CARD PAYMENTS — FEATURES #2, #3, #4)
        ═══════════════════════════════════════════════════════════════════════ -->
     <div class="checkout-modal-backdrop" id="checkoutModalBackdrop">
