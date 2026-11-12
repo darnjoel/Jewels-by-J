@@ -202,6 +202,9 @@
                     Keepsakes <i class="fa-solid fa-chevron-right"></i></a></li>
             <li><a href="#cam" class="drawer-menu-link" data-nav="cam">Client Cam (Videos) <i
                         class="fa-solid fa-chevron-right"></i></a></li>
+            <li><a href="#reviews" class="drawer-menu-link" onclick="closeMobileDrawer(); scrollToReviews();"><i
+                        class="fa-solid fa-star" style="margin-right:8px; color:var(--color-gold);"></i> Client Reviews <i
+                        class="fa-solid fa-chevron-right"></i></a></li>
             <li><a href="#about" class="drawer-menu-link" data-nav="about">Our Story <i
                         class="fa-solid fa-chevron-right"></i></a></li>
             <li><a href="#contact" class="drawer-menu-link" data-nav="contact">Private Inquiries <i
@@ -435,6 +438,90 @@
                     </div>
                     <div class="about-img-box">
                         <img src="images/logo.jpg" alt="Jewels by J Founder Story">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════════════
+               CUSTOMER REVIEWS & ATELIER SERVICE EXPERIENCE
+               ═══════════════════════════════════════════════════════════════ -->
+            <div id="customerReviewsSection" class="reviews-section">
+                <div class="container">
+                    <div class="reviews-header-block">
+                        <span class="shop-eyebrow">Client Feedback &amp; Atelier Service</span>
+                        <h2 class="reviews-main-title">CUSTOMER REVIEWS</h2>
+                        <p class="reviews-main-subtitle">Real experiences handcrafted for cherished clients across Ghana</p>
+                    </div>
+
+                    <div class="reviews-main-grid">
+                        <!-- Left Column: WRITE A REVIEW (Matches Reference Image) -->
+                        <div class="review-form-card">
+                            <h3 class="review-form-title">WRITE A REVIEW</h3>
+                            <form id="customerReviewForm" onsubmit="handleCustomerReviewSubmit(event)">
+                                <div class="review-form-grid-2">
+                                    <div class="review-form-field">
+                                        <label for="reviewAuthorName">NAME *</label>
+                                        <input type="text" id="reviewAuthorName" required placeholder="Your name" autocomplete="name">
+                                    </div>
+                                    <div class="review-form-field">
+                                        <label for="reviewAuthorEmail">EMAIL *</label>
+                                        <input type="email" id="reviewAuthorEmail" required placeholder="your@email.com" autocomplete="email">
+                                    </div>
+                                </div>
+
+                                <div class="review-form-field">
+                                    <label>RATING *</label>
+                                    <div class="review-star-rating" id="reviewStarPicker" role="radiogroup" aria-label="Rating from 1 to 5 stars">
+                                        <button type="button" class="star-btn active" data-value="1" onclick="setReviewRating(1)" onmouseenter="previewReviewRating(1)" onmouseleave="resetReviewRatingPreview()"><i class="fa-solid fa-star"></i></button>
+                                        <button type="button" class="star-btn active" data-value="2" onclick="setReviewRating(2)" onmouseenter="previewReviewRating(2)" onmouseleave="resetReviewRatingPreview()"><i class="fa-solid fa-star"></i></button>
+                                        <button type="button" class="star-btn active" data-value="3" onclick="setReviewRating(3)" onmouseenter="previewReviewRating(3)" onmouseleave="resetReviewRatingPreview()"><i class="fa-solid fa-star"></i></button>
+                                        <button type="button" class="star-btn active" data-value="4" onclick="setReviewRating(4)" onmouseenter="previewReviewRating(4)" onmouseleave="resetReviewRatingPreview()"><i class="fa-solid fa-star"></i></button>
+                                        <button type="button" class="star-btn active" data-value="5" onclick="setReviewRating(5)" onmouseenter="previewReviewRating(5)" onmouseleave="resetReviewRatingPreview()"><i class="fa-solid fa-star"></i></button>
+                                        <span class="star-rating-text" id="starRatingLabel">5 of 5 Stars (Exceptional)</span>
+                                    </div>
+                                    <input type="hidden" id="reviewRatingValue" value="5">
+                                </div>
+
+                                <div class="review-form-field">
+                                    <label for="reviewTitleInput">TITLE (OPTIONAL)</label>
+                                    <input type="text" id="reviewTitleInput" placeholder="Summarize your experience">
+                                </div>
+
+                                <div class="review-form-field">
+                                    <label for="reviewTextInput">REVIEW *</label>
+                                    <textarea id="reviewTextInput" rows="4" required placeholder="Tell us about your experience..."></textarea>
+                                </div>
+
+                                <button type="submit" class="btn-submit-review" id="reviewSubmitBtn">
+                                    SUBMIT REVIEW
+                                </button>
+                                <div id="reviewFormStatusMsg" class="review-status-msg" style="display:none;"></div>
+                            </form>
+                        </div>
+
+                        <!-- Right Column: Overall Rating Score + Published Reviews Feed -->
+                        <div class="reviews-feed-column">
+                            <!-- Overall Score Card -->
+                            <div class="reviews-summary-card">
+                                <div class="summary-score-large">
+                                    <span class="score-number" id="reviewsAverageScore">5.0</span>
+                                    <div class="score-stars-wrap">
+                                        <div class="score-stars">★★★★★</div>
+                                        <span class="score-count" id="reviewsCountBadge">Based on verified client reviews</span>
+                                    </div>
+                                </div>
+                                <div class="summary-badges-row">
+                                    <span class="summary-badge"><i class="fa-solid fa-certificate"></i> 100% Verified Clients</span>
+                                    <span class="summary-badge"><i class="fa-solid fa-shield-heart"></i> Atelier Care</span>
+                                    <span class="summary-badge"><i class="fa-solid fa-truck-fast"></i> Ghana Nationwide Delivery</span>
+                                </div>
+                            </div>
+
+                            <!-- List of Client Reviews -->
+                            <div class="reviews-list" id="customerReviewsList">
+                                <!-- Populated dynamically by app.js -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1400,6 +1487,9 @@
                                 <i class="fa-solid fa-inbox"></i> Customer Inbox (<span id="admTabInboxCount"
                                     class="badge-count-inline">0</span>)
                             </button>
+                            <button class="admin-tab-btn" id="admTabBtnReviews" onclick="switchAdminTab('reviews')">
+                                <i class="fa-solid fa-star"></i> Customer Reviews (<span id="admTabReviewsCount">3</span>)
+                            </button>
                             <button class="admin-tab-btn" id="admTabBtnSettings" onclick="switchAdminTab('settings')">
                                 <i class="fa-solid fa-gear"></i> Store Settings
                             </button>
@@ -1565,6 +1655,40 @@
                                     style="font-size:2rem; color:var(--color-text-subtle); margin-bottom:10px; display:block;"></i>
                                 <p style="font-size:0.9rem; color:var(--color-text-muted);">No messages found matching
                                     your filter.</p>
+                            </div>
+                        </div>
+
+                        <!-- TAB: CUSTOMER REVIEWS MANAGEMENT -->
+                        <div class="admin-tab-content" id="admTabContentReviews" style="display:none;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+                                <div>
+                                    <h3 style="font-size:1.15rem; color:var(--color-black);">Customer Reviews &amp; Ratings</h3>
+                                    <p style="font-size:0.8rem; color:var(--color-text-muted);">
+                                        View and moderate genuine reviews submitted by clients from your online store.
+                                    </p>
+                                </div>
+                                <div style="display:flex; gap:10px;">
+                                    <button class="btn btn-outline btn-sm" onclick="scrollToReviews(); closeAdminPortal();">
+                                        <i class="fa-solid fa-arrow-up-right-from-square"></i> View on Live Site
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Client</th>
+                                            <th>Rating</th>
+                                            <th>Review Title &amp; Feedback</th>
+                                            <th>Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminReviewsTableBody">
+                                        <!-- Dynamically populated by app.js -->
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
 
@@ -3440,6 +3564,8 @@
                     <li><a href="#delivery" data-nav="delivery">Delivery &amp; Charges</a></li>
                     <li><a href="#track" data-nav="track">Track Your Order</a></li>
                     <li><a href="#cam" data-nav="cam">Client Cam (Videos)</a></li>
+                    <li><a href="#reviews" onclick="scrollToReviews(); return false;"><i class="fa-solid fa-star"
+                                style="color:var(--color-gold); font-size:0.8rem; margin-right:4px;"></i> Client Reviews</a></li>
                     <li><a href="#about" data-nav="about">Our Story</a></li>
                     <li><a href="#contact" data-nav="contact">Private Inquiries</a></li>
                     <li><a href="#admin" data-nav="admin"><i class="fa-solid fa-shield-halved"

@@ -385,6 +385,49 @@ storeProducts.forEach(p => {
 // For backwards compatibility across all catalog & cart lookups
 let PRODUCTS = storeProducts;
 
+// ── Verified Customer Reviews Dataset (Feature: Atelier Service Reviews) ──
+const INITIAL_REVIEWS = [
+    {
+        id: "rev_1",
+        name: "Ama Serwaa",
+        email: "ama@example.com",
+        location: "East Legon, Accra",
+        rating: 5,
+        title: "Breathtaking Butterfly Nameplate!",
+        review: "I ordered the Jerrilyn Duo Butterfly Nameplate in 18k gold vermeil for my graduation. The cursive calligraphy is so fine and sharp. Rider delivered to my doorstep in East Legon within 24 hours. The packaging alone felt like opening something from Paris!",
+        date: "2 days ago",
+        verified: true
+    },
+    {
+        id: "rev_2",
+        name: "Kofi Owusu",
+        email: "kofi@example.com",
+        location: "KNUST Campus, Kumasi",
+        rating: 5,
+        title: "Top-tier Cuban Chain & Fast Nationwide Delivery",
+        review: "Purchased the Custom Silver Cuban ID Bracelet. The weight and shine are phenomenal — not hollow like regular market pieces. MoMo payment was smooth and tracking updates kept me informed all the way to Kumasi. 10/10 recommend Jewels by J.",
+        date: "1 week ago",
+        verified: true
+    },
+    {
+        id: "rev_3",
+        name: "Naa Dromo",
+        email: "dromo@example.com",
+        location: "Airport Residential, Accra",
+        rating: 5,
+        title: "Incredible Bespoke Service on WhatsApp",
+        review: "Jerrilyn was so patient with me while finalizing the spelling and chain length on WhatsApp. She even shared a preview before crafting. The final piece arrived polished to perfection. Truly Ghana's finest jewelry atelier.",
+        date: "2 weeks ago",
+        verified: true
+    }
+];
+
+let storeReviews = JSON.parse(localStorage.getItem("j_reviews") || "null");
+if (!storeReviews || !storeReviews.length) {
+    storeReviews = INITIAL_REVIEWS.slice();
+    localStorage.setItem("j_reviews", JSON.stringify(storeReviews));
+}
+
 // ── Store Orders State (Feature #6 & #8) ──
 let storeOrders = JSON.parse(localStorage.getItem("j_orders") || "null");
 if (!storeOrders) {
@@ -640,6 +683,8 @@ document.addEventListener("DOMContentLoaded", () => {
     initCheckoutModal();
     initAdminPortal();
     initTrackOrder();
+    renderCustomerReviews();
+    setReviewRating(5);
     updateCartUI();
     updateWishlistUI();
     updateAuthUI();
@@ -2089,6 +2134,262 @@ function initNewsletterForm() {
             input.value = "";
         }
     });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CUSTOMER REVIEWS & ATELIER SERVICE SYSTEM
+// ═══════════════════════════════════════════════════════════════════════════
+let currentSelectedRating = 5;
+
+const RATING_DESCRIPTIONS = {
+    1: "1 of 5 Stars (Needs Improvement)",
+    2: "2 of 5 Stars (Fair)",
+    3: "3 of 5 Stars (Good Experience)",
+    4: "4 of 5 Stars (Great Craftsmanship)",
+    5: "5 of 5 Stars (Exceptional Service)"
+};
+
+function setReviewRating(rating) {
+    currentSelectedRating = Math.max(1, Math.min(5, parseInt(rating) || 5));
+    const hiddenInput = document.getElementById("reviewRatingValue");
+    if (hiddenInput) hiddenInput.value = currentSelectedRating;
+
+    const label = document.getElementById("starRatingLabel");
+    if (label) label.textContent = RATING_DESCRIPTIONS[currentSelectedRating] || `${currentSelectedRating} of 5 Stars`;
+
+    const btns = document.querySelectorAll("#reviewStarPicker .star-btn");
+    btns.forEach((btn, idx) => {
+        btn.classList.toggle("active", idx < currentSelectedRating);
+        btn.classList.remove("hovered");
+    });
+}
+
+function previewReviewRating(hoverVal) {
+    const val = parseInt(hoverVal) || 1;
+    const label = document.getElementById("starRatingLabel");
+    if (label) label.textContent = RATING_DESCRIPTIONS[val] || `${val} of 5 Stars`;
+
+    const btns = document.querySelectorAll("#reviewStarPicker .star-btn");
+    btns.forEach((btn, idx) => {
+        btn.classList.toggle("hovered", idx < val);
+    });
+}
+
+function resetReviewRatingPreview() {
+    setReviewRating(currentSelectedRating);
+}
+
+function renderCustomerReviews() {
+    const listEl = document.getElementById("customerReviewsList");
+    const avgScoreEl = document.getElementById("reviewsAverageScore");
+    const countBadgeEl = document.getElementById("reviewsCountBadge");
+    const adminReviewsTabBadge = document.getElementById("admTabReviewsCount");
+
+    if (!storeReviews || !Array.isArray(storeReviews)) {
+        storeReviews = INITIAL_REVIEWS.slice();
+    }
+
+    // Calculate Average Rating
+    const totalReviews = storeReviews.length;
+    const totalScore = storeReviews.reduce((sum, r) => sum + (Number(r.rating) || 5), 0);
+    const avgScore = totalReviews > 0 ? (totalScore / totalReviews).toFixed(1) : "5.0";
+
+    if (avgScoreEl) avgScoreEl.textContent = avgScore;
+    if (countBadgeEl) {
+        countBadgeEl.textContent = `Based on ${totalReviews} verified client review${totalReviews === 1 ? '' : 's'}`;
+    }
+    if (adminReviewsTabBadge) adminReviewsTabBadge.textContent = totalReviews;
+
+    if (!listEl) return;
+
+    if (totalReviews === 0) {
+        listEl.innerHTML = `
+            <div style="text-align:center; padding:40px 20px; color:#8c9ba5;">
+                <i class="fa-regular fa-star" style="font-size:2rem; color:var(--color-gold); margin-bottom:10px; display:block;"></i>
+                <p>Be the first valued client to share your experience with Jewels by J!</p>
+            </div>
+        `;
+        return;
+    }
+
+    listEl.innerHTML = storeReviews.map(r => {
+        const rating = Math.max(1, Math.min(5, Number(r.rating) || 5));
+        const starsHtml = "★".repeat(rating) + "☆".repeat(5 - rating);
+        const initials = (r.name || "Client")
+            .split(" ")
+            .map(n => n[0])
+            .join("")
+            .slice(0, 2)
+            .toUpperCase();
+
+        return `
+            <div class="review-item-card" data-id="${r.id}">
+                <div class="review-item-header">
+                    <div class="review-author-info">
+                        <div class="review-author-avatar">${initials}</div>
+                        <div>
+                            <div style="display:flex; align-items:center;">
+                                <span class="review-author-name">${escapeHTML(r.name)}</span>
+                                ${r.verified ? `<span class="review-verified-pill"><i class="fa-solid fa-circle-check"></i> Verified</span>` : ''}
+                            </div>
+                            <span class="review-author-loc">${escapeHTML(r.location || 'Ghana')}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="review-item-stars">${starsHtml}</div>
+                        <div class="review-item-date">${escapeHTML(r.date || 'Recent')}</div>
+                    </div>
+                </div>
+                ${r.title ? `<h4 class="review-item-title">${escapeHTML(r.title)}</h4>` : ''}
+                <p class="review-item-text">${escapeHTML(r.review)}</p>
+            </div>
+        `;
+    }).join("");
+}
+
+function handleCustomerReviewSubmit(event) {
+    event.preventDefault();
+
+    const nameInput = document.getElementById("reviewAuthorName");
+    const emailInput = document.getElementById("reviewAuthorEmail");
+    const ratingInput = document.getElementById("reviewRatingValue");
+    const titleInput = document.getElementById("reviewTitleInput");
+    const textInput = document.getElementById("reviewTextInput");
+    const statusMsg = document.getElementById("reviewFormStatusMsg");
+    const submitBtn = document.getElementById("reviewSubmitBtn");
+
+    const name = nameInput ? nameInput.value.trim() : "";
+    const email = emailInput ? emailInput.value.trim() : "";
+    const rating = ratingInput ? parseInt(ratingInput.value) || 5 : 5;
+    const title = titleInput ? titleInput.value.trim() : "";
+    const review = textInput ? textInput.value.trim() : "";
+
+    if (!name || !email || !review) {
+        showToast("Incomplete Review", "Please enter your name, email, and your review feedback.");
+        return;
+    }
+
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting Review...';
+    }
+
+    const newReview = {
+        id: "rev_" + Date.now(),
+        name: name,
+        email: email,
+        location: "Verified Client",
+        rating: rating,
+        title: title || `${rating}-Star Atelier Experience`,
+        review: review,
+        date: "Just now",
+        verified: true
+    };
+
+    if (!storeReviews) storeReviews = [];
+    storeReviews.unshift(newReview);
+    localStorage.setItem("j_reviews", JSON.stringify(storeReviews));
+
+    renderCustomerReviews();
+    renderAdminReviews();
+    renderAdminDashboardStats();
+
+    if (statusMsg) {
+        statusMsg.className = "review-status-msg success";
+        statusMsg.style.display = "block";
+        statusMsg.innerHTML = `<i class="fa-solid fa-circle-check"></i> Thank you, <strong>${escapeHTML(name)}</strong>! Your review has been published.`;
+        setTimeout(() => {
+            if (statusMsg) statusMsg.style.display = "none";
+        }, 6000);
+    }
+
+    showToast("Review Published!", `Thank you, ${name}! Your review has been added.`);
+
+    // Send notification email to Jerrilyn via sendStoreEmail
+    sendStoreEmail(
+        "Jewels by J Inquiry",
+        {
+            name: `${name} (Review)`,
+            email: email,
+            phone: "Customer Review",
+            piece_of_interest: `${rating} Star Client Review`,
+            subject: `Client Review: ${title || `${rating} Stars`}`,
+            message: `★ Rating: ${rating}/5 Stars\nReview Title: ${title || 'None'}\n\nClient Feedback:\n"${review}"\n\nClient Email: ${email}`
+        }
+    ).catch(() => {});
+
+    // Reset Form
+    if (document.getElementById("customerReviewForm")) {
+        document.getElementById("customerReviewForm").reset();
+    }
+    setReviewRating(5);
+
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = "SUBMIT REVIEW";
+    }
+}
+
+function scrollToReviews() {
+    navigateToPage("home");
+    setTimeout(() => {
+        const sec = document.getElementById("customerReviewsSection");
+        if (sec) {
+            sec.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    }, 150);
+}
+
+function renderAdminReviews() {
+    const tbody = document.getElementById("adminReviewsTableBody");
+    if (!tbody) return;
+
+    if (!storeReviews || storeReviews.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align:center; padding:30px; color:var(--color-text-muted);">
+                    No reviews published yet.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = storeReviews.map(r => `
+        <tr>
+            <td>
+                <strong>${escapeHTML(r.name)}</strong><br>
+                <span style="font-size:0.75rem; color:var(--color-text-muted);">${escapeHTML(r.email || 'Verified')}</span>
+            </td>
+            <td>
+                <span style="color:#f59e0b; font-weight:700;">${"★".repeat(r.rating || 5)} (${r.rating}/5)</span>
+            </td>
+            <td>
+                <strong style="color:var(--color-black); font-size:0.85rem;">${escapeHTML(r.title || 'Review')}</strong><br>
+                <span style="font-size:0.8rem; color:var(--color-text-muted); line-height:1.4; display:block; max-width:420px;">
+                    ${escapeHTML(r.review)}
+                </span>
+            </td>
+            <td>
+                <span style="font-size:0.75rem; color:var(--color-text-subtle);">${escapeHTML(r.date || 'Recent')}</span>
+            </td>
+            <td>
+                <button class="btn btn-outline btn-sm" onclick="deleteAdminReview('${r.id}')" style="padding:4px 8px; font-size:0.75rem; color:#d32f2f;" title="Delete Review">
+                    <i class="fa-regular fa-trash-can"></i>
+                </button>
+            </td>
+        </tr>
+    `).join("");
+}
+
+function deleteAdminReview(reviewId) {
+    if (!confirm("Are you sure you want to remove this client review?")) return;
+    storeReviews = storeReviews.filter(r => r.id !== reviewId);
+    localStorage.setItem("j_reviews", JSON.stringify(storeReviews));
+    renderCustomerReviews();
+    renderAdminReviews();
+    renderAdminDashboardStats();
+    showToast("Review Removed", "The review has been deleted from your store.");
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -4873,7 +5174,7 @@ function lockAdminDashboard() {
 }
 
 function switchAdminTab(tabKey) {
-    const tabs = ["products", "orders", "inbox", "settings"];
+    const tabs = ["products", "orders", "inbox", "reviews", "settings"];
     tabs.forEach(t => {
         const btn = document.getElementById(`admTabBtn${t.charAt(0).toUpperCase() + t.slice(1)}`);
         const content = document.getElementById(`admTabContent${t.charAt(0).toUpperCase() + t.slice(1)}`);
@@ -4882,6 +5183,8 @@ function switchAdminTab(tabKey) {
     });
     if (tabKey === "inbox") {
         renderAdminMessages();
+    } else if (tabKey === "reviews") {
+        renderAdminReviews();
     }
 }
 
@@ -4905,11 +5208,15 @@ function renderAdminDashboardStats() {
     const tabProdCount = document.getElementById("admTabProdCount");
     const tabOrdCount = document.getElementById("admTabOrderCount");
     const tabInboxCount = document.getElementById("admTabInboxCount");
+    const tabReviewsCount = document.getElementById("admTabReviewsCount");
     if (tabProdCount) tabProdCount.textContent = storeProducts.length;
     if (tabOrdCount) tabOrdCount.textContent = storeOrders.length;
     if (tabInboxCount) {
         tabInboxCount.textContent = unreadCount;
         tabInboxCount.style.display = unreadCount > 0 ? "inline-block" : "none";
+    }
+    if (tabReviewsCount) {
+        tabReviewsCount.textContent = storeReviews ? storeReviews.length : 0;
     }
 }
 
@@ -5906,6 +6213,14 @@ window.closeGoogleSheetsTemplateModal = closeGoogleSheetsTemplateModal;
 window.copyGoogleAppsScriptCode = copyGoogleAppsScriptCode;
 window.refreshCurrentTrackingStatus = refreshCurrentTrackingStatus;
 window.shareTrackingLink = shareTrackingLink;
+window.setReviewRating = setReviewRating;
+window.previewReviewRating = previewReviewRating;
+window.resetReviewRatingPreview = resetReviewRatingPreview;
+window.renderCustomerReviews = renderCustomerReviews;
+window.handleCustomerReviewSubmit = handleCustomerReviewSubmit;
+window.scrollToReviews = scrollToReviews;
+window.renderAdminReviews = renderAdminReviews;
+window.deleteAdminReview = deleteAdminReview;
 
 // Initialize Preferences Immediately
 applyStoredPreferences();
