@@ -6301,36 +6301,59 @@ function _liveCheckPaystackKey(val) {
 // VIP BROADCAST & APPLE-STYLE ALERT ENGINE
 // ═══════════════════════════════════════════════════════════════════════════
 
-function getAllSubscribers() {
-    let subs = [];
+function getUnsubscribedEmails() {
     try {
-        subs = JSON.parse(localStorage.getItem("j_subscribers") || "[]");
+        const list = JSON.parse(localStorage.getItem("j_unsubscribed_emails") || "[]");
+        return Array.isArray(list) ? list.map(e => String(e).trim().toLowerCase()) : [];
     } catch (_) {
-        subs = [];
+        return [];
     }
+}
 
-    // Convert string emails if any
-    subs = subs.map(s => (typeof s === "string" ? { email: s.toLowerCase(), name: "VIP Subscriber", date: new Date().toISOString() } : s));
+function getAllSubscribers() {
+    const unsubscribed = getUnsubscribedEmails();
+    let subs = [];
 
-    // Also include registered users from database
+    // 1. Load newsletter subscribers
     try {
-        const users = JSON.parse(localStorage.getItem("j_users_db") || "[]");
-        users.forEach(u => {
-            if (u.email && !subs.some(s => s.email.toLowerCase() === u.email.toLowerCase())) {
-                subs.push({
-                    email: u.email.toLowerCase(),
-                    name: u.name || "Valued Client",
-                    phone: u.phone,
-                    date: u.createdAt || new Date().toISOString(),
-                    source: "Registered Account"
-                });
-            }
-        });
+        const rawSubs = JSON.parse(localStorage.getItem("j_subscribers") || "[]");
+        if (Array.isArray(rawSubs)) {
+            rawSubs.forEach(s => {
+                const email = (typeof s === "string" ? s : s.email || "").trim().toLowerCase();
+                if (email && !unsubscribed.includes(email) && !subs.some(item => item.email === email)) {
+                    subs.push({
+                        email: email,
+                        name: (typeof s === "object" && s.name) ? s.name : "VIP Subscriber",
+                        date: (typeof s === "object" && s.date) ? s.date : new Date().toISOString(),
+                        source: "Newsletter"
+                    });
+                }
+            });
+        }
     } catch (_) {}
 
-    // Always include store email for testing if list is small
-    const adminEmail = (storeSettings?.email || SITE_CONFIG.email || "mensahjerrilyn@gmail.com").toLowerCase();
-    if (!subs.some(s => s.email.toLowerCase() === adminEmail)) {
+    // 2. Load registered accounts from user database
+    try {
+        const users = JSON.parse(localStorage.getItem("j_users_db") || "[]");
+        if (Array.isArray(users)) {
+            users.forEach(u => {
+                const email = (u.email || "").trim().toLowerCase();
+                if (email && !u.unsubscribedFromBroadcasts && !unsubscribed.includes(email) && !subs.some(item => item.email === email)) {
+                    subs.push({
+                        email: email,
+                        name: u.name || "Valued Client",
+                        phone: u.phone,
+                        date: u.createdAt || new Date().toISOString(),
+                        source: "Registered Account"
+                    });
+                }
+            });
+        }
+    } catch (_) {}
+
+    // 3. Optional fallback: Include store email for admin preview ONLY if not unsubscribed and audience is empty
+    const adminEmail = (storeSettings?.email || SITE_CONFIG.email || "mensahjerrilyn@gmail.com").trim().toLowerCase();
+    if (subs.length === 0 && !unsubscribed.includes(adminEmail)) {
         subs.push({
             email: adminEmail,
             name: "Jerrilyn Mensah (Admin)",
@@ -6384,13 +6407,82 @@ function renderAdminBroadcast() {
 
 function removeSubscriber(email) {
     if (!email) return;
+    const clean = email.trim().toLowerCase();
+
+    // 1. Add to persistent unsubscribed blacklist
+    let unsubscribed = getUnsubscribedEmails();
+    if (!unsubscribed.includes(clean)) {
+        unsubscribed.push(clean);
+        localStorage.setItem("j_unsubscribed_emails", JSON.stringify(unsubscribed));
+    }
+
+    // 2. Remove from newsletter subscribers
     try {
         let subs = JSON.parse(localStorage.getItem("j_subscribers") || "[]");
-        subs = subs.filter(s => (typeof s === "string" ? s : s.email).toLowerCase() !== email.toLowerCase());
-        localStorage.setItem("j_subscribers", JSON.stringify(subs));
+        if (Array.isArray(subs)) {
+            subs = subs.filter(s => {
+                const e = (typeof s === "string" ? s : s.email || "").trim().toLowerCase();
+                return e !== clean;
+            });
+            localStorage.setItem("j_subscribers", JSON.stringify(subs));
+        }
     } catch (_) {}
+
+    // 3. Mark in registered accounts database
+    try {
+        let users = JSON.parse(localStorage.getItem("j_users_db") || "[]");
+        if (Array.isArray(users)) {
+            users.forEach(u => {
+                if ((u.email || "").trim().toLowerCase() === clean) {
+                    u.unsubscribedFromBroadcasts = true;
+                }
+            });
+            localStorage.setItem("j_users_db", JSON.stringify(users));
+        }
+    } catch (_) {}
+
+    // 4. Update UI immediately
     renderAdminBroadcast();
-    showToast("Subscriber Removed", `Removed ${email} from active list.`);
+    showToast("Subscriber Removed", `Removed ${email} from active broadcast list.`);
+}
+
+function addSubscriberManual() {
+    const input = document.getElementById("admNewSubEmail");
+    if (!input) return;
+    const email = input.value.trim().toLowerCase();
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showToast("Invalid Email", "Please enter a valid email address.");
+        input.focus();
+        return;
+    }
+
+    // Remove from unsubscribed list if previously excluded
+    let unsubscribed = getUnsubscribedEmails();
+    unsubscribed = unsubscribed.filter(e => e !== email);
+    localStorage.setItem("j_unsubscribed_emails", JSON.stringify(unsubscribed));
+
+    // Add to subscribers list
+    let subs = [];
+    try {
+        subs = JSON.parse(localStorage.getItem("j_subscribers") || "[]");
+    } catch (_) {
+        subs = [];
+    }
+    if (!subs.some(s => (typeof s === "string" ? s : s.email).toLowerCase() === email)) {
+        subs.push({
+            email: email,
+            name: "VIP Subscriber",
+            date: new Date().toISOString(),
+            status: "active",
+            source: "Manual Admin Entry"
+        });
+        localStorage.setItem("j_subscribers", JSON.stringify(subs));
+    }
+
+    input.value = "";
+    renderAdminBroadcast();
+    showToast("Subscriber Added", `Added ${email} to broadcast audience.`);
 }
 
 function onBroadcastProductSelect(productId) {
@@ -6664,6 +6756,8 @@ window.onBroadcastProductSelect = onBroadcastProductSelect;
 window.sendBroadcastToAllSubscribers = sendBroadcastToAllSubscribers;
 window.sendTestBroadcastToAdmin = sendTestBroadcastToAdmin;
 window.removeSubscriber = removeSubscriber;
+window.addSubscriberManual = addSubscriberManual;
+window.getUnsubscribedEmails = getUnsubscribedEmails;
 
 // Initialize Preferences Immediately
 applyStoredPreferences();
