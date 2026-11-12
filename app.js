@@ -377,6 +377,11 @@ if (!storeProducts || !storeProducts.length) {
     storeProducts = INITIAL_PRODUCTS.slice();
     localStorage.setItem("j_products", JSON.stringify(storeProducts));
 }
+// Normalize stock availability status on all products
+storeProducts.forEach(p => {
+    if (!p.status) p.status = (p.inStock === false ? "unavailable" : "available");
+    if (p.inStock === undefined) p.inStock = (p.status !== "unavailable");
+});
 // For backwards compatibility across all catalog & cart lookups
 let PRODUCTS = storeProducts;
 
@@ -1213,11 +1218,14 @@ function renderProducts() {
     // Render Cards
     grid.innerHTML = filtered.map(p => {
         const isWishlisted = wishlist.includes(p.id);
-        const badgeHTML = p.badge ? `<span class="badge badge-${p.badgeType}">${p.badge}</span>` : "";
+        const isAvailable = (p.status !== "unavailable" && p.inStock !== false);
+        const badgeHTML = !isAvailable
+            ? `<span class="badge badge-unavailable"><i class="fa-solid fa-circle-xmark"></i> Unavailable</span>`
+            : (p.badge ? `<span class="badge badge-${p.badgeType}">${p.badge}</span>` : "");
         const originalPriceHTML = p.originalPrice ? `<span class="price-original">${SITE_CONFIG.currency} ${p.originalPrice.toFixed(2)}</span>` : "";
 
         return `
-            <div class="product-card" data-id="${p.id}">
+            <div class="product-card ${isAvailable ? '' : 'is-unavailable'}" data-id="${p.id}">
                 <div class="product-card-image" onclick="openQuickView('${p.id}')">
                     <img src="${p.img}" alt="${escapeHTML(p.title)}" loading="lazy">
                     <div class="product-card-badges">
@@ -1240,10 +1248,16 @@ function renderProducts() {
                         ${originalPriceHTML}
                     </div>
                     <div class="product-card-actions">
-                        <button class="btn-card-add" onclick="quickAddToCart('${p.id}')">
-                            <i class="fa-solid fa-bag-shopping"></i> Add to Bag
-                        </button>
-                        <button class="btn-card-wa" aria-label="Order on WhatsApp" title="Order on WhatsApp" onclick="orderItemDirectWhatsApp('${p.id}')">
+                        ${isAvailable ? `
+                            <button class="btn-card-add" onclick="quickAddToCart('${p.id}')">
+                                <i class="fa-solid fa-bag-shopping"></i> Add to Bag
+                            </button>
+                        ` : `
+                            <button class="btn-card-add" disabled title="Currently Unavailable" onclick="event.stopPropagation();">
+                                <i class="fa-solid fa-ban"></i> Unavailable
+                            </button>
+                        `}
+                        <button class="btn-card-wa" aria-label="${isAvailable ? 'Order on WhatsApp' : 'Inquire Availability on WhatsApp'}" title="${isAvailable ? 'Order on WhatsApp' : 'Inquire Availability on WhatsApp'}" onclick="orderItemDirectWhatsApp('${p.id}')">
                             <i class="fa-brands fa-whatsapp"></i>
                         </button>
                     </div>
@@ -1361,6 +1375,30 @@ function openQuickView(productId) {
         }
     }
 
+    // Availability Badge & Add to Bag State
+    const isAvail = (p.status !== "unavailable" && p.inStock !== false);
+    const availEl = document.getElementById("modalProductAvailability");
+    if (availEl) {
+        availEl.innerHTML = isAvail
+            ? `<span style="color:#2e7d32; font-weight:600; font-size:0.85rem;"><i class="fa-solid fa-circle-check"></i> In Stock &amp; Ready to Craft</span>`
+            : `<span style="color:#d32f2f; font-weight:600; font-size:0.85rem;"><i class="fa-solid fa-circle-xmark"></i> Currently Unavailable / Sold Out</span>`;
+    }
+
+    const modalAddBtn = document.getElementById("modalAddToCartBtn");
+    if (modalAddBtn) {
+        if (!isAvail) {
+            modalAddBtn.disabled = true;
+            modalAddBtn.style.opacity = "0.55";
+            modalAddBtn.style.cursor = "not-allowed";
+            modalAddBtn.innerHTML = `<i class="fa-solid fa-ban"></i> Unavailable`;
+        } else {
+            modalAddBtn.disabled = false;
+            modalAddBtn.style.opacity = "1";
+            modalAddBtn.style.cursor = "pointer";
+            modalAddBtn.innerHTML = `<i class="fa-solid fa-bag-shopping"></i> Add to Bag`;
+        }
+    }
+
     document.getElementById("quickModalBackdrop")?.classList.add("active");
     document.body.classList.add("modal-open");
     document.body.style.overflow = "hidden";
@@ -1412,6 +1450,10 @@ function closeCartDrawer() {
 function quickAddToCart(productId) {
     const p = PRODUCTS.find(item => item.id === productId);
     if (!p) return;
+    if (p.status === "unavailable" || p.inStock === false) {
+        showToast("Currently Unavailable", `${p.title} is currently out of stock. You can inquire via WhatsApp.`);
+        return;
+    }
     const defaultOption = p.options && p.options.length ? p.options[0] : null;
     addToCart(productId, defaultOption, 1);
     openCartDrawer();
@@ -1420,6 +1462,10 @@ function quickAddToCart(productId) {
 function addToCart(productId, option, quantity = 1) {
     const p = PRODUCTS.find(item => item.id === productId);
     if (!p) return;
+    if (p.status === "unavailable" || p.inStock === false) {
+        showToast("Currently Unavailable", `${p.title} is currently out of stock.`);
+        return;
+    }
 
     // Check if same product + option already in cart
     const existingIndex = cart.findIndex(item => item.id === productId && item.option === option);
@@ -1582,7 +1628,10 @@ function checkoutWhatsApp() {
 function orderItemDirectWhatsApp(productId) {
     const p = PRODUCTS.find(item => item.id === productId);
     if (!p) return;
-    const msg = `Hi Jewels by J! I would like to order "${p.title}" priced at ${SITE_CONFIG.currency} ${p.price.toFixed(2)}. Please confirm availability and delivery details.`;
+    const isAvail = (p.status !== "unavailable" && p.inStock !== false);
+    const msg = isAvail
+        ? `Hi Jewels by J! I would like to order "${p.title}" priced at ${SITE_CONFIG.currency} ${p.price.toFixed(2)}. Please confirm availability and delivery details.`
+        : `Hi Jewels by J! I saw "${p.title}" on your website which is marked as currently unavailable. Is it possible to have one custom-crafted for me on special request?`;
     window.open(`https://wa.me/${SITE_CONFIG.whatsappNumber}?text=${encodeURIComponent(msg)}`, "_blank");
 }
 
@@ -4869,7 +4918,9 @@ function renderAdminProducts() {
     const tbody = document.getElementById("adminProductsTableBody");
     if (!tbody) return;
 
-    tbody.innerHTML = storeProducts.map(p => `
+    tbody.innerHTML = storeProducts.map(p => {
+        const isAvail = (p.status !== "unavailable" && p.inStock !== false);
+        return `
         <tr>
             <td>
                 <img src="${p.img}" alt="${escapeHTML(p.title)}" class="admin-prod-thumb">
@@ -4891,7 +4942,12 @@ function renderAdminProducts() {
                 ${p.badge ? `<span class="badge badge-${p.badgeType || 'bestseller'}">${escapeHTML(p.badge)}</span>` : '<span style="color:var(--color-text-subtle);">-</span>'}
             </td>
             <td>
-                <span style="color:#2e7d32; font-weight:600; font-size:0.8rem;"><i class="fa-solid fa-circle-check"></i> In Stock</span>
+                <button type="button" class="btn-status-toggle ${isAvail ? 'status-available' : 'status-unavailable'}" 
+                        onclick="toggleAdminProductStatus('${p.id}')" 
+                        title="Click to toggle Available / Unavailable">
+                    <i class="fa-solid ${isAvail ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
+                    ${isAvail ? 'In Stock' : 'Unavailable'}
+                </button>
             </td>
             <td>
                 <div style="display:flex; gap:6px;">
@@ -4904,7 +4960,25 @@ function renderAdminProducts() {
                 </div>
             </td>
         </tr>
-    `).join("");
+    `;
+    }).join("");
+}
+
+function toggleAdminProductStatus(productId) {
+    const p = storeProducts.find(item => item.id === productId);
+    if (!p) return;
+    const isNowAvailable = (p.status === "unavailable" || p.inStock === false);
+    p.status = isNowAvailable ? "available" : "unavailable";
+    p.inStock = isNowAvailable;
+    PRODUCTS = storeProducts;
+    localStorage.setItem("j_products", JSON.stringify(storeProducts));
+    renderAdminProducts();
+    renderProducts();
+    renderAdminDashboardStats();
+    showToast(
+        isNowAvailable ? "Marked as In Stock" : "Marked as Unavailable",
+        `${p.title} is now ${isNowAvailable ? 'Available (In Stock)' : 'Unavailable (Sold Out)'}.`
+    );
 }
 
 function openAddProductModal() {
@@ -4917,6 +4991,8 @@ function openAddProductModal() {
     if (form) form.reset();
     document.getElementById("admProdId").value = "";
     document.getElementById("admProdImgData").value = "";
+    const statEl = document.getElementById("admProdStatus");
+    if (statEl) statEl.value = "available";
     if (preview) {
         preview.src = "";
         preview.style.display = "none";
@@ -4951,6 +5027,10 @@ function openEditProductModal(productId) {
     document.getElementById("admProdDesc").value = p.description || "";
     document.getElementById("admProdImgUrl").value = p.img.startsWith("data:") ? "" : p.img;
     document.getElementById("admProdImgData").value = p.img;
+    const editStatEl = document.getElementById("admProdStatus");
+    if (editStatEl) {
+        editStatEl.value = (p.status === "unavailable" || p.inStock === false) ? "unavailable" : "available";
+    }
 
     if (preview) {
         preview.src = p.img;
@@ -5011,6 +5091,8 @@ function saveAdminProduct(event) {
 
     const finalImg = imgData || imgUrl || "images/jerrilyn.jpg";
     const options = optionsRaw ? optionsRaw.split(",").map(o => o.trim()).filter(Boolean) : ["16\"", "18\""];
+    const statusVal = document.getElementById("admProdStatus") ? document.getElementById("admProdStatus").value : "available";
+    const isAvail = (statusVal === "available");
 
     const categoryNames = {
         necklaces: "Nameplate Necklaces",
@@ -5034,6 +5116,8 @@ function saveAdminProduct(event) {
                 metal,
                 badge,
                 badgeType: badge ? badge.toLowerCase() : "",
+                status: statusVal,
+                inStock: isAvail,
                 options,
                 description,
                 img: finalImg
@@ -5052,6 +5136,8 @@ function saveAdminProduct(event) {
             metal,
             badge,
             badgeType: badge ? badge.toLowerCase() : "",
+            status: statusVal,
+            inStock: isAvail,
             options,
             description,
             img: finalImg,
@@ -5782,6 +5868,7 @@ window.closeAdminMessageModal = closeAdminMessageModal;
 window.openAddProductModal = openAddProductModal;
 window.openEditProductModal = openEditProductModal;
 window.closeAdminProductModal = closeAdminProductModal;
+window.toggleAdminProductStatus = toggleAdminProductStatus;
 window.toggleAdminMessageReadById = toggleAdminMessageReadById;
 window.toggleCurrentAdminMessageRead = toggleCurrentAdminMessageRead;
 window.deleteCurrentAdminMessage = deleteCurrentAdminMessage;

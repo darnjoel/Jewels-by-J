@@ -2219,6 +2219,7 @@
                         <span class="modal-price-current" id="modalProductPriceCurrent">GH₵ 380.00</span>
                         <span class="modal-price-original" id="modalProductPriceOrig">GH₵ 420.00</span>
                     </div>
+                    <div id="modalProductAvailability" style="margin-bottom:12px;"></div>
                     <p class="modal-desc" id="modalProductDesc">Product description goes here.</p>
 
                     <!-- Options (Length / Variant) -->
@@ -3155,11 +3156,21 @@
                         </div>
                     </div>
 
-                    <div class="form-field" style="margin-bottom:12px;">
-                        <label style="font-size:0.75rem; font-weight:600; display:block; margin-bottom:4px;">Available
-                            Sizes / Options (Comma separated)</label>
-                        <input type="text" id="admProdOptions" placeholder="e.g. 16&quot;, 18&quot;, 20&quot;"
-                            class="customizer-input-field" style="padding:10px 14px; font-size:0.9rem;">
+                    <div class="form-grid-2"
+                        style="display:grid; grid-template-columns:1.2fr 0.8fr; gap:12px; margin-bottom:12px;">
+                        <div>
+                            <label style="font-size:0.75rem; font-weight:600; display:block; margin-bottom:4px;">Available
+                                Sizes / Options (Comma separated)</label>
+                            <input type="text" id="admProdOptions" placeholder="e.g. 16&quot;, 18&quot;, 20&quot;"
+                                class="customizer-input-field" style="padding:10px 14px; font-size:0.9rem;">
+                        </div>
+                        <div>
+                            <label style="font-size:0.75rem; font-weight:600; display:block; margin-bottom:4px;">Stock Availability Status *</label>
+                            <select id="admProdStatus" class="shop-select" style="width:100%; padding:10px 14px;">
+                                <option value="available">✓ In Stock (Available)</option>
+                                <option value="unavailable">✕ Unavailable (Sold Out)</option>
+                            </select>
+                        </div>
                     </div>
 
                     <!-- Picture Upload (Native File Reader + URL Fallback) -->
