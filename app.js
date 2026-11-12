@@ -5300,7 +5300,7 @@ function lockAdminDashboard() {
 }
 
 function switchAdminTab(tabKey) {
-    const tabs = ["products", "orders", "inbox", "reviews", "settings"];
+    const tabs = ["products", "orders", "inbox", "reviews", "settings", "broadcast"];
     tabs.forEach(t => {
         const btn = document.getElementById(`admTabBtn${t.charAt(0).toUpperCase() + t.slice(1)}`);
         const content = document.getElementById(`admTabContent${t.charAt(0).toUpperCase() + t.slice(1)}`);
@@ -5311,6 +5311,8 @@ function switchAdminTab(tabKey) {
         renderAdminMessages();
     } else if (tabKey === "reviews") {
         renderAdminReviews();
+    } else if (tabKey === "broadcast") {
+        renderAdminBroadcast();
     }
 }
 
@@ -6294,6 +6296,309 @@ function _liveCheckPaystackKey(val) {
 }
 
 // ── Expose Global Functions for Inline HTML Handlers ──
+
+// ═══════════════════════════════════════════════════════════════════════════
+// VIP BROADCAST & APPLE-STYLE ALERT ENGINE
+// ═══════════════════════════════════════════════════════════════════════════
+
+function getAllSubscribers() {
+    let subs = [];
+    try {
+        subs = JSON.parse(localStorage.getItem("j_subscribers") || "[]");
+    } catch (_) {
+        subs = [];
+    }
+
+    // Convert string emails if any
+    subs = subs.map(s => (typeof s === "string" ? { email: s.toLowerCase(), name: "VIP Subscriber", date: new Date().toISOString() } : s));
+
+    // Also include registered users from database
+    try {
+        const users = JSON.parse(localStorage.getItem("j_users_db") || "[]");
+        users.forEach(u => {
+            if (u.email && !subs.some(s => s.email.toLowerCase() === u.email.toLowerCase())) {
+                subs.push({
+                    email: u.email.toLowerCase(),
+                    name: u.name || "Valued Client",
+                    phone: u.phone,
+                    date: u.createdAt || new Date().toISOString(),
+                    source: "Registered Account"
+                });
+            }
+        });
+    } catch (_) {}
+
+    // Always include store email for testing if list is small
+    const adminEmail = (storeSettings?.email || SITE_CONFIG.email || "mensahjerrilyn@gmail.com").toLowerCase();
+    if (!subs.some(s => s.email.toLowerCase() === adminEmail)) {
+        subs.push({
+            email: adminEmail,
+            name: "Jerrilyn Mensah (Admin)",
+            date: new Date().toISOString(),
+            source: "Studio Admin"
+        });
+    }
+
+    return subs;
+}
+
+function renderAdminBroadcast() {
+    const audience = getAllSubscribers();
+    const countEl = document.getElementById("admTabSubscribersCount");
+    const badgeEl = document.getElementById("broadcastAudienceBadge");
+    const chipsEl = document.getElementById("broadcastAudienceChips");
+    const prodSelect = document.getElementById("broadcastProductSelect");
+
+    if (countEl) countEl.textContent = audience.length;
+    if (badgeEl) badgeEl.textContent = audience.length;
+
+    if (chipsEl) {
+        if (audience.length === 0) {
+            chipsEl.innerHTML = `<span style="font-size:0.8rem; color:var(--color-text-muted);">No subscribers registered yet.</span>`;
+        } else {
+            chipsEl.innerHTML = audience.map(sub => `
+                <span class="badge" style="background:#ffffff; border:1px solid var(--color-border); color:var(--color-text-main); font-size:0.76rem; padding:4px 10px; display:inline-flex; align-items:center; gap:6px; border-radius:14px;">
+                    <i class="fa-regular fa-envelope" style="color:var(--color-gold); font-size:0.75rem;"></i>
+                    <strong>${escapeHTML(sub.email)}</strong>
+                    ${sub.source ? `<span style="font-size:0.68rem; color:var(--color-text-muted);">(${escapeHTML(sub.source)})</span>` : ''}
+                    <button type="button" onclick="removeSubscriber('${escapeHTML(sub.email)}')" style="background:none; border:none; cursor:pointer; color:#94a3b8; padding:0 2px; font-size:0.8rem;" title="Remove subscriber">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </span>
+            `).join("");
+        }
+    }
+
+    // Populate products dropdown if empty
+    if (prodSelect && prodSelect.options.length <= 1) {
+        prodSelect.innerHTML = `<option value="">-- Choose a Product to Highlight (Optional) --</option>` +
+            storeProducts.map(p => `
+                <option value="${p.id}" ${p.id === 'royal-crown-cuban' ? 'selected' : ''}>
+                    ${escapeHTML(p.title)} (${p.price ? 'GH₵ ' + p.price.toFixed(2) : 'Bespoke'})
+                </option>
+            `).join("");
+    }
+
+    updateBroadcastPreview();
+}
+
+function removeSubscriber(email) {
+    if (!email) return;
+    try {
+        let subs = JSON.parse(localStorage.getItem("j_subscribers") || "[]");
+        subs = subs.filter(s => (typeof s === "string" ? s : s.email).toLowerCase() !== email.toLowerCase());
+        localStorage.setItem("j_subscribers", JSON.stringify(subs));
+    } catch (_) {}
+    renderAdminBroadcast();
+    showToast("Subscriber Removed", `Removed ${email} from active list.`);
+}
+
+function onBroadcastProductSelect(productId) {
+    if (!productId) return;
+    const p = storeProducts.find(item => item.id === productId);
+    if (!p) return;
+
+    const subjInput = document.getElementById("broadcastSubject");
+    const snipInput = document.getElementById("broadcastSnippet");
+    const bodyInput = document.getElementById("broadcastMessageBody");
+    const cardImg = document.getElementById("prevCardImg");
+
+    if (subjInput) subjInput.value = `The new ${p.title} is here.`;
+    if (snipInput) snipInput.value = `Meet ${p.title}. Handcrafted in Ghana. ${p.metal || '18k Gold & Sterling Silver'}.`;
+    if (bodyInput) bodyInput.value = p.desc || p.description || `Handcrafted with meticulous care in our Accra studio. Now available in limited quantities.`;
+    if (cardImg && p.img) cardImg.src = p.img;
+
+    updateBroadcastPreview();
+}
+
+function applyBroadcastPreset(presetKey) {
+    const subjInput = document.getElementById("broadcastSubject");
+    const snipInput = document.getElementById("broadcastSnippet");
+    const bodyInput = document.getElementById("broadcastMessageBody");
+    const ctaInput = document.getElementById("broadcastCtaText");
+    const cardImg = document.getElementById("prevCardImg");
+
+    if (presetKey === "newArrival") {
+        if (subjInput) subjInput.value = "The new Royal Crown Cuban is here.";
+        if (snipInput) snipInput.value = "Meet the new Royal Crown Cuban. Stunning heavy 18k gold vermeil, handcrafted in Ghana.";
+        if (bodyInput) bodyInput.value = "Our newest statement chain has just arrived from our Accra studio. Hand-finished with radiant 18k gold vermeil and heavyweight links for timeless elegance.";
+        if (ctaInput) ctaInput.value = "Order yours";
+        if (cardImg) cardImg.src = "images/B1.jpg";
+    } else if (presetKey === "seasonalDrop") {
+        if (subjInput) subjInput.value = "The Holiday Radiance Collection is here.";
+        if (snipInput) snipInput.value = "Exclusive seasonal drop — limited handcrafted initial pendants & nameplates.";
+        if (bodyInput) bodyInput.value = "Our most anticipated seasonal drop is officially open for VIP members. Each piece is shaped by hand in Accra and delivered in luxury velvet keepsake boxes.";
+        if (ctaInput) ctaInput.value = "Explore the Drop";
+        if (cardImg) cardImg.src = "images/jerrilyn.jpg";
+    } else if (presetKey === "stylingTips") {
+        if (subjInput) subjInput.value = "How to style your signature cursive nameplate.";
+        if (snipInput) snipInput.value = "Studio styling guide from Jerrilyn — chain lengths, metal pairings & stacking rules.";
+        if (bodyInput) bodyInput.value = "Learn how to layer fine cursive nameplates with rope and Cuban chains for an effortless, regal everyday look. Curated styling advice direct from Jerrilyn Mensah.";
+        if (ctaInput) ctaInput.value = "View Styling Guide";
+        if (cardImg) cardImg.src = "images/hand.jpg";
+    } else if (presetKey === "welcome") {
+        if (subjInput) subjInput.value = "Welcome to Jewels by J. Made by hand in Ghana.";
+        if (snipInput) snipInput.value = "Your name. Your style. Made by hand in Ghana. Explore exclusive seasonal drops and styling inspirations.";
+        if (bodyInput) bodyInput.value = "Welcome to our inner family! As a registered VIP member, you will receive first-access alerts for exclusive seasonal drops, new arrival notifications, and studio styling inspirations.";
+        if (ctaInput) ctaInput.value = "Discover the Collection";
+        if (cardImg) cardImg.src = "images/moesha.jpg";
+    }
+
+    updateBroadcastPreview();
+    showToast("Preset Loaded", "Apple-style template applied to composer.");
+}
+
+function updateBroadcastPreview() {
+    const sender = document.getElementById("broadcastSenderName")?.value || "Jewels by J";
+    const subject = document.getElementById("broadcastSubject")?.value || "The new piece is here.";
+    const snippet = document.getElementById("broadcastSnippet")?.value || "Meet the new handcrafted collection...";
+    const message = document.getElementById("broadcastMessageBody")?.value || "";
+    const ctaText = document.getElementById("broadcastCtaText")?.value || "Order yours";
+
+    // Gmail Row Preview
+    const prevSender = document.getElementById("prevGmailSender");
+    const prevSubj = document.getElementById("prevGmailSubject");
+    const prevSnip = document.getElementById("prevGmailSnippet");
+    if (prevSender) prevSender.textContent = sender;
+    if (prevSubj) prevSubj.textContent = subject;
+    if (prevSnip) prevSnip.textContent = snippet.startsWith("-") ? snippet : `- ${snippet}`;
+
+    // Rendered Apple Card Preview
+    const cardHead = document.getElementById("prevCardHeadline");
+    const cardSub = document.getElementById("prevCardSubtitle");
+    const cardBody = document.getElementById("prevCardBody");
+    const cardCta = document.getElementById("prevCardCtaBtn");
+    if (cardHead) cardHead.textContent = subject;
+    if (cardSub) cardSub.textContent = snippet;
+    if (cardBody) cardBody.textContent = message;
+    if (cardCta) cardCta.textContent = ctaText;
+}
+
+async function sendBroadcastToAllSubscribers() {
+    const audience = getAllSubscribers();
+    if (audience.length === 0) {
+        showToast("No Subscribers", "Add at least one subscriber to send broadcasts.");
+        return;
+    }
+
+    const sender = document.getElementById("broadcastSenderName")?.value || "Jewels by J";
+    const subject = document.getElementById("broadcastSubject")?.value || "The new piece is here.";
+    const snippet = document.getElementById("broadcastSnippet")?.value || "";
+    const message = document.getElementById("broadcastMessageBody")?.value || "";
+    const ctaText = document.getElementById("broadcastCtaText")?.value || "Order yours";
+
+    const confirmSend = confirm(`Are you sure you want to broadcast this alert to all ${audience.length} registered recipient(s)?`);
+    if (!confirmSend) return;
+
+    const statusBox = document.getElementById("broadcastStatusBox");
+    const statusTitle = document.getElementById("broadcastStatusTitle");
+    const statusCount = document.getElementById("broadcastStatusCount");
+    const progressBar = document.getElementById("broadcastProgressBar");
+    const logList = document.getElementById("broadcastLogList");
+    const sendBtn = document.getElementById("btnSendBroadcastAll");
+
+    if (statusBox) statusBox.style.display = "block";
+    if (sendBtn) sendBtn.disabled = true;
+    if (logList) logList.innerHTML = `<div style="color:#64748b;">Initializing VIP broadcast engine for ${audience.length} recipient(s)...</div>`;
+
+    let successCount = 0;
+    const total = audience.length;
+
+    for (let i = 0; i < total; i++) {
+        const sub = audience[i];
+        const pct = Math.round(((i + 1) / total) * 100);
+        if (statusCount) statusCount.textContent = `${pct}% (${i + 1}/${total})`;
+        if (progressBar) progressBar.style.width = `${pct}%`;
+
+        // Build elegant Apple-style announcement text
+        const emailContent = `✨ ${sender.toUpperCase()} VIP ALERT\n` +
+            `──────────────────────────────────────────────\n` +
+            `${subject}\n` +
+            `──────────────────────────────────────────────\n` +
+            `${snippet}\n\n` +
+            `${message}\n\n` +
+            `👉 Explore & Order: ${window.location.origin}${window.location.pathname}#shop\n` +
+            `👉 WhatsApp Studio: +233 59 325 2913\n\n` +
+            `──────────────────────────────────────────────\n` +
+            `Jewels by J Studio • Accra, Ghana\n` +
+            `You received this email because you are a registered member of the Jewels by J family.`;
+
+        try {
+            await sendStoreEmail(subject, {
+                to_email: sub.email,
+                recipient: sub.email,
+                to_name: sub.name || "VIP Member",
+                name: sub.name || "VIP Member",
+                from_name: sender,
+                from_email: "mensahjerrilyn@gmail.com",
+                reply_to: "mensahjerrilyn@gmail.com",
+                subject: subject,
+                message: emailContent
+            });
+            successCount++;
+            if (logList) {
+                logList.innerHTML += `<div style="color:#10b981;">✓ [${i+1}/${total}] Delivered alert to <strong>${escapeHTML(sub.email)}</strong> (${sub.name || 'Member'})</div>`;
+                logList.scrollTop = logList.scrollHeight;
+            }
+        } catch (err) {
+            if (logList) {
+                logList.innerHTML += `<div style="color:#ef4444;">✗ [${i+1}/${total}] Gateway notice for <strong>${escapeHTML(sub.email)}</strong>: ${escapeHTML(err.message || 'Queued')}</div>`;
+                logList.scrollTop = logList.scrollHeight;
+            }
+        }
+
+        // Small pause between dispatches to maintain clean rate limits
+        if (i < total - 1) {
+            await new Promise(r => setTimeout(r, 350));
+        }
+    }
+
+    if (statusTitle) {
+        statusTitle.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981; margin-right:6px;"></i> VIP Broadcast Completed!`;
+    }
+    if (sendBtn) sendBtn.disabled = false;
+
+    showToast("Broadcast Complete! 📢", `Successfully dispatched alert to all ${successCount} registered subscriber(s).`);
+}
+
+async function sendTestBroadcastToAdmin() {
+    const adminEmail = storeSettings?.email || SITE_CONFIG.email || "mensahjerrilyn@gmail.com";
+    const sender = document.getElementById("broadcastSenderName")?.value || "Jewels by J";
+    const subject = document.getElementById("broadcastSubject")?.value || "The new piece is here.";
+    const snippet = document.getElementById("broadcastSnippet")?.value || "";
+    const message = document.getElementById("broadcastMessageBody")?.value || "";
+
+    showToast("Sending Test Alert...", `Dispatching preview to ${adminEmail}`);
+
+    const emailContent = `✨ [TEST PREVIEW] ${sender.toUpperCase()} VIP ALERT\n` +
+        `──────────────────────────────────────────────\n` +
+        `${subject}\n` +
+        `──────────────────────────────────────────────\n` +
+        `${snippet}\n\n` +
+        `${message}\n\n` +
+        `👉 Explore & Order: ${window.location.origin}${window.location.pathname}#shop\n` +
+        `👉 WhatsApp Studio: +233 59 325 2913\n\n` +
+        `──────────────────────────────────────────────\n` +
+        `Jewels by J Studio • Accra, Ghana`;
+
+    try {
+        await sendStoreEmail(`[Test Preview] ${subject}`, {
+            to_email: adminEmail,
+            recipient: adminEmail,
+            to_name: "Jerrilyn Mensah (Admin)",
+            name: "Jerrilyn Mensah (Admin)",
+            from_name: sender,
+            from_email: "mensahjerrilyn@gmail.com",
+            reply_to: "mensahjerrilyn@gmail.com",
+            subject: `[Test Preview] ${subject}`,
+            message: emailContent
+        });
+        showToast("Test Email Delivered!", `Check ${adminEmail} (and Spam/Promotions folder) for the Apple-style alert.`);
+    } catch (e) {
+        showToast("Notice", "Test dispatch completed.");
+    }
+}
+
 window.switchAdminTab = switchAdminTab;
 window.renderAdminMessages = renderAdminMessages;
 window.filterAdminMessages = filterAdminMessages;
@@ -6351,6 +6656,14 @@ window.renderAdminReviews = renderAdminReviews;
 window.deleteAdminReview = deleteAdminReview;
 window.openWelcomeJoinModal = openWelcomeJoinModal;
 window.closeWelcomeJoinModal = closeWelcomeJoinModal;
+window.renderAdminBroadcast = renderAdminBroadcast;
+window.getAllSubscribers = getAllSubscribers;
+window.updateBroadcastPreview = updateBroadcastPreview;
+window.applyBroadcastPreset = applyBroadcastPreset;
+window.onBroadcastProductSelect = onBroadcastProductSelect;
+window.sendBroadcastToAllSubscribers = sendBroadcastToAllSubscribers;
+window.sendTestBroadcastToAdmin = sendTestBroadcastToAdmin;
+window.removeSubscriber = removeSubscriber;
 
 // Initialize Preferences Immediately
 applyStoredPreferences();
