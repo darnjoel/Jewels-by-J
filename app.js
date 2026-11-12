@@ -743,14 +743,21 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
                 .replace(/\s*—\s*.*$/, "")
                 .trim();
 
-            // Simple, clean subject as requested: "Jewels by J Inquiry" (or Order # for orders)
-            const emailSubject = fields.order_id
-                ? `Jewels by J Order #${fields.order_id}`
-                : "Jewels by J Inquiry";
+            // Determine recipient: either the customer (if to_email is set) or store owner
+            const recipientEmail = fields.to_email || fields.recipient || targetEmail;
+            const isCustomerFacing = (recipientEmail !== targetEmail);
+            const recipientName = fields.to_name || (isCustomerFacing ? (fields.name || "VIP Member") : "Jerrilyn Mensah");
 
-            // Build an elegant, structured notification body
+            // Clean subject
+            const emailSubject = fields.subject || (fields.order_id
+                ? `Jewels by J Order #${fields.order_id}`
+                : (subject || "Jewels by J Inquiry"));
+
+            // Build structured notification body
             let richBody = "";
-            if (fields.order_id) {
+            if (fields.message) {
+                richBody = fields.message;
+            } else if (fields.order_id) {
                 richBody = `💎 NEW ORDER #${fields.order_id}\n` +
                     `──────────────────────────────────────────────\n` +
                     `• Customer Name:  ${clientName}\n` +
@@ -780,8 +787,9 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
             }
 
             const templateParams = {
-                to_name: "Jerrilyn Mensah",
-                to_email: targetEmail,
+                to_name: recipientName,
+                to_email: recipientEmail,
+                recipient_email: recipientEmail,
                 from_name: clientName,
                 user_name: clientName,
                 customer_name: clientName,
@@ -789,8 +797,8 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
                 from_email: clientEmail,
                 user_email: clientEmail,
                 customer_email: clientEmail,
-                email: clientEmail,
-                reply_to: clientEmail,
+                email: isCustomerFacing ? recipientEmail : clientEmail,
+                reply_to: fields.reply_to || (isCustomerFacing ? targetEmail : clientEmail),
                 phone: clientPhone,
                 customer_phone: clientPhone,
                 subject: emailSubject,
@@ -2196,13 +2204,46 @@ function initNewsletterForm() {
         localStorage.setItem("j_messages_db", JSON.stringify(storeMessages));
         if (typeof renderAdminInbox === "function") renderAdminInbox();
 
-        // 3. Dispatch store email notification to Jerrilyn (and FormSubmit autoresponse)
-        sendStoreEmail("✨ New Jewels Family Member — VIP Newsletter", {
+        // 3. Prepare Welcome Letter for the subscriber
+        const welcomeLetter = `✨ WELCOME TO THE JEWELS BY J FAMILY!\n` +
+            `──────────────────────────────────────────────\n` +
+            `Hello,\n\n` +
+            `Thank you for subscribing to Jewels by J! You are now officially enrolled on our VIP list with ${email}.\n\n` +
+            `Here is what you will receive directly from our Accra jewelry studio:\n` +
+            `• 🌸 EXCLUSIVE SEASONAL DROPS: Priority 24-hour advance VIP access to limited-edition seasonal releases before public availability.\n` +
+            `• 🔔 NEW ARRIVAL NOTIFICATIONS: Direct alerts the moment new custom cursive nameplates, chains, and pendants leave our studio.\n` +
+            `• ✨ STYLING INSPIRATIONS: Curated layering guides, precious metal pairing advice, and personalized jewelry care direct from Jerrilyn Mensah.\n\n` +
+            `💎 VIP WELCOME PRIVILEGE:\n` +
+            `Enjoy priority crafting queue & complimentary luxury packaging on your orders.\n\n` +
+            `Have a custom design idea or question?\n` +
+            `• WhatsApp Jerrilyn directly: +233 59 325 2913\n` +
+            `• Website: Jewels by J Studio, Accra, Ghana\n\n` +
+            `With love & fine craftsmanship,\n` +
+            `Jerrilyn Mensah & The Jewels by J Studio Team`;
+
+        // Dispatch Welcome Email directly TO THE CUSTOMER'S EMAIL INBOX
+        try {
+            await sendStoreEmail("✨ Welcome to the Jewels by J Family!", {
+                to_email: email,
+                recipient: email,
+                to_name: "VIP Family Member",
+                from_name: "Jewels by J Studio",
+                from_email: "mensahjerrilyn@gmail.com",
+                reply_to: "mensahjerrilyn@gmail.com",
+                subject: "✨ Welcome to the Jewels by J Family! (VIP Perks Inside)",
+                message: welcomeLetter
+            });
+            console.log("Welcome email dispatched to customer:", email);
+        } catch (eSendErr) {
+            console.warn("Notice sending welcome email:", eSendErr);
+        }
+
+        // Also notify store owner (Jerrilyn)
+        sendStoreEmail("✨ New VIP Subscriber Joined", {
             name: "VIP Family Member",
             email: email,
-            subject: "VIP Family Member — Exclusive Drops & Styling Inspirations",
-            message: `New VIP subscriber joined the Jewels by J family.\nEmail: ${email}\nSubscribed for: Exclusive Seasonal Drops, New Arrival Notifications, and Styling Inspirations.\nTimestamp: ${new Date().toLocaleString()}`,
-            _autoresponse: "Welcome to the Jewels by J family! ✨ You are now officially subscribed to receive our exclusive seasonal drops, new arrival notifications, and styling inspirations directly from our Accra jewelry studio."
+            subject: "✨ New Jewels Family VIP Subscription: " + email,
+            message: `A new customer (${email}) subscribed for exclusive seasonal drops, new arrival notifications, and styling inspirations.\nTimestamp: ${new Date().toLocaleString()}`
         }).catch(() => {});
 
         // 4. Show VIP notification modal & toast
