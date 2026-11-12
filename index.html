@@ -2367,61 +2367,74 @@
                                     </div>
                                 </div>
 
-                                <!-- Right Column: Live Gmail & Apple-Style Card Preview -->
-                                <div>
-                                    <h4 style="font-size:0.95rem; color:var(--color-black); margin-bottom:14px; display:flex; align-items:center; gap:6px;">
-                                        <i class="fa-solid fa-eye" style="color:var(--color-gold);"></i> 2. Live Inbox Preview (Apple Style)
-                                    </h4>
-
-                                    <!-- Gmail Row Mockup (Exact match to User Reference Image) -->
-                                    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.05); font-family:-apple-system,BlinkMacSystemFont,sans-serif;">
-                                        <div style="padding:10px 14px; background:#f8fafc; border-bottom:1px solid #f1f5f9; font-size:0.74rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:1px;">
-                                            How It Appears in Customer's Gmail Inbox:
-                                        </div>
-                                        <div style="padding:12px 14px; display:flex; align-items:center; gap:12px; font-size:0.84rem; background:#ffffff;">
-                                            <input type="checkbox" disabled style="opacity:0.4;">
-                                            <i class="fa-regular fa-star" style="color:#cbd5e1; font-size:0.85rem;"></i>
-                                            <strong style="color:#0f172a; min-width:90px;" id="prevGmailSender">Jewels by J</strong>
-                                            <div style="overflow:hidden; white-space:nowrap; text-overflow:ellipsis; flex:1;">
-                                                <strong style="color:#0f172a;" id="prevGmailSubject">The new Royal Crown Cuban is here.</strong>
-                                                <span style="color:#64748b; margin-left:4px;" id="prevGmailSnippet">- Meet the newest handcrafted chain...</span>
-                                            </div>
-                                            <span style="font-size:0.7rem; border:1px solid #cbd5e1; border-radius:10px; padding:1px 7px; color:#64748b; white-space:nowrap;">Unsubscribe</span>
-                                            <span style="font-size:0.75rem; color:#64748b; white-space:nowrap;">Today</span>
-                                        </div>
+                                <!-- Right Column: Live Gmail & Apple-Style Card Preview (Scrollable & Responsive) -->
+                                <div style="min-width:0; width:100%;">
+                                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+                                        <h4 style="font-size:0.95rem; color:var(--color-black); margin:0; display:flex; align-items:center; gap:6px;">
+                                            <i class="fa-solid fa-eye" style="color:var(--color-gold);"></i> 2. Live Inbox Preview (Apple Style)
+                                        </h4>
+                                        <span style="font-size:0.72rem; font-weight:600; color:var(--color-gold); background:rgba(200, 149, 44, 0.12); padding:3px 10px; border-radius:12px; border:1px solid rgba(200, 149, 44, 0.3); display:inline-flex; align-items:center; gap:5px;">
+                                            <i class="fa-solid fa-arrows-left-right"></i> Horizontal Scroll Active
+                                        </span>
                                     </div>
 
-                                    <!-- Rendered Apple-Style Email Card Mockup -->
-                                    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.06); padding:28px 22px; text-align:center; font-family:-apple-system,BlinkMacSystemFont,sans-serif;">
-                                        <div style="font-size:0.76rem; font-weight:800; letter-spacing:3.5px; color:#1e293b; text-transform:uppercase; margin-bottom:18px;">
-                                            JEWELS BY J
-                                        </div>
-                                        <h3 id="prevCardHeadline" style="font-family:var(--font-serif); font-size:1.85rem; font-weight:600; line-height:1.2; color:#0f172a; margin:0 0 8px;">
-                                            The new Royal Crown Cuban is here.
-                                        </h3>
-                                        <p id="prevCardSubtitle" style="font-size:0.92rem; color:#64748b; line-height:1.5; margin:0 auto 18px; max-width:380px;">
-                                            Meet the newest handcrafted chain in 18k gold vermeil. Handcrafted by hand in Ghana.
-                                        </p>
+                                    <!-- Horizontal Scroll Container -->
+                                    <div class="custom-horizontal-scroll" style="width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:12px;">
+                                        <div style="min-width:480px; width:100%;">
 
-                                        <!-- Featured Image -->
-                                        <div style="margin:0 auto 18px; max-width:280px; border-radius:10px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,0.08);">
-                                            <img id="prevCardImg" src="images/hand.jpg" alt="Featured Product" style="width:100%; height:220px; object-fit:cover; display:block;">
-                                        </div>
+                                            <!-- Gmail Row Mockup (Exact match to User Reference Image) -->
+                                            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.05); font-family:-apple-system,BlinkMacSystemFont,sans-serif;">
+                                                <div style="padding:10px 14px; background:#f8fafc; border-bottom:1px solid #f1f5f9; font-size:0.74rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:1px; display:flex; justify-content:space-between; align-items:center;">
+                                                    <span>How It Appears in Customer's Gmail Inbox:</span>
+                                                    <span style="font-size:0.68rem; color:#94a3b8; text-transform:none; font-weight:normal;">(Swipe/scroll horizontally)</span>
+                                                </div>
+                                                <div style="padding:12px 14px; display:flex; align-items:center; gap:12px; font-size:0.84rem; background:#ffffff; min-width:540px;">
+                                                    <input type="checkbox" disabled style="opacity:0.4;">
+                                                    <i class="fa-regular fa-star" style="color:#cbd5e1; font-size:0.85rem;"></i>
+                                                    <strong style="color:#0f172a; min-width:90px;" id="prevGmailSender">Jewels by J</strong>
+                                                    <div style="overflow:hidden; white-space:nowrap; text-overflow:ellipsis; flex:1;">
+                                                        <strong style="color:#0f172a;" id="prevGmailSubject">The new Royal Crown Cuban is here.</strong>
+                                                        <span style="color:#64748b; margin-left:4px;" id="prevGmailSnippet">- Meet the newest handcrafted chain...</span>
+                                                    </div>
+                                                    <span style="font-size:0.7rem; border:1px solid #cbd5e1; border-radius:10px; padding:1px 7px; color:#64748b; white-space:nowrap;">Unsubscribe</span>
+                                                    <span style="font-size:0.75rem; color:#64748b; white-space:nowrap;">Today</span>
+                                                </div>
+                                            </div>
 
-                                        <p id="prevCardBody" style="font-size:0.85rem; color:#475569; line-height:1.55; margin:0 auto 20px; max-width:400px;">
-                                            Meet our newest piece fresh from the Accra studio. Handcrafted with luminous 18k gold plate and 925 sterling silver.
-                                        </p>
+                                            <!-- Rendered Apple-Style Email Card Mockup -->
+                                            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,0.06); padding:28px 24px; text-align:center; font-family:-apple-system,BlinkMacSystemFont,sans-serif; min-width:440px;">
+                                                <div style="font-size:0.76rem; font-weight:800; letter-spacing:3.5px; color:#1e293b; text-transform:uppercase; margin-bottom:18px;">
+                                                    JEWELS BY J
+                                                </div>
+                                                <h3 id="prevCardHeadline" style="font-family:var(--font-serif); font-size:1.85rem; font-weight:600; line-height:1.25; color:#0f172a; margin:0 0 10px; word-wrap:break-word; overflow-wrap:break-word; word-break:break-word;">
+                                                    The new Royal Crown Cuban is here.
+                                                </h3>
+                                                <p id="prevCardSubtitle" style="font-size:0.92rem; color:#64748b; line-height:1.55; margin:0 auto 18px; max-width:420px; word-wrap:break-word; overflow-wrap:break-word;">
+                                                    Meet the newest handcrafted chain in 18k gold vermeil. Handcrafted by hand in Ghana.
+                                                </p>
 
-                                        <div>
-                                            <a href="#shop" id="prevCardCtaBtn" style="display:inline-block; background:#0f172a; color:#ffffff; font-weight:600; font-size:0.86rem; padding:10px 28px; border-radius:24px; text-decoration:none;">
-                                                Order yours
-                                            </a>
-                                        </div>
+                                                <!-- Featured Image -->
+                                                <div style="margin:0 auto 18px; max-width:280px; border-radius:10px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,0.08);">
+                                                    <img id="prevCardImg" src="images/hand.jpg" alt="Featured Product" style="width:100%; height:220px; object-fit:cover; display:block;">
+                                                </div>
 
-                                        <div style="border-top:1px solid #f1f5f9; margin-top:24px; padding-top:16px; font-size:0.72rem; color:#94a3b8; line-height:1.6;">
-                                            Jewels by J Studio • Accra, Ghana • WhatsApp: +233 59 325 2913<br>
-                                            You received this exclusive alert because you are registered with Jewels by J.<br>
-                                            <span style="text-decoration:underline; cursor:pointer;">Unsubscribe from VIP Alerts</span>
+                                                <p id="prevCardBody" style="font-size:0.85rem; color:#475569; line-height:1.55; margin:0 auto 20px; max-width:420px; word-wrap:break-word; overflow-wrap:break-word;">
+                                                    Meet our newest piece fresh from the Accra studio. Handcrafted with luminous 18k gold plate and 925 sterling silver.
+                                                </p>
+
+                                                <div>
+                                                    <a href="#shop" id="prevCardCtaBtn" style="display:inline-block; background:#0f172a; color:#ffffff; font-weight:600; font-size:0.86rem; padding:10px 28px; border-radius:24px; text-decoration:none;">
+                                                        Order yours
+                                                    </a>
+                                                </div>
+
+                                                <div style="border-top:1px solid #f1f5f9; margin-top:24px; padding-top:16px; font-size:0.72rem; color:#94a3b8; line-height:1.6;">
+                                                    Jewels by J Studio • Accra, Ghana • WhatsApp: +233 59 325 2913<br>
+                                                    You received this exclusive alert because you are registered with Jewels by J.<br>
+                                                    <span style="text-decoration:underline; cursor:pointer;">Unsubscribe from VIP Alerts</span>
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </div>
 

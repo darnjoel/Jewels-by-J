@@ -6158,3 +6158,81 @@ body.modal-open {
         font-size: 1.7rem !important;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VIP EMAIL BROADCASTS & APPLE-STYLE ALERTS STYLING
+   ═══════════════════════════════════════════════════════════════════════════ */
+.broadcast-layout-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 24px;
+}
+
+@media (max-width: 992px) {
+    .broadcast-layout-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+}
+
+html[data-theme="dark"] #admTabContentBroadcast > div:nth-child(2),
+html[data-theme="dark"] #admTabContentBroadcast .broadcast-layout-grid > div {
+    background: #1b1718 !important;
+    border-color: #332b2c !important;
+    color: #f5eeea !important;
+}
+
+html[data-theme="dark"] #admTabContentBroadcast h3,
+html[data-theme="dark"] #admTabContentBroadcast h4,
+html[data-theme="dark"] #admTabContentBroadcast strong {
+    color: #f5eeea !important;
+}
+
+html[data-theme="dark"] #broadcastAudienceChips .badge {
+    background: #241f20 !important;
+    border-color: #3d3335 !important;
+    color: #f5eeea !important;
+}
+
+html[data-theme="dark"] #broadcastLogList {
+    background: #1b1718 !important;
+    border-color: #332b2c !important;
+    color: #f5eeea !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HORIZONTAL SCROLL & OVERFLOW BAR FOR LIVE PREVIEW
+   ═══════════════════════════════════════════════════════════════════════════ */
+.custom-horizontal-scroll {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-gold) #f1f5f9;
+}
+
+.custom-horizontal-scroll::-webkit-scrollbar {
+    height: 8px;
+}
+
+.custom-horizontal-scroll::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 6px;
+}
+
+.custom-horizontal-scroll::-webkit-scrollbar-thumb {
+    background: var(--color-gold);
+    border-radius: 6px;
+}
+
+.custom-horizontal-scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gold-dark);
+}
+
+html[data-theme="dark"] .custom-horizontal-scroll::-webkit-scrollbar-track {
+    background: #1b1718 !important;
+}
+
+html[data-theme="dark"] .custom-horizontal-scroll::-webkit-scrollbar-thumb {
+    background: #c8952c !important;
+}
