@@ -385,46 +385,17 @@ storeProducts.forEach(p => {
 // For backwards compatibility across all catalog & cart lookups
 let PRODUCTS = storeProducts;
 
-// ── Verified Customer Reviews Dataset (Feature: Atelier Service Reviews) ──
-const INITIAL_REVIEWS = [
-    {
-        id: "rev_1",
-        name: "Ama Serwaa",
-        email: "ama@example.com",
-        location: "East Legon, Accra",
-        rating: 5,
-        title: "Breathtaking Butterfly Nameplate!",
-        review: "I ordered the Jerrilyn Duo Butterfly Nameplate in 18k gold vermeil for my graduation. The cursive calligraphy is so fine and sharp. Rider delivered to my doorstep in East Legon within 24 hours. The packaging alone felt like opening something from Paris!",
-        date: "2 days ago",
-        verified: true
-    },
-    {
-        id: "rev_2",
-        name: "Kofi Owusu",
-        email: "kofi@example.com",
-        location: "KNUST Campus, Kumasi",
-        rating: 5,
-        title: "Top-tier Cuban Chain & Fast Nationwide Delivery",
-        review: "Purchased the Custom Silver Cuban ID Bracelet. The weight and shine are phenomenal — not hollow like regular market pieces. MoMo payment was smooth and tracking updates kept me informed all the way to Kumasi. 10/10 recommend Jewels by J.",
-        date: "1 week ago",
-        verified: true
-    },
-    {
-        id: "rev_3",
-        name: "Naa Dromo",
-        email: "dromo@example.com",
-        location: "Airport Residential, Accra",
-        rating: 5,
-        title: "Incredible Bespoke Service on WhatsApp",
-        review: "Jerrilyn was so patient with me while finalizing the spelling and chain length on WhatsApp. She even shared a preview before crafting. The final piece arrived polished to perfection. Truly Ghana's finest jewelry atelier.",
-        date: "2 weeks ago",
-        verified: true
-    }
-];
+// ── Customer Reviews Dataset (Real Customer Reviews Only) ──
+const INITIAL_REVIEWS = [];
 
 let storeReviews = JSON.parse(localStorage.getItem("j_reviews") || "null");
-if (!storeReviews || !storeReviews.length) {
-    storeReviews = INITIAL_REVIEWS.slice();
+if (!storeReviews || !Array.isArray(storeReviews)) {
+    storeReviews = [];
+    localStorage.setItem("j_reviews", JSON.stringify(storeReviews));
+}
+// Clean out any legacy mock demo reviews so store starts strictly fresh
+if (storeReviews.length > 0 && storeReviews.every(r => r.id === "rev_1" || r.id === "rev_2" || r.id === "rev_3")) {
+    storeReviews = [];
     localStorage.setItem("j_reviews", JSON.stringify(storeReviews));
 }
 
@@ -2181,36 +2152,26 @@ function resetReviewRatingPreview() {
 
 function renderCustomerReviews() {
     const listEl = document.getElementById("customerReviewsList");
-    const avgScoreEl = document.getElementById("reviewsAverageScore");
-    const countBadgeEl = document.getElementById("reviewsCountBadge");
+    const feedWrap = document.getElementById("customerReviewsFeedWrap");
     const adminReviewsTabBadge = document.getElementById("admTabReviewsCount");
 
     if (!storeReviews || !Array.isArray(storeReviews)) {
-        storeReviews = INITIAL_REVIEWS.slice();
+        storeReviews = [];
     }
 
-    // Calculate Average Rating
     const totalReviews = storeReviews.length;
-    const totalScore = storeReviews.reduce((sum, r) => sum + (Number(r.rating) || 5), 0);
-    const avgScore = totalReviews > 0 ? (totalScore / totalReviews).toFixed(1) : "5.0";
-
-    if (avgScoreEl) avgScoreEl.textContent = avgScore;
-    if (countBadgeEl) {
-        countBadgeEl.textContent = `Based on ${totalReviews} verified client review${totalReviews === 1 ? '' : 's'}`;
-    }
     if (adminReviewsTabBadge) adminReviewsTabBadge.textContent = totalReviews;
 
     if (!listEl) return;
 
+    // For now, there are no reviews yet, so hide feed until real reviews are submitted
     if (totalReviews === 0) {
-        listEl.innerHTML = `
-            <div style="text-align:center; padding:40px 20px; color:#8c9ba5;">
-                <i class="fa-regular fa-star" style="font-size:2rem; color:var(--color-gold); margin-bottom:10px; display:block;"></i>
-                <p>Be the first valued client to share your experience with Jewels by J!</p>
-            </div>
-        `;
+        if (feedWrap) feedWrap.style.display = "none";
+        listEl.innerHTML = "";
         return;
     }
+
+    if (feedWrap) feedWrap.style.display = "block";
 
     listEl.innerHTML = storeReviews.map(r => {
         const rating = Math.max(1, Math.min(5, Number(r.rating) || 5));
@@ -2331,13 +2292,7 @@ function handleCustomerReviewSubmit(event) {
 }
 
 function scrollToReviews() {
-    navigateToPage("home");
-    setTimeout(() => {
-        const sec = document.getElementById("customerReviewsSection");
-        if (sec) {
-            sec.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-    }, 150);
+    navigateTo("reviews");
 }
 
 function renderAdminReviews() {
