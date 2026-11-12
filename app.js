@@ -1965,7 +1965,7 @@ function initContactForm() {
         const targetEmail = getAdminEmail();
 
         // Build inquiry record for in-app Customer Inbox (open to both registered clients and guests)
-        const isBespoke = (subject.toLowerCase().includes("bespoke") || message.toLowerCase().includes("bespoke") || subject.toLowerCase().includes("custom") || message.toLowerCase().includes("custom"));
+        const isCustom = (subject.toLowerCase().includes("bespoke") || message.toLowerCase().includes("bespoke") || subject.toLowerCase().includes("custom") || message.toLowerCase().includes("custom"));
         const newMsgRecord = {
             id: "msg_" + Date.now(),
             userId: currentUser ? (currentUser.uid || ("user_" + Date.now())) : ("guest_" + Date.now()),
@@ -1974,7 +1974,7 @@ function initContactForm() {
             phone: phone || "Not provided",
             subject: subject || "General Consultation Inquiry",
             message: message,
-            type: isBespoke ? "bespoke" : "inquiry",
+            type: isCustom ? "custom" : "inquiry",
             date: new Date().toISOString().replace("T", " ").slice(0, 16),
             unread: true,
             verifiedAccount: !!currentUser
@@ -3206,9 +3206,9 @@ function updateCustomizerPreview() {
 }
 
 function submitCustomizationViaWhatsApp() {
-    let msg = `*BESPOKE JEWELRY INQUIRY — ${SITE_CONFIG.brandName.toUpperCase()}*\n`;
+    let msg = `*CUSTOM JEWELRY INQUIRY — ${SITE_CONFIG.brandName.toUpperCase()}*\n`;
     msg += `─────────────────────────\n`;
-    msg += `Hello Jerrilyn, I designed a custom bespoke piece on your website and would love to place an order:\n\n`;
+    msg += `Hello Jerrilyn, I designed a custom handcrafted piece on your website and would love to place an order:\n\n`;
     msg += `• *Custom Text / Name:* ${customDesign.text}\n`;
     msg += `• *Font Style:* ${customDesign.fontName}\n`;
     msg += `• *Precious Metal:* ${customDesign.metalName}\n`;
@@ -4632,9 +4632,9 @@ function renderOrderTrackingResult(order) {
         },
         {
             stage: "crafting",
-            title: "Atelier Studio Crafting",
+            title: "Studio Handcrafting",
             time: order.statusCode === "crafting" ? "Active Now" : (activeIndex > 2 ? "Completed" : "Scheduled"),
-            desc: "Jewelry hand-shaped, custom engraved, and polished in Accra atelier."
+            desc: "Jewelry hand-shaped, custom engraved, and polished in Accra studio."
         },
         {
             stage: "transit",

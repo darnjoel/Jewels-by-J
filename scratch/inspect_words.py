@@ -11,3 +11,4 @@ for fn in ['style.css', 'index.html', 'app.js']:
         end = min(len(c), m.end() + 35)
         snippet = c[start:end].replace('\n', ' ')
         print(f"[{m.group(0)}] ... {snippet} ...")
+
