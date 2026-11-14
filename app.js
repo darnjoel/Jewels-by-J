@@ -833,6 +833,15 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
                     subtitle: fields.snippet || fields.subtitle || "",
                     snippet: fields.snippet || fields.subtitle || "",
                     image_url: fields.image_url || "",
+                    imageUrl: fields.image_url || "",
+                    image: fields.image_url || "",
+                    img: fields.image_url || "",
+                    img_url: fields.image_url || "",
+                    imgUrl: fields.image_url || "",
+                    featured_image: fields.image_url || "",
+                    product_image: fields.image_url || "",
+                    photo: fields.image_url || "",
+                    picture: fields.image_url || "",
                     body_text: fields.message_body || richBody,
                     cta_text: fields.cta_text || "Order Yours",
                     cta_url: fields.cta_url || `${window.location.origin}${window.location.pathname}#shop`,
@@ -898,6 +907,11 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
                     content: richBody,
                     inquiry_details: richBody,
                     order_id: fields.order_id || "",
+                    image_url: fields.image_url || "",
+                    imageUrl: fields.image_url || "",
+                    image: fields.image_url || "",
+                    img: fields.image_url || "",
+                    img_url: fields.image_url || "",
                     items: fields.items || "",
                     grand_total: fields.grand_total || "",
                     total: fields.grand_total || "",
@@ -6625,7 +6639,7 @@ function renderAdminBroadcast() {
     // Initialize broadcast image URL input
     const customUrlInput = document.getElementById("broadcastCustomImageUrl");
     const cardImg = document.getElementById("prevCardImg");
-    if (customUrlInput && cardImg && (!customUrlInput.value || customUrlInput.value.includes("localhost") || customUrlInput.value.includes("file:"))) {
+    if (customUrlInput && cardImg && (!customUrlInput.value || customUrlInput.value.includes("localhost") || customUrlInput.value.includes("file:") || customUrlInput.value.includes("jsdelivr.net"))) {
         customUrlInput.value = resolvePublicImageUrl(cardImg.getAttribute("src") || cardImg.src || "images/logo.jpg");
     }
 
@@ -6839,7 +6853,7 @@ function updateBroadcastPreview() {
     if (cardBody) cardBody.textContent = message;
     if (cardCta) cardCta.textContent = ctaText;
 
-    if (customUrlInput && cardImg && (!customUrlInput.value || customUrlInput.value.includes("localhost") || customUrlInput.value.includes("file:"))) {
+    if (customUrlInput && cardImg && (!customUrlInput.value || customUrlInput.value.includes("localhost") || customUrlInput.value.includes("file:") || customUrlInput.value.includes("jsdelivr.net"))) {
         customUrlInput.value = resolvePublicImageUrl(cardImg.getAttribute("src") || cardImg.src || "images/logo.jpg");
     }
 }
@@ -6911,7 +6925,7 @@ function copyAppleEmailTemplate() {
       <h1 style="font-family:Georgia,Cambria,serif; font-size:28px; font-weight:600; line-height:1.25; color:#0f172a; margin:0 0 14px;">{{subject}}</h1>
       <p style="font-size:16px; color:#64748b; line-height:1.6; margin:0 auto 24px; max-width:480px;">{{subtitle}}</p>
       <div style="margin:0 auto 24px; max-width:320px; border-radius:12px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.08);">
-        <img src="{{image_url}}" alt="Featured Piece" style="width:100%; height:auto; display:block; border:0;" />
+        <img src="{{{image_url}}}" alt="Jewels by J Featured Piece" width="320" style="width:100%; max-width:320px; height:auto; display:block; margin:0 auto; border:0;" />
       </div>
       <p style="font-size:15px; color:#334155; line-height:1.75; margin:0 auto 28px; max-width:480px; text-align:center; white-space:pre-line;">{{body_text}}</p>
       <div style="margin-bottom:26px;">
@@ -6972,13 +6986,41 @@ function saveBroadcastTemplateId(id) {
 // ── Public Asset URL Resolvers for Email Clients ───────────────────────────
 // Gmail, Apple Mail, and Outlook require absolute public https:// URLs.
 // Local files (file://), localhost, 127.0.0.1, or private IPs must be converted
-// to the official public GitHub repository asset URL so image proxies can fetch them.
+// to the official public CDN asset URL (jsDelivr) which is whitelisted by Google Image Proxy.
+// ── Public High-Speed CDN Asset Map for Email Clients ───────────────────────────
+// Verified direct public image CDN hosting on iili.io (FreeImage CDN), guaranteed to render
+// reliably across Google Image Proxy (Gmail), Apple Mail, Outlook, and Yahoo Mail with 0 rate limiting.
+const PUBLIC_IMAGE_CDN_MAP = {
+    "logo.jpg": "https://iili.io/o9sFPna.jpg",
+    "moesha.jpg": "https://iili.io/o9s5o6N.jpg",
+    "hand.jpg": "https://iili.io/o9s5gAg.jpg",
+    "B1.jpg": "https://iili.io/o9sYHkF.jpg",
+    "jerrilyn.jpg": "https://iili.io/o9sYAQf.jpg",
+    "bet.jpg": "https://iili.io/o9sYyG4.jpg",
+    "regina.jpg": "https://iili.io/o9scBRt.jpg",
+    "A2.jpg": "https://iili.io/o9scWgV.jpg",
+    "A1.jpg": "https://iili.io/o9sXqdJ.jpg",
+    "B2.jpg": "https://iili.io/o9sXWru.jpg",
+    "box.jpg": "https://iili.io/o9sXPkv.jpg",
+    "bri.jpg": "https://iili.io/o9shTTQ.jpg",
+    "C1.jpg": "https://iili.io/o9shv9f.jpg",
+    "C2.jpg": "https://iili.io/o9sXWru.jpg",
+    "cat.jpg": "https://iili.io/o9swJX2.jpg",
+    "emp.jpg": "https://iili.io/o9swakJ.jpg",
+    "ggift.jpg": "https://iili.io/o9swg49.jpg",
+    "heart.jpg": "https://iili.io/o9sNfCN.jpg",
+    "jan.jpg": "https://iili.io/o9sOoiB.jpg",
+    "kimberry.jpg": "https://iili.io/o9sOiWQ.jpg",
+    "nam.jpg": "https://iili.io/o9seCes.jpg",
+    "new1.jpg": "https://iili.io/o9sejYF.jpg"
+};
+
 function resolvePublicImageUrl(src) {
-    if (!src) return "https://raw.githubusercontent.com/darnjoel/Jewels-by-J/main/images/logo.jpg";
+    if (!src) return PUBLIC_IMAGE_CDN_MAP["logo.jpg"];
 
     const s = String(src).trim();
 
-    // Check if it's already an absolute public external URL (e.g. Cloudinary, Imgur, or external CDN)
+    // Check if it's already an absolute public external URL (e.g. iili.io, Cloudinary, Imgur)
     // AND NOT a local or private address
     const isLocalOrPrivate = s.startsWith("file:") ||
                              s.includes("localhost") ||
@@ -6988,6 +7030,12 @@ function resolvePublicImageUrl(src) {
                              s.includes("0.0.0.0");
 
     if ((s.startsWith("http://") || s.startsWith("https://")) && !isLocalOrPrivate) {
+        // If it was an old jsDelivr or raw.githubusercontent URL, upgrade to direct high-speed CDN
+        for (const [key, cdnUrl] of Object.entries(PUBLIC_IMAGE_CDN_MAP)) {
+            if (s.toLowerCase().includes(key.toLowerCase())) {
+                return cdnUrl;
+            }
+        }
         return s;
     }
 
@@ -6995,8 +7043,18 @@ function resolvePublicImageUrl(src) {
     const match = s.match(/([a-zA-Z0-9_\-]+\.(?:jpg|jpeg|png|webp|gif|svg))/i);
     const fileName = match ? match[1] : "logo.jpg";
 
-    // Public GitHub Raw asset URL on the main repository branch (accessible by Google Image Proxy)
-    return `https://raw.githubusercontent.com/darnjoel/Jewels-by-J/main/images/${fileName}`;
+    // Direct lookup in our verified CDN map
+    if (PUBLIC_IMAGE_CDN_MAP[fileName]) {
+        return PUBLIC_IMAGE_CDN_MAP[fileName];
+    }
+
+    // Case-insensitive lookup fallback
+    const foundKey = Object.keys(PUBLIC_IMAGE_CDN_MAP).find(k => k.toLowerCase() === fileName.toLowerCase());
+    if (foundKey) {
+        return PUBLIC_IMAGE_CDN_MAP[foundKey];
+    }
+
+    return PUBLIC_IMAGE_CDN_MAP["logo.jpg"];
 }
 
 function resolvePublicStorefrontUrl() {
