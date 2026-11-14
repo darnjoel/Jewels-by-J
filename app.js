@@ -6622,6 +6622,13 @@ function renderAdminBroadcast() {
     const bcTplInput = document.getElementById("broadcastTemplateIdInput");
     if (bcTplInput) bcTplInput.value = storeSettings.emailjsBroadcastTemplateId || "";
 
+    // Initialize broadcast image URL input
+    const customUrlInput = document.getElementById("broadcastCustomImageUrl");
+    const cardImg = document.getElementById("prevCardImg");
+    if (customUrlInput && cardImg && (!customUrlInput.value || customUrlInput.value.includes("localhost") || customUrlInput.value.includes("file:"))) {
+        customUrlInput.value = resolvePublicImageUrl(cardImg.getAttribute("src") || cardImg.src || "images/logo.jpg");
+    }
+
     updateBroadcastPreview();
     initPreviewPanViewport();
 }
@@ -6714,9 +6721,12 @@ function onBroadcastProductSelect(productId) {
     const bodyInput = document.getElementById("broadcastMessageBody");
     const ctaInput = document.getElementById("broadcastCtaText");
     const cardImg = document.getElementById("prevCardImg");
+    const customUrlInput = document.getElementById("broadcastCustomImageUrl");
 
     if (productId === "studio-logo") {
-        if (cardImg) cardImg.src = "images/logo.jpg";
+        const logoUrl = resolvePublicImageUrl("images/logo.jpg");
+        if (cardImg) cardImg.src = logoUrl;
+        if (customUrlInput) customUrlInput.value = logoUrl;
         if (subjInput && (!subjInput.value || subjInput.value.includes("is here."))) {
             subjInput.value = "Welcome to Jewels by J. Made by hand in Ghana.";
         }
@@ -6734,12 +6744,23 @@ function onBroadcastProductSelect(productId) {
     const p = storeProducts.find(item => item.id === productId);
     if (!p) return;
 
+    const pImg = p.img || p.image || "images/hand.jpg";
+    const resolvedUrl = resolvePublicImageUrl(pImg);
+
     if (subjInput) subjInput.value = `The new ${p.title} is here.`;
     if (snipInput) snipInput.value = `Meet ${p.title}. Handcrafted in Ghana. ${p.metal || '18k Gold & Sterling Silver'}.`;
     if (bodyInput) bodyInput.value = p.desc || p.description || `Handcrafted with meticulous care in our Accra studio. Now available in limited quantities.`;
-    if (cardImg && p.img) cardImg.src = p.img;
+    if (cardImg) cardImg.src = resolvedUrl;
+    if (customUrlInput) customUrlInput.value = resolvedUrl;
 
     updateBroadcastPreview();
+}
+
+function onBroadcastCustomImageUrl(url) {
+    const cardImg = document.getElementById("prevCardImg");
+    if (cardImg && url && url.trim()) {
+        cardImg.src = url.trim();
+    }
 }
 
 function applyBroadcastPreset(presetKey) {
@@ -6748,31 +6769,40 @@ function applyBroadcastPreset(presetKey) {
     const bodyInput = document.getElementById("broadcastMessageBody");
     const ctaInput = document.getElementById("broadcastCtaText");
     const cardImg = document.getElementById("prevCardImg");
+    const customUrlInput = document.getElementById("broadcastCustomImageUrl");
 
     if (presetKey === "newArrival") {
+        const imgUrl = resolvePublicImageUrl("images/B1.jpg");
         if (subjInput) subjInput.value = "The new Royal Crown Cuban is here.";
         if (snipInput) snipInput.value = "Meet the new Royal Crown Cuban. Stunning heavy 18k gold vermeil, handcrafted in Ghana.";
         if (bodyInput) bodyInput.value = "Our newest statement chain has just arrived from our Accra studio. Hand-finished with radiant 18k gold vermeil and heavyweight links for timeless elegance.";
         if (ctaInput) ctaInput.value = "Order yours";
-        if (cardImg) cardImg.src = "images/B1.jpg";
+        if (cardImg) cardImg.src = imgUrl;
+        if (customUrlInput) customUrlInput.value = imgUrl;
     } else if (presetKey === "seasonalDrop") {
+        const imgUrl = resolvePublicImageUrl("images/jerrilyn.jpg");
         if (subjInput) subjInput.value = "The Holiday Radiance Collection is here.";
         if (snipInput) snipInput.value = "Exclusive seasonal drop — limited handcrafted initial pendants & nameplates.";
         if (bodyInput) bodyInput.value = "Our most anticipated seasonal drop is officially open for VIP members. Each piece is shaped by hand in Accra and delivered in luxury velvet keepsake boxes.";
         if (ctaInput) ctaInput.value = "Explore the Drop";
-        if (cardImg) cardImg.src = "images/jerrilyn.jpg";
+        if (cardImg) cardImg.src = imgUrl;
+        if (customUrlInput) customUrlInput.value = imgUrl;
     } else if (presetKey === "stylingTips") {
+        const imgUrl = resolvePublicImageUrl("images/hand.jpg");
         if (subjInput) subjInput.value = "How to style your signature cursive nameplate.";
         if (snipInput) snipInput.value = "Studio styling guide from Jerrilyn — chain lengths, metal pairings & stacking rules.";
         if (bodyInput) bodyInput.value = "Learn how to layer fine cursive nameplates with rope and Cuban chains for an effortless, regal everyday look. Curated styling advice direct from Jerrilyn Mensah.";
         if (ctaInput) ctaInput.value = "View Styling Guide";
-        if (cardImg) cardImg.src = "images/hand.jpg";
+        if (cardImg) cardImg.src = imgUrl;
+        if (customUrlInput) customUrlInput.value = imgUrl;
     } else if (presetKey === "welcome") {
+        const imgUrl = resolvePublicImageUrl("images/logo.jpg");
         if (subjInput) subjInput.value = "Welcome to Jewels by J. Made by hand in Ghana.";
         if (snipInput) snipInput.value = "Your name. Your style. Made by hand in Ghana. Explore exclusive seasonal drops and styling inspirations.";
         if (bodyInput) bodyInput.value = "Welcome to our inner family! As a registered VIP member, you will receive first-access alerts for exclusive seasonal drops, new arrival notifications, and studio styling inspirations.";
         if (ctaInput) ctaInput.value = "Discover the Collection";
-        if (cardImg) cardImg.src = "images/logo.jpg";
+        if (cardImg) cardImg.src = imgUrl;
+        if (customUrlInput) customUrlInput.value = imgUrl;
         const prodSelect = document.getElementById("broadcastProductSelect");
         if (prodSelect) prodSelect.value = "studio-logo";
     }
@@ -6801,10 +6831,17 @@ function updateBroadcastPreview() {
     const cardSub = document.getElementById("prevCardSubtitle");
     const cardBody = document.getElementById("prevCardBody");
     const cardCta = document.getElementById("prevCardCtaBtn");
+    const cardImg = document.getElementById("prevCardImg");
+    const customUrlInput = document.getElementById("broadcastCustomImageUrl");
+
     if (cardHead) cardHead.textContent = subject;
     if (cardSub) cardSub.textContent = snippet;
     if (cardBody) cardBody.textContent = message;
     if (cardCta) cardCta.textContent = ctaText;
+
+    if (customUrlInput && cardImg && (!customUrlInput.value || customUrlInput.value.includes("localhost") || customUrlInput.value.includes("file:"))) {
+        customUrlInput.value = resolvePublicImageUrl(cardImg.getAttribute("src") || cardImg.src || "images/logo.jpg");
+    }
 }
 
 // ── 2D Drag-To-Pan Viewport Initialization ─────────────────────────────────
@@ -6933,25 +6970,33 @@ function saveBroadcastTemplateId(id) {
 }
 
 // ── Public Asset URL Resolvers for Email Clients ───────────────────────────
-// Gmail and external mail servers require public https:// URLs.
-// When testing from local file (file://) or localhost, fallback to GitHub CDN.
+// Gmail, Apple Mail, and Outlook require absolute public https:// URLs.
+// Local files (file://), localhost, 127.0.0.1, or private IPs must be converted
+// to the official public GitHub repository asset URL so image proxies can fetch them.
 function resolvePublicImageUrl(src) {
-    if (!src) return "https://raw.githubusercontent.com/darnjoel/Jewels-by-J/main/images/hand.jpg";
-    if (src.startsWith("http://") || src.startsWith("https://")) return src;
+    if (!src) return "https://raw.githubusercontent.com/darnjoel/Jewels-by-J/main/images/logo.jpg";
 
-    const cleanPath = src.replace(/^\.?\//, "");
+    const s = String(src).trim();
 
-    // If running on a live web server (custom domain or GitHub Pages), use origin
-    const isLiveHosted = window.location.protocol.startsWith("http") &&
-                         !window.location.hostname.includes("localhost") &&
-                         !window.location.hostname.includes("127.0.0.1");
+    // Check if it's already an absolute public external URL (e.g. Cloudinary, Imgur, or external CDN)
+    // AND NOT a local or private address
+    const isLocalOrPrivate = s.startsWith("file:") ||
+                             s.includes("localhost") ||
+                             s.includes("127.0.0.1") ||
+                             s.includes("192.168.") ||
+                             s.includes("10.0.") ||
+                             s.includes("0.0.0.0");
 
-    if (isLiveHosted) {
-        return `${window.location.origin}/${cleanPath}`;
+    if ((s.startsWith("http://") || s.startsWith("https://")) && !isLocalOrPrivate) {
+        return s;
     }
 
-    // Default to public GitHub CDN raw repository asset
-    return `https://raw.githubusercontent.com/darnjoel/Jewels-by-J/main/${cleanPath}`;
+    // Extract the image filename (e.g. "logo.jpg", "moesha.jpg", "hand.jpg")
+    const match = s.match(/([a-zA-Z0-9_\-]+\.(?:jpg|jpeg|png|webp|gif|svg))/i);
+    const fileName = match ? match[1] : "logo.jpg";
+
+    // Public GitHub Raw asset URL on the main repository branch (accessible by Google Image Proxy)
+    return `https://raw.githubusercontent.com/darnjoel/Jewels-by-J/main/images/${fileName}`;
 }
 
 function resolvePublicStorefrontUrl() {
@@ -6979,7 +7024,9 @@ async function sendBroadcastToAllSubscribers() {
     const ctaText = document.getElementById("broadcastCtaText")?.value || "Order yours";
 
     const cardImg = document.getElementById("prevCardImg");
-    const rawImgSrc = cardImg?.getAttribute("src") || cardImg?.src || "images/hand.jpg";
+    const customUrlInput = document.getElementById("broadcastCustomImageUrl");
+    const customUrl = customUrlInput?.value?.trim();
+    const rawImgSrc = customUrl || cardImg?.getAttribute("src") || cardImg?.src || "images/logo.jpg";
     const fullImgUrl = resolvePublicImageUrl(rawImgSrc);
     const storefrontUrl = resolvePublicStorefrontUrl();
 
@@ -7072,7 +7119,9 @@ async function sendTestBroadcastToAdmin() {
     const ctaText = document.getElementById("broadcastCtaText")?.value || "Order yours";
 
     const cardImg = document.getElementById("prevCardImg");
-    const rawImgSrc = cardImg?.getAttribute("src") || cardImg?.src || "images/hand.jpg";
+    const customUrlInput = document.getElementById("broadcastCustomImageUrl");
+    const customUrl = customUrlInput?.value?.trim();
+    const rawImgSrc = customUrl || cardImg?.getAttribute("src") || cardImg?.src || "images/logo.jpg";
     const fullImgUrl = resolvePublicImageUrl(rawImgSrc);
     const storefrontUrl = resolvePublicStorefrontUrl();
 
@@ -7175,6 +7224,7 @@ window.getAllSubscribers = getAllSubscribers;
 window.updateBroadcastPreview = updateBroadcastPreview;
 window.applyBroadcastPreset = applyBroadcastPreset;
 window.onBroadcastProductSelect = onBroadcastProductSelect;
+window.onBroadcastCustomImageUrl = onBroadcastCustomImageUrl;
 window.resolvePublicImageUrl = resolvePublicImageUrl;
 window.resolvePublicStorefrontUrl = resolvePublicStorefrontUrl;
 window.sendBroadcastToAllSubscribers = sendBroadcastToAllSubscribers;

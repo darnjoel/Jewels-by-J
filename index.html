@@ -2356,12 +2356,18 @@
                                     <!-- Featured Image / Brand Highlight Selection -->
                                     <div class="form-field" style="margin-bottom:12px;">
                                         <label style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); display:block; margin-bottom:4px;">
-                                            Featured Image / Product Highlight (Optional):
+                                            Featured Image / Product Highlight:
                                         </label>
-                                        <select id="broadcastProductSelect" class="shop-select" style="width:100%; padding:8px 12px; font-size:0.85rem;" onchange="onBroadcastProductSelect(this.value)">
+                                        <select id="broadcastProductSelect" class="shop-select" style="width:100%; padding:8px 12px; font-size:0.85rem; margin-bottom:6px;" onchange="onBroadcastProductSelect(this.value)">
                                             <option value="">-- Choose an Image or Product (Optional) --</option>
-                                            <option value="studio-logo">✨ Jewels by J Official Brand Logo (Welcome &amp; Brand Alerts)</option>
+                                            <option value="studio-logo" selected>✨ Jewels by J Official Brand Logo (Welcome &amp; Brand Alerts)</option>
                                         </select>
+                                        <div style="display:flex; gap:6px; align-items:center;">
+                                            <input type="text" id="broadcastCustomImageUrl" placeholder="Public Image URL (https://...)" class="customizer-input-field" style="padding:6px 10px; font-size:0.78rem; flex:1;" oninput="onBroadcastCustomImageUrl(this.value)">
+                                            <span style="font-size:0.72rem; color:var(--color-gold); font-weight:600; white-space:nowrap;" title="Guaranteed public image delivery for Gmail, Apple Mail, and Outlook">
+                                                <i class="fa-solid fa-cloud-arrow-up"></i> Public CDN
+                                            </span>
+                                        </div>
                                     </div>
 
                                     <!-- Message Body -->
