@@ -3390,7 +3390,45 @@ body.modal-open {
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FEATURE 1 & NAVIGATION: HEADER DESKTOP LINKS & ADMIN TRIGGER
+   Privileged Admin Controls: Hidden by default for guests & customers.
+   Only displayed when Administrator (mensahjerrilyn@gmail.com) is logged in.
    ═══════════════════════════════════════════════════════════════════════════ */
+.admin-only,
+#navAdminTrigger,
+#desktopNavLinks,
+#desktopAdminNavLink,
+#footerAdminLink,
+#drawerAdminItem,
+#accountAdminBtn {
+    display: none !important;
+}
+
+body.is-admin .admin-only,
+body.is-admin #navAdminTrigger,
+body.is-admin #desktopAdminNavLink,
+body.is-admin #accountAdminBtn {
+    display: inline-flex !important;
+}
+
+body.is-admin #desktopNavLinks {
+    display: flex !important;
+}
+
+@media (max-width: 960px) {
+    body.is-admin #desktopNavLinks,
+    body.is-admin #desktopAdminNavLink {
+        display: none !important;
+    }
+}
+
+body.is-admin #footerAdminLink {
+    display: list-item !important;
+}
+
+body.is-admin #drawerAdminItem {
+    display: block !important;
+}
+
 .admin-quick-btn {
     color: var(--color-gold) !important;
     position: relative;

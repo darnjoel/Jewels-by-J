@@ -491,9 +491,8 @@ if (!storeSettings) {
     };
     localStorage.setItem("j_settings", JSON.stringify(storeSettings));
 } else {
-    if (storeSettings.adminPIN === "1234") {
-        storeSettings.adminPIN = "2023";
-    }
+    // Always guarantee admin PIN is 2023
+    storeSettings.adminPIN = "2023";
     if (storeSettings.paystackPublicKey === undefined) storeSettings.paystackPublicKey = "";
     if (!storeSettings.whatsappNumber || storeSettings.whatsappNumber === "233500594879") {
         storeSettings.whatsappNumber = "233593252913";
@@ -568,7 +567,8 @@ if (!registeredUsers || !Array.isArray(registeredUsers) || registeredUsers.lengt
             name: "Jerrilyn Mensah",
             email: "mensahjerrilyn@gmail.com",
             phone: "+233 59 325 2913",
-            passwordHash: "jerrilyn2026",
+            passwordHash: "2023",
+            role: "admin",
             createdAt: "2026-10-01 09:00"
         },
         {
@@ -577,11 +577,28 @@ if (!registeredUsers || !Array.isArray(registeredUsers) || registeredUsers.lengt
             email: "ama@example.com",
             phone: "+233 54 123 4567",
             passwordHash: "password123",
+            role: "customer",
             createdAt: "2026-10-15 14:30"
         }
     ];
-    localStorage.setItem("j_users_db", JSON.stringify(registeredUsers));
 }
+// Guarantee admin account mensahjerrilyn@gmail.com is present with PIN/password 2023 and role admin
+const adminUserIndex = registeredUsers.findIndex(u => u.email && u.email.toLowerCase() === "mensahjerrilyn@gmail.com");
+if (adminUserIndex >= 0) {
+    registeredUsers[adminUserIndex].passwordHash = "2023";
+    registeredUsers[adminUserIndex].role = "admin";
+} else {
+    registeredUsers.unshift({
+        uid: "usr_admin_001",
+        name: "Jerrilyn Mensah",
+        email: "mensahjerrilyn@gmail.com",
+        phone: "+233 59 325 2913",
+        passwordHash: "2023",
+        role: "admin",
+        createdAt: "2026-10-01 09:00"
+    });
+}
+localStorage.setItem("j_users_db", JSON.stringify(registeredUsers));
 
 // Firebase Global References
 let firebaseApp = null;
@@ -596,6 +613,15 @@ let searchQuery = "";
 let cart = JSON.parse(localStorage.getItem("j_cart") || "[]");
 let wishlist = JSON.parse(localStorage.getItem("j_wishlist") || "[]");
 let currentUser = JSON.parse(localStorage.getItem("j_user") || "null");
+if (currentUser && currentUser.email && currentUser.email.toLowerCase() === "mensahjerrilyn@gmail.com") {
+    currentUser.role = "admin";
+}
+
+function isAdminUser() {
+    if (!currentUser || !currentUser.email) return false;
+    const cleanEmail = currentUser.email.trim().toLowerCase();
+    return cleanEmail === "mensahjerrilyn@gmail.com" || currentUser.role === "admin";
+}
 let quickViewProduct = null;
 let quickViewSelectedOption = null;
 let quickViewQuantity = 1;
@@ -663,6 +689,18 @@ document.addEventListener("DOMContentLoaded", () => {
     setReviewRating(5);
     updateCartUI();
     updateWishlistUI();
+    if (isAdminUser()) {
+        document.body.classList.add("is-admin");
+        isAdminAuthenticated = true;
+        unlockAdminDashboard(false);
+    } else {
+        document.body.classList.remove("is-admin");
+        isAdminAuthenticated = false;
+        const gate = document.getElementById("adminAuthGate");
+        const dash = document.getElementById("adminDashboardView");
+        if (gate) gate.style.display = "block";
+        if (dash) dash.style.display = "none";
+    }
     updateAuthUI();
     updateAdminNotificationBadge();
 
@@ -977,6 +1015,15 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
 // SPA NAVIGATION
 // ═══════════════════════════════════════════════════════════════════════════
 function navigateTo(sectionId) {
+    if (sectionId === "admin") {
+        if (!isAdminUser()) {
+            showToast("Admin Sign In Required", "Please sign in with administrator credentials (mensahjerrilyn@gmail.com) to access the Admin Portal.");
+            openAuthModal("login");
+            return;
+        }
+        unlockAdminDashboard(false);
+    }
+
     const sections = document.querySelectorAll(".page-section");
     sections.forEach(sec => sec.classList.remove("active"));
 
@@ -2596,7 +2643,8 @@ function getRegisteredUsers() {
                 name: "Jerrilyn Mensah",
                 email: "mensahjerrilyn@gmail.com",
                 phone: "+233 59 325 2913",
-                passwordHash: "jerrilyn2026",
+                passwordHash: "2023",
+                role: "admin",
                 createdAt: "2026-10-01 09:00"
             },
             {
@@ -2605,11 +2653,27 @@ function getRegisteredUsers() {
                 email: "ama@example.com",
                 phone: "+233 54 123 4567",
                 passwordHash: "password123",
+                role: "customer",
                 createdAt: "2026-10-15 14:30"
             }
         ];
-        localStorage.setItem("j_users_db", JSON.stringify(users));
     }
+    const adminIdx = users.findIndex(u => u.email && u.email.toLowerCase() === "mensahjerrilyn@gmail.com");
+    if (adminIdx >= 0) {
+        users[adminIdx].passwordHash = "2023";
+        users[adminIdx].role = "admin";
+    } else {
+        users.unshift({
+            uid: "usr_admin_001",
+            name: "Jerrilyn Mensah",
+            email: "mensahjerrilyn@gmail.com",
+            phone: "+233 59 325 2913",
+            passwordHash: "2023",
+            role: "admin",
+            createdAt: "2026-10-01 09:00"
+        });
+    }
+    localStorage.setItem("j_users_db", JSON.stringify(users));
     return users;
 }
 
@@ -2643,7 +2707,17 @@ function hashPasswordSimple(pwd) {
 
 function verifyUserPassword(user, enteredPassword) {
     if (!user || !enteredPassword) return false;
-    return (user.passwordHash === enteredPassword) ||
+    const cleanEmail = (user.email || "").trim().toLowerCase();
+    const entered = (enteredPassword || "").trim();
+    if (cleanEmail === "mensahjerrilyn@gmail.com") {
+        const storePin = (storeSettings && storeSettings.adminPIN) || "2023";
+        if (entered === "2023" || entered === storePin || entered === "jerrilyn2026") {
+            return true;
+        }
+    }
+    return (user.passwordHash === entered) ||
+        (user.passwordHash === hashPasswordSimple(entered)) ||
+        (user.passwordHash === enteredPassword) ||
         (user.passwordHash === hashPasswordSimple(enteredPassword));
 }
 
@@ -2852,17 +2926,27 @@ function initAuthSystem() {
                     firebaseAuth.signInWithEmailAndPassword(email, password).catch(() => { });
                 }
 
+                const isAdmin = (user.email.toLowerCase() === "mensahjerrilyn@gmail.com") || (user.role === "admin");
                 currentUser = {
                     uid: user.uid,
                     name: user.name,
                     email: user.email,
-                    phone: user.phone || "+233 59 325 2913"
+                    phone: user.phone || "+233 59 325 2913",
+                    role: isAdmin ? "admin" : (user.role || "customer")
                 };
 
                 localStorage.setItem("j_user", JSON.stringify(currentUser));
+                if (isAdmin) {
+                    isAdminAuthenticated = true;
+                    unlockAdminDashboard(false);
+                }
                 updateAuthUI();
                 const hadContactDraft = restoreContactDraftIfExists();
-                showToast("Welcome Back!", `Signed in successfully as ${currentUser.name}.`);
+                if (isAdmin) {
+                    showToast("Welcome Admin Jerrilyn!", "Signed in successfully. Admin Portal is now unlocked at the top.");
+                } else {
+                    showToast("Welcome Back!", `Signed in successfully as ${currentUser.name}.`);
+                }
 
                 setTimeout(() => {
                     closeAuthModal();
@@ -2928,9 +3012,10 @@ function initAuthSystem() {
                 return;
             }
 
-            if (!password || password.length < 6) {
+            const isSigningUpAsAdmin = (email && email.toLowerCase() === "mensahjerrilyn@gmail.com");
+            if (!password || (!isSigningUpAsAdmin && password.length < 6) || (isSigningUpAsAdmin && password.length < 4)) {
                 if (passWrap) passWrap.classList.add("has-error");
-                showAuthFeedback("signupFeedbackBox", "error", "Weak Password", "Password must be at least 6 characters long.");
+                showAuthFeedback("signupFeedbackBox", "error", "Password / PIN Required", isSigningUpAsAdmin ? "Please enter your 4-digit PIN (2023) or security password." : "Password must be at least 6 characters long.");
                 triggerCardShake();
                 passInput?.focus();
                 return;
@@ -2970,7 +3055,8 @@ function initAuthSystem() {
                 name: name,
                 phone: phone,
                 email: email.toLowerCase(),
-                passwordHash: hashPasswordSimple(password),
+                passwordHash: isSigningUpAsAdmin ? "2023" : hashPasswordSimple(password),
+                role: isSigningUpAsAdmin ? "admin" : "customer",
                 createdAt: new Date().toISOString()
             };
 
@@ -3034,13 +3120,22 @@ function initAuthSystem() {
                     uid: newUser.uid,
                     name: newUser.name,
                     phone: newUser.phone,
-                    email: newUser.email
+                    email: newUser.email,
+                    role: newUser.role || "customer"
                 };
 
                 localStorage.setItem("j_user", JSON.stringify(currentUser));
+                if (isSigningUpAsAdmin) {
+                    isAdminAuthenticated = true;
+                    unlockAdminDashboard(false);
+                }
                 updateAuthUI();
                 const hadContactDraft = restoreContactDraftIfExists();
-                showToast("Account Created!", `Welcome to Jewels by J, ${newUser.name}!`);
+                if (isSigningUpAsAdmin) {
+                    showToast("Account Created!", `Welcome Admin Jerrilyn! Admin Portal unlocked at the top.`);
+                } else {
+                    showToast("Account Created!", `Welcome to Jewels by J, ${newUser.name}!`);
+                }
 
                 setTimeout(() => {
                     closeAuthModal();
@@ -3156,11 +3251,18 @@ function handleForgotPassword() {
 function handleLogout() {
     currentUser = null;
     localStorage.removeItem("j_user");
+    lockAdminDashboard();
     if (isFirebaseReady && firebaseAuth) {
         firebaseAuth.signOut().catch(() => { });
     }
     updateAuthUI();
     closeAuthModal();
+
+    // If currently viewing admin section, safely redirect to home
+    const adminSection = document.getElementById("section-admin");
+    if (adminSection && adminSection.classList.contains("active")) {
+        navigateTo("home");
+    }
     showToast("Signed Out", "You have been securely signed out.");
 }
 
@@ -3177,6 +3279,37 @@ function updateAuthUI() {
     const accountPhone = document.getElementById("accountUserPhone");
     const accountOrders = document.getElementById("accountOrdersSummary");
 
+    const isAdmin = isAdminUser();
+
+    // Toggle body class so CSS rules apply immediately
+    document.body.classList.toggle("is-admin", isAdmin);
+
+    // Sync admin triggers
+    const navAdminTrigger = document.getElementById("navAdminTrigger");
+    const desktopNavLinks = document.getElementById("desktopNavLinks");
+    const desktopAdminNavLink = document.getElementById("desktopAdminNavLink");
+    const footerAdminLink = document.getElementById("footerAdminLink");
+    const drawerAdminItem = document.getElementById("drawerAdminItem");
+    const accountAdminBtn = document.getElementById("accountAdminBtn");
+
+    if (isAdmin) {
+        if (navAdminTrigger) navAdminTrigger.style.display = "inline-flex";
+        if (desktopNavLinks) desktopNavLinks.style.display = "";
+        if (desktopAdminNavLink) desktopAdminNavLink.style.display = "inline-flex";
+        if (footerAdminLink) footerAdminLink.style.display = "list-item";
+        if (drawerAdminItem) drawerAdminItem.style.display = "block";
+        if (accountAdminBtn) accountAdminBtn.style.display = "inline-flex";
+        isAdminAuthenticated = true;
+    } else {
+        if (navAdminTrigger) navAdminTrigger.style.display = "none";
+        if (desktopNavLinks) desktopNavLinks.style.display = "none";
+        if (desktopAdminNavLink) desktopAdminNavLink.style.display = "none";
+        if (footerAdminLink) footerAdminLink.style.display = "none";
+        if (drawerAdminItem) drawerAdminItem.style.display = "none";
+        if (accountAdminBtn) accountAdminBtn.style.display = "none";
+        isAdminAuthenticated = false;
+    }
+
     if (currentUser) {
         const firstName = currentUser.name.split(" ")[0];
         const initial = currentUser.name.charAt(0).toUpperCase();
@@ -3184,28 +3317,31 @@ function updateAuthUI() {
         // Update header button
         if (navAuthBtn) {
             navAuthBtn.classList.add("is-logged-in");
-            navAuthBtn.innerHTML = `<i class="fa-solid fa-circle-user"></i> <span class="auth-label">${escapeHTML(firstName)}</span>`;
+            navAuthBtn.innerHTML = `<i class="fa-solid fa-circle-user"></i> <span class="auth-label">${escapeHTML(firstName)}${isAdmin ? ' (Admin)' : ''}</span>`;
         }
 
         // Update mobile drawer account box
         if (drawerAvatar) drawerAvatar.innerHTML = `<span style="font-weight:700;">${initial}</span>`;
         if (drawerText) {
-            drawerText.innerHTML = `<strong>Hi, ${escapeHTML(firstName)}</strong><span>${escapeHTML(currentUser.email)}</span>`;
+            drawerText.innerHTML = `<strong>Hi, ${escapeHTML(firstName)}${isAdmin ? ' (Admin)' : ''}</strong><span>${escapeHTML(currentUser.email)}</span>`;
         }
         if (drawerActions) {
             drawerActions.innerHTML = `
                 <button class="btn btn-outline btn-sm" onclick="closeMobileDrawer(); openAuthModal('account');">My Account</button>
-                <button class="btn btn-primary btn-sm" onclick="handleLogout()">Sign Out</button>
+                ${isAdmin ? '<button class="btn btn-primary btn-sm" onclick="closeMobileDrawer(); navigateTo(\'admin\');"><i class="fa-solid fa-shield-halved"></i> Admin</button>' : ''}
+                <button class="btn btn-outline btn-sm" onclick="handleLogout()">Sign Out</button>
             `;
         }
 
         // Update dashboard modal panel
         if (avatarLetter) avatarLetter.textContent = initial;
-        if (accountName) accountName.textContent = currentUser.name;
+        if (accountName) accountName.textContent = currentUser.name + (isAdmin ? ' (Store Admin)' : '');
         if (accountEmail) accountEmail.textContent = currentUser.email;
         if (accountPhone) accountPhone.textContent = `Ghana • ${currentUser.phone || '+233 59 325 2913'}`;
         if (accountOrders) {
-            accountOrders.textContent = "Your profile is active. Ready to order your signature custom jewelry!";
+            accountOrders.textContent = isAdmin
+                ? "Store Administrator account active. You have full access to orders, products, messages, and settings via the Admin Portal."
+                : "Your profile is active. Ready to order your signature custom jewelry!";
         }
     } else {
         // Guest mode
@@ -5244,8 +5380,19 @@ function handleAdminLoginSubmit(event) {
     const entered = input ? input.value.trim() : adminEnteredPIN;
     const valid = storeSettings.adminPIN || "2023";
 
-    if (entered === valid) {
-        unlockAdminDashboard();
+    if (entered === valid || entered === "2023" || entered === "jerrilyn2026") {
+        if (!currentUser || !isAdminUser()) {
+            currentUser = {
+                uid: "usr_admin_001",
+                name: "Jerrilyn Mensah",
+                email: "mensahjerrilyn@gmail.com",
+                phone: "+233 59 325 2913",
+                role: "admin"
+            };
+            localStorage.setItem("j_user", JSON.stringify(currentUser));
+            updateAuthUI();
+        }
+        unlockAdminDashboard(true);
         if (input) input.value = "";
         adminEnteredPIN = "";
     } else {
@@ -5331,7 +5478,7 @@ function submitAdminPIN() {
     handleAdminLoginSubmit(null);
 }
 
-function unlockAdminDashboard() {
+function unlockAdminDashboard(showGreeting = true) {
     isAdminAuthenticated = true;
     const gate = document.getElementById("adminAuthGate");
     const dash = document.getElementById("adminDashboardView");
@@ -5342,7 +5489,9 @@ function unlockAdminDashboard() {
     renderAdminProducts();
     renderAdminOrders();
     renderAdminMessages();
-    showToast("Welcome Jerrilyn", "Admin Dashboard unlocked.");
+    if (showGreeting) {
+        showToast("Welcome Jerrilyn", "Admin Dashboard unlocked.");
+    }
 }
 
 function lockAdminDashboard() {
@@ -7036,6 +7185,7 @@ window.initPreviewPanViewport = initPreviewPanViewport;
 window.removeSubscriber = removeSubscriber;
 window.addSubscriberManual = addSubscriberManual;
 window.getUnsubscribedEmails = getUnsubscribedEmails;
+window.isAdminUser = isAdminUser;
 
 // Initialize Preferences Immediately
 applyStoredPreferences();
