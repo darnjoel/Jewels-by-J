@@ -7111,17 +7111,15 @@ async function sendBroadcastToAllSubscribers() {
         if (statusCount) statusCount.textContent = `${pct}% (${i + 1}/${total})`;
         if (progressBar) progressBar.style.width = `${pct}%`;
 
-        // Build elegant Apple-style announcement content
-        const emailContent = `👑 ${subject.toUpperCase()}\n` +
-            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-            `${snippet}\n\n` +
+        // Build elegant Apple-style announcement content (clean text fallback to prevent spam flagging)
+        const emailContent = `${subject}\n\n` +
+            `${snippet ? snippet + '\n\n' : ''}` +
             `${message}\n\n` +
-            `📷 FEATURED PIECE:\n${fullImgUrl}\n\n` +
-            `🛍️ EXPLORE & ORDER DIRECTLY:\n👉 ${storefrontUrl}#shop\n\n` +
-            `💬 CHAT WITH STUDIO ON WHATSAPP:\n👉 https://wa.me/233593252913 (+233 59 325 2913)\n\n` +
-            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+            `Featured Piece: ${fullImgUrl}\n\n` +
+            `Explore & Order: ${storefrontUrl}#shop\n` +
+            `WhatsApp: +233 59 325 2913\n\n` +
             `Jewels by J Studio • Accra, Ghana\n` +
-            `You received this exclusive alert because you are a registered member of the Jewels by J family.`;
+            `You received this email because you are a registered member of the Jewels by J family.`;
 
         try {
             await sendStoreEmail(subject, {
@@ -7185,18 +7183,16 @@ async function sendTestBroadcastToAdmin() {
 
     showToast("Sending Test Alert...", `Dispatching preview to ${adminEmail}`);
 
-    const emailContent = `👑 [VIP PREVIEW] ${subject.toUpperCase()}\n` +
-        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-        `${snippet}\n\n` +
+    const emailContent = `${subject}\n\n` +
+        `${snippet ? snippet + '\n\n' : ''}` +
         `${message}\n\n` +
-        `📷 FEATURED PIECE:\n${fullImgUrl}\n\n` +
-        `🛍️ EXPLORE & ORDER DIRECTLY:\n👉 ${storefrontUrl}#shop\n\n` +
-        `💬 CHAT WITH STUDIO ON WHATSAPP:\n👉 https://wa.me/233593252913 (+233 59 325 2913)\n\n` +
-        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `Featured Piece: ${fullImgUrl}\n\n` +
+        `Explore & Order: ${storefrontUrl}#shop\n` +
+        `WhatsApp: +233 59 325 2913\n\n` +
         `Jewels by J Studio • Accra, Ghana`;
 
     try {
-        await sendStoreEmail(`[VIP Preview] ${subject}`, {
+        await sendStoreEmail(`Preview: ${subject}`, {
             is_broadcast: true,
             to_email: adminEmail,
             recipient: adminEmail,
@@ -7205,7 +7201,7 @@ async function sendTestBroadcastToAdmin() {
             from_name: sender,
             from_email: "mensahjerrilyn@gmail.com",
             reply_to: "mensahjerrilyn@gmail.com",
-            subject: `[VIP Preview] ${subject}`,
+            subject: `Preview: ${subject}`,
             snippet: snippet,
             subtitle: snippet,
             image_url: fullImgUrl,
