@@ -1,4 +1,4 @@
-﻿/* ═══════════════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════════
    JEWELS BY J — E-COMMERCE APPLICATION JAVASCRIPT
    Inspired by The Strand Brand Architecture & Features
    (Email system updated: central sender, activation-safe, auto-reply, spam trap)
@@ -18,7 +18,8 @@ const SITE_CONFIG = {
     // ── EmailJS Dispatch & Reply Gateway (mensahjerrilyn@gmail.com) ──
     emailjs: {
         serviceId: "service_0wy2cgh",
-        templateId: "template_ocw57xp",
+        templateId: "template_ocw57xp", // Client Enquiries & Store Notifications
+        broadcastTemplateId: "template_broadcast", // Promos, Drops & Welcome Subscriptions
         publicKey: "H29CgoFchjgsnL_0S"
     },
     // ── Firebase Database Security & Auth Vault ──
@@ -474,6 +475,7 @@ if (!storeSettings) {
         web3Key: "",
         emailjsServiceId: "service_0wy2cgh",
         emailjsTemplateId: "template_ocw57xp",
+        emailjsBroadcastTemplateId: "template_broadcast",
         emailjsPublicKey: "H29CgoFchjgsnL_0S",
         preferences: {
             theme: "default",
@@ -503,6 +505,7 @@ if (!storeSettings) {
     if (storeSettings.cloudSyncUrl === undefined) storeSettings.cloudSyncUrl = "";
     if (storeSettings.emailjsServiceId === undefined) storeSettings.emailjsServiceId = "service_0wy2cgh";
     if (storeSettings.emailjsTemplateId === undefined) storeSettings.emailjsTemplateId = "template_ocw57xp";
+    if (storeSettings.emailjsBroadcastTemplateId === undefined) storeSettings.emailjsBroadcastTemplateId = "template_broadcast";
     if (!storeSettings.emailjsPublicKey) storeSettings.emailjsPublicKey = "H29CgoFchjgsnL_0S";
     if (!storeSettings.preferences) {
         storeSettings.preferences = {
@@ -835,10 +838,11 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
                     to_name: recipientName,
                     to_email: recipientEmail,
                     recipient_email: recipientEmail,
-                    from_name: clientName,
+                    from_name: fields.from_name || "Jewels by J",
                     user_name: clientName,
                     customer_name: clientName,
                     name: clientName,
+                    client_name: clientName,
                     from_email: clientEmail,
                     user_email: clientEmail,
                     customer_email: clientEmail,
@@ -5144,7 +5148,7 @@ function initAdminPortal() {
     if (setEjService) setEjService.value = storeSettings.emailjsServiceId || "service_0wy2cgh";
     if (setEjTemplate) setEjTemplate.value = storeSettings.emailjsTemplateId || "template_ocw57xp";
     const setEjBcTemplate = document.getElementById("settingEmailjsBroadcastTemplateId");
-    if (setEjBcTemplate) setEjBcTemplate.value = storeSettings.emailjsBroadcastTemplateId || "";
+    if (setEjBcTemplate) setEjBcTemplate.value = storeSettings.emailjsBroadcastTemplateId || SITE_CONFIG.emailjs?.broadcastTemplateId || "template_broadcast";
     if (setEjKey) setEjKey.value = storeSettings.emailjsPublicKey || SITE_CONFIG.emailjs?.publicKey || "H29CgoFchjgsnL_0S";
     if (setPaystack) {
         setPaystack.value = storeSettings.paystackPublicKey || "";
