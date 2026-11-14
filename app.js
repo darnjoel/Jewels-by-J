@@ -19,7 +19,7 @@ const SITE_CONFIG = {
     emailjs: {
         serviceId: "service_0wy2cgh",
         templateId: "template_ocw57xp", // Client Enquiries & Store Notifications
-        broadcastTemplateId: "template_broadcast", // Promos, Drops & Welcome Subscriptions
+        broadcastTemplateId: "template_atxjn5f", // Promos, Drops & Welcome Subscriptions
         publicKey: "H29CgoFchjgsnL_0S"
     },
     // ── Firebase Database Security & Auth Vault ──
@@ -475,7 +475,7 @@ if (!storeSettings) {
         web3Key: "",
         emailjsServiceId: "service_0wy2cgh",
         emailjsTemplateId: "template_ocw57xp",
-        emailjsBroadcastTemplateId: "template_broadcast",
+        emailjsBroadcastTemplateId: "template_atxjn5f",
         emailjsPublicKey: "H29CgoFchjgsnL_0S",
         preferences: {
             theme: "default",
@@ -505,7 +505,9 @@ if (!storeSettings) {
     if (storeSettings.cloudSyncUrl === undefined) storeSettings.cloudSyncUrl = "";
     if (storeSettings.emailjsServiceId === undefined) storeSettings.emailjsServiceId = "service_0wy2cgh";
     if (storeSettings.emailjsTemplateId === undefined) storeSettings.emailjsTemplateId = "template_ocw57xp";
-    if (storeSettings.emailjsBroadcastTemplateId === undefined) storeSettings.emailjsBroadcastTemplateId = "template_broadcast";
+    if (!storeSettings.emailjsBroadcastTemplateId || storeSettings.emailjsBroadcastTemplateId === "template_broadcast") {
+        storeSettings.emailjsBroadcastTemplateId = "template_atxjn5f";
+    }
     if (!storeSettings.emailjsPublicKey) storeSettings.emailjsPublicKey = "H29CgoFchjgsnL_0S";
     if (!storeSettings.preferences) {
         storeSettings.preferences = {
@@ -5148,7 +5150,7 @@ function initAdminPortal() {
     if (setEjService) setEjService.value = storeSettings.emailjsServiceId || "service_0wy2cgh";
     if (setEjTemplate) setEjTemplate.value = storeSettings.emailjsTemplateId || "template_ocw57xp";
     const setEjBcTemplate = document.getElementById("settingEmailjsBroadcastTemplateId");
-    if (setEjBcTemplate) setEjBcTemplate.value = storeSettings.emailjsBroadcastTemplateId || SITE_CONFIG.emailjs?.broadcastTemplateId || "template_broadcast";
+    if (setEjBcTemplate) setEjBcTemplate.value = storeSettings.emailjsBroadcastTemplateId || SITE_CONFIG.emailjs?.broadcastTemplateId || "template_atxjn5f";
     if (setEjKey) setEjKey.value = storeSettings.emailjsPublicKey || SITE_CONFIG.emailjs?.publicKey || "H29CgoFchjgsnL_0S";
     if (setPaystack) {
         setPaystack.value = storeSettings.paystackPublicKey || "";
@@ -6695,11 +6697,9 @@ function copyAppleEmailTemplate() {
     <div style="padding:40px 32px; text-align:center;">
       <h1 style="font-family:Georgia,Cambria,serif; font-size:28px; font-weight:600; line-height:1.25; color:#0f172a; margin:0 0 14px;">{{subject}}</h1>
       <p style="font-size:16px; color:#64748b; line-height:1.6; margin:0 auto 24px; max-width:480px;">{{subtitle}}</p>
-      {{#if image_url}}
-      <div style="margin:0 auto 24px; max-width:340px; border-radius:12px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.08);">
+      <div style="margin:0 auto 24px; max-width:320px; border-radius:12px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.08);">
         <img src="{{image_url}}" alt="Featured Piece" style="width:100%; height:auto; display:block; border:0;" />
       </div>
-      {{/if}}
       <p style="font-size:15px; color:#334155; line-height:1.75; margin:0 auto 28px; max-width:480px; text-align:center; white-space:pre-line;">{{body_text}}</p>
       <div style="margin-bottom:26px;">
         <a href="{{cta_url}}" style="display:inline-block; background:#0f172a; color:#ffffff; font-weight:600; font-size:15px; padding:14px 38px; border-radius:30px; text-decoration:none;">{{cta_text}}</a>
