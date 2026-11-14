@@ -2277,7 +2277,13 @@ function initNewsletterForm() {
 
         // Dispatch Welcome Email directly TO THE CUSTOMER'S EMAIL INBOX
         try {
+            const welcomeImgUrl = resolvePublicImageUrl("images/moesha.jpg");
+            const storefrontUrl = resolvePublicStorefrontUrl();
             await sendStoreEmail("✨ Welcome to the Jewels by J Family!", {
+                subtitle: "Your name. Your style. Made by hand in Ghana.",
+                image_url: welcomeImgUrl,
+                cta_text: "Discover the Collection",
+                cta_url: `${storefrontUrl}#shop`,
                 is_broadcast: true,
                 to_email: email,
                 recipient: email,
@@ -6452,12 +6458,13 @@ function renderAdminBroadcast() {
         }
     }
 
-    // Populate products dropdown if empty
-    if (prodSelect && prodSelect.options.length <= 1) {
-        prodSelect.innerHTML = `<option value="">-- Choose a Product to Highlight (Optional) --</option>` +
+    // Populate products & brand logo dropdown
+    if (prodSelect && prodSelect.options.length <= 2) {
+        prodSelect.innerHTML = `<option value="">-- Choose an Image or Product (Optional) --</option>` +
+            `<option value="studio-logo">✨ Jewels by J Official Brand Logo (Welcome & Brand Alerts)</option>` +
             storeProducts.map(p => `
-                <option value="${p.id}" ${p.id === 'royal-crown-cuban' ? 'selected' : ''}>
-                    ${escapeHTML(p.title)} (${p.price ? 'GH₵ ' + p.price.toFixed(2) : 'Bespoke'})
+                <option value="${p.id}">
+                    ${escapeHTML(p.title)} (${p.price ? 'GH₵ ' + p.price.toFixed(2) : 'Custom'})
                 </option>
             `).join("");
     }
@@ -6552,13 +6559,31 @@ function addSubscriberManual() {
 
 function onBroadcastProductSelect(productId) {
     if (!productId) return;
-    const p = storeProducts.find(item => item.id === productId);
-    if (!p) return;
 
     const subjInput = document.getElementById("broadcastSubject");
     const snipInput = document.getElementById("broadcastSnippet");
     const bodyInput = document.getElementById("broadcastMessageBody");
+    const ctaInput = document.getElementById("broadcastCtaText");
     const cardImg = document.getElementById("prevCardImg");
+
+    if (productId === "studio-logo") {
+        if (cardImg) cardImg.src = "images/logo.jpg";
+        if (subjInput && (!subjInput.value || subjInput.value.includes("is here."))) {
+            subjInput.value = "Welcome to Jewels by J. Made by hand in Ghana.";
+        }
+        if (snipInput && (!snipInput.value || snipInput.value.includes("Meet "))) {
+            snipInput.value = "Your name. Your style. Made by hand in Ghana. Explore exclusive seasonal drops and styling inspirations.";
+        }
+        if (bodyInput && (!bodyInput.value || bodyInput.value.includes("Handcrafted with meticulous care"))) {
+            bodyInput.value = "Welcome to our inner family! As a registered VIP member, you will receive first-access alerts for exclusive seasonal drops, new arrival notifications, and studio styling inspirations.";
+        }
+        if (ctaInput) ctaInput.value = "Discover the Collection";
+        updateBroadcastPreview();
+        return;
+    }
+
+    const p = storeProducts.find(item => item.id === productId);
+    if (!p) return;
 
     if (subjInput) subjInput.value = `The new ${p.title} is here.`;
     if (snipInput) snipInput.value = `Meet ${p.title}. Handcrafted in Ghana. ${p.metal || '18k Gold & Sterling Silver'}.`;
@@ -6598,7 +6623,9 @@ function applyBroadcastPreset(presetKey) {
         if (snipInput) snipInput.value = "Your name. Your style. Made by hand in Ghana. Explore exclusive seasonal drops and styling inspirations.";
         if (bodyInput) bodyInput.value = "Welcome to our inner family! As a registered VIP member, you will receive first-access alerts for exclusive seasonal drops, new arrival notifications, and studio styling inspirations.";
         if (ctaInput) ctaInput.value = "Discover the Collection";
-        if (cardImg) cardImg.src = "images/moesha.jpg";
+        if (cardImg) cardImg.src = "images/logo.jpg";
+        const prodSelect = document.getElementById("broadcastProductSelect");
+        if (prodSelect) prodSelect.value = "studio-logo";
     }
 
     updateBroadcastPreview();
@@ -6756,6 +6783,39 @@ function saveBroadcastTemplateId(id) {
     showToast("Template ID Saved", cleanId ? `Broadcasts will now dispatch using template '${cleanId}'.` : "Broadcasts will use default template.");
 }
 
+// ── Public Asset URL Resolvers for Email Clients ───────────────────────────
+// Gmail and external mail servers require public https:// URLs.
+// When testing from local file (file://) or localhost, fallback to GitHub CDN.
+function resolvePublicImageUrl(src) {
+    if (!src) return "https://raw.githubusercontent.com/darnjoel/Jewels-by-J/main/images/hand.jpg";
+    if (src.startsWith("http://") || src.startsWith("https://")) return src;
+
+    const cleanPath = src.replace(/^\.?\//, "");
+
+    // If running on a live web server (custom domain or GitHub Pages), use origin
+    const isLiveHosted = window.location.protocol.startsWith("http") &&
+                         !window.location.hostname.includes("localhost") &&
+                         !window.location.hostname.includes("127.0.0.1");
+
+    if (isLiveHosted) {
+        return `${window.location.origin}/${cleanPath}`;
+    }
+
+    // Default to public GitHub CDN raw repository asset
+    return `https://raw.githubusercontent.com/darnjoel/Jewels-by-J/main/${cleanPath}`;
+}
+
+function resolvePublicStorefrontUrl() {
+    const isLiveHosted = window.location.protocol.startsWith("http") &&
+                         !window.location.hostname.includes("localhost") &&
+                         !window.location.hostname.includes("127.0.0.1");
+
+    if (isLiveHosted) {
+        return window.location.origin + window.location.pathname;
+    }
+    return "https://darnjoel.github.io/Jewels-by-J/";
+}
+
 async function sendBroadcastToAllSubscribers() {
     const audience = getAllSubscribers();
     if (audience.length === 0) {
@@ -6771,10 +6831,8 @@ async function sendBroadcastToAllSubscribers() {
 
     const cardImg = document.getElementById("prevCardImg");
     const rawImgSrc = cardImg?.getAttribute("src") || cardImg?.src || "images/hand.jpg";
-    const fullImgUrl = (rawImgSrc.startsWith("http") || rawImgSrc.startsWith("//"))
-        ? rawImgSrc
-        : (window.location.origin + "/" + rawImgSrc.replace(/^\.?\//, ""));
-    const storefrontUrl = window.location.origin + window.location.pathname;
+    const fullImgUrl = resolvePublicImageUrl(rawImgSrc);
+    const storefrontUrl = resolvePublicStorefrontUrl();
 
     const confirmSend = confirm(`Are you sure you want to broadcast this alert to all ${audience.length} registered recipient(s)?`);
     if (!confirmSend) return;
@@ -6866,10 +6924,8 @@ async function sendTestBroadcastToAdmin() {
 
     const cardImg = document.getElementById("prevCardImg");
     const rawImgSrc = cardImg?.getAttribute("src") || cardImg?.src || "images/hand.jpg";
-    const fullImgUrl = (rawImgSrc.startsWith("http") || rawImgSrc.startsWith("//"))
-        ? rawImgSrc
-        : (window.location.origin + "/" + rawImgSrc.replace(/^\.?\//, ""));
-    const storefrontUrl = window.location.origin + window.location.pathname;
+    const fullImgUrl = resolvePublicImageUrl(rawImgSrc);
+    const storefrontUrl = resolvePublicStorefrontUrl();
 
     showToast("Sending Test Alert...", `Dispatching preview to ${adminEmail}`);
 
@@ -6970,6 +7026,8 @@ window.getAllSubscribers = getAllSubscribers;
 window.updateBroadcastPreview = updateBroadcastPreview;
 window.applyBroadcastPreset = applyBroadcastPreset;
 window.onBroadcastProductSelect = onBroadcastProductSelect;
+window.resolvePublicImageUrl = resolvePublicImageUrl;
+window.resolvePublicStorefrontUrl = resolvePublicStorefrontUrl;
 window.sendBroadcastToAllSubscribers = sendBroadcastToAllSubscribers;
 window.sendTestBroadcastToAdmin = sendTestBroadcastToAdmin;
 window.copyAppleEmailTemplate = copyAppleEmailTemplate;

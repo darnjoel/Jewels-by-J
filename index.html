@@ -2350,13 +2350,14 @@
                                         <input type="text" id="broadcastSnippet" value="Meet the newest handcrafted chain in 18k gold vermeil. Handcrafted by hand in Ghana." class="customizer-input-field" style="padding:8px 12px; font-size:0.84rem;" oninput="updateBroadcastPreview()">
                                     </div>
 
-                                    <!-- Featured Product Selection -->
+                                    <!-- Featured Image / Brand Highlight Selection -->
                                     <div class="form-field" style="margin-bottom:12px;">
                                         <label style="font-size:0.75rem; font-weight:600; color:var(--color-text-muted); display:block; margin-bottom:4px;">
-                                            Featured Product Highlight (Optional):
+                                            Featured Image / Product Highlight (Optional):
                                         </label>
                                         <select id="broadcastProductSelect" class="shop-select" style="width:100%; padding:8px 12px; font-size:0.85rem;" onchange="onBroadcastProductSelect(this.value)">
-                                            <!-- Populated dynamically via JS -->
+                                            <option value="">-- Choose an Image or Product (Optional) --</option>
+                                            <option value="studio-logo">✨ Jewels by J Official Brand Logo (Welcome &amp; Brand Alerts)</option>
                                         </select>
                                     </div>
 
