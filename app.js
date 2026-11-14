@@ -3015,7 +3015,7 @@ function initAuthSystem() {
             const isSigningUpAsAdmin = (email && email.toLowerCase() === "mensahjerrilyn@gmail.com");
             if (!password || (!isSigningUpAsAdmin && password.length < 6) || (isSigningUpAsAdmin && password.length < 4)) {
                 if (passWrap) passWrap.classList.add("has-error");
-                showAuthFeedback("signupFeedbackBox", "error", "Password / PIN Required", isSigningUpAsAdmin ? "Please enter your 4-digit PIN (2023) or security password." : "Password must be at least 6 characters long.");
+                showAuthFeedback("signupFeedbackBox", "error", "Password / PIN Required", isSigningUpAsAdmin ? "Please enter your 4-digit PIN or security password." : "Password must be at least 6 characters long.");
                 triggerCardShake();
                 passInput?.focus();
                 return;
