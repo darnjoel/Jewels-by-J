@@ -767,6 +767,11 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
                     to_name: recipientName,
                     to_email: recipientEmail,
                     recipient_email: recipientEmail,
+                    to: recipientEmail,
+                    recipient: recipientEmail,
+                    to: recipientEmail,
+                    recipient: recipientEmail,
+                    subscriber_email: recipientEmail,
                     from_name: broadcastSender,
                     user_name: broadcastSender,
                     customer_name: broadcastSender,
@@ -913,9 +918,10 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
     // Timeout guard so the UI never hangs if network/gateway is slow
     const controller = new AbortController();
     const timeoutTimer = setTimeout(() => controller.abort(), 4000);
+    const destinationEmail = fields.to_email || fields.recipient || targetEmail;
 
     try {
-        const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(targetEmail)}`, {
+        const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(destinationEmail)}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -2072,6 +2078,7 @@ function initContactForm() {
         sendStoreEmail(
             "Jewels by J Inquiry",
             {
+                to_email: targetEmail,
                 name: name,
                 email: email, // EmailJS uses this as Reply-To
                 phone: phone || "Not provided",
@@ -2265,6 +2272,7 @@ function initNewsletterForm() {
         // Dispatch Welcome Email directly TO THE CUSTOMER'S EMAIL INBOX
         try {
             await sendStoreEmail("✨ Welcome to the Jewels by J Family!", {
+                is_broadcast: true,
                 to_email: email,
                 recipient: email,
                 to_name: "VIP Family Member",
@@ -2462,6 +2470,7 @@ function handleCustomerReviewSubmit(event) {
     sendStoreEmail(
         "Jewels by J Inquiry",
         {
+            to_email: targetEmail,
             name: `${name} (Review)`,
             email: email,
             phone: "Customer Review",
@@ -4143,6 +4152,7 @@ function sendEmailOrderNotification(order) {
     sendStoreEmail(
         `💎 NEW ORDER #${order.id} — ${order.customerName} (GH₵ ${Number(order.total).toFixed(2)})`,
         {
+            to_email: targetEmail,
             name: order.customerName,
             email: order.customerEmail, // Reply-To
             order_id: order.id,
