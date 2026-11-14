@@ -726,7 +726,7 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
 
     // ── 1. EmailJS Direct Dispatch (mensahjerrilyn@gmail.com) ──
     const ejServiceId = (storeSettings && storeSettings.emailjsServiceId) || SITE_CONFIG.emailjs?.serviceId || "service_0wy2cgh";
-    const ejTemplateId = (storeSettings && storeSettings.emailjsTemplateId) || SITE_CONFIG.emailjs?.templateId || "template_ocw57xp";
+    const ejTemplateId = fields._template_id || (fields.is_broadcast && storeSettings && storeSettings.emailjsBroadcastTemplateId) || (storeSettings && storeSettings.emailjsTemplateId) || SITE_CONFIG.emailjs?.templateId || "template_ocw57xp";
     const ejPublicKey = (storeSettings && storeSettings.emailjsPublicKey) || SITE_CONFIG.emailjs?.publicKey || "";
 
     if (ejServiceId && ejTemplateId && ejPublicKey) {
@@ -755,69 +755,110 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
 
             // Build structured notification body
             let richBody = "";
-            if (fields.message) {
-                richBody = fields.message;
-            } else if (fields.order_id) {
-                richBody = `💎 NEW ORDER #${fields.order_id}\n` +
-                    `──────────────────────────────────────────────\n` +
-                    `• Customer Name:  ${clientName}\n` +
-                    `• Customer Email: ${clientEmail}\n` +
-                    `• Phone / MoMo:   ${clientPhone}\n` +
-                    `• Delivery To:    ${fields.delivery_address || 'Accra'}\n` +
-                    `• Payment Method: ${fields.payment_method || 'Mobile Money'}\n` +
-                    `• Reference:      ${fields.payment_ref || 'CONFIRMED'}\n` +
-                    `• Total Paid:     ${fields.grand_total || fields.total || 'GH₵ 0.00'}\n` +
-                    `──────────────────────────────────────────────\n` +
-                    `Items Ordered:\n${fields.items || 'Custom Jewelry Package'}\n` +
-                    (fields.notes && fields.notes !== "None" ? `\nCustomer Notes:\n${fields.notes}\n` : '') +
-                    `──────────────────────────────────────────────\n` +
-                    `👉 Reply directly to this email to contact ${clientName} (${clientEmail}).`;
-            } else {
-                richBody = `💎 CUSTOM JEWELRY INQUIRY\n` +
-                    `──────────────────────────────────────────────\n` +
-                    `• Client Name:    ${clientName}\n` +
-                    `• Client Email:   ${clientEmail}\n` +
-                    `• Phone / WA:     ${clientPhone}\n` +
-                    `• Interested In:  ${pieceOfInterest}\n` +
-                    `──────────────────────────────────────────────\n` +
-                    `Client Message:\n` +
-                    `"${rawMessage || 'Customer inquiry submitted from store website.'}"\n\n` +
-                    `──────────────────────────────────────────────\n` +
-                    `👉 Click "Reply" in your email to respond directly to ${clientName} (${clientEmail}).`;
-            }
+            let templateParams = {};
 
-            const templateParams = {
-                to_name: recipientName,
-                to_email: recipientEmail,
-                recipient_email: recipientEmail,
-                from_name: clientName,
-                user_name: clientName,
-                customer_name: clientName,
-                name: clientName,
-                from_email: clientEmail,
-                user_email: clientEmail,
-                customer_email: clientEmail,
-                email: isCustomerFacing ? recipientEmail : clientEmail,
-                reply_to: fields.reply_to || (isCustomerFacing ? targetEmail : clientEmail),
-                phone: clientPhone,
-                customer_phone: clientPhone,
-                subject: emailSubject,
-                clean_subject: pieceOfInterest,
-                piece_of_interest: pieceOfInterest,
-                message: richBody,
-                raw_message: rawMessage || (fields.order_id ? richBody : "Customer inquiry submitted from store website."),
-                content: richBody,
-                inquiry_details: richBody,
-                order_id: fields.order_id || "",
-                items: fields.items || "",
-                grand_total: fields.grand_total || "",
-                total: fields.grand_total || "",
-                delivery_address: fields.delivery_address || "",
-                payment_method: fields.payment_method || "",
-                payment_ref: fields.payment_ref || "",
-                notes: fields.notes || "",
-                date: fields.order_date || new Date().toLocaleString()
-            };
+            if (fields.is_broadcast) {
+                // ── VIP Broadcast Announcement Mode ──
+                // Formatted specifically as a brand alert, NEVER as a customer inquiry
+                const broadcastSender = fields.from_name || "Jewels by J";
+                richBody = fields.message || "";
+
+                templateParams = {
+                    to_name: recipientName,
+                    to_email: recipientEmail,
+                    recipient_email: recipientEmail,
+                    from_name: broadcastSender,
+                    user_name: broadcastSender,
+                    customer_name: broadcastSender,
+                    name: `VIP Family Member (${recipientName})`,
+                    from_email: "mensahjerrilyn@gmail.com",
+                    user_email: "mensahjerrilyn@gmail.com",
+                    customer_email: "mensahjerrilyn@gmail.com",
+                    email: recipientEmail,
+                    reply_to: fields.reply_to || "mensahjerrilyn@gmail.com",
+                    phone: "+233 59 325 2913 (Jewels by J Studio WhatsApp)",
+                    customer_phone: "+233 59 325 2913",
+                    subject: emailSubject,
+                    clean_subject: emailSubject,
+                    piece_of_interest: `✨ VIP Drop: ${emailSubject}`,
+                    headline: emailSubject,
+                    subtitle: fields.snippet || fields.subtitle || "",
+                    snippet: fields.snippet || fields.subtitle || "",
+                    image_url: fields.image_url || "",
+                    body_text: fields.message_body || richBody,
+                    cta_text: fields.cta_text || "Order Yours",
+                    cta_url: fields.cta_url || `${window.location.origin}${window.location.pathname}#shop`,
+                    message: richBody,
+                    raw_message: richBody,
+                    content: richBody,
+                    inquiry_details: richBody,
+                    date: new Date().toLocaleString()
+                };
+            } else {
+                if (fields.message) {
+                    richBody = fields.message;
+                } else if (fields.order_id) {
+                    richBody = `💎 NEW ORDER #${fields.order_id}\n` +
+                        `──────────────────────────────────────────────\n` +
+                        `• Customer Name:  ${clientName}\n` +
+                        `• Customer Email: ${clientEmail}\n` +
+                        `• Phone / MoMo:   ${clientPhone}\n` +
+                        `• Delivery To:    ${fields.delivery_address || 'Accra'}\n` +
+                        `• Payment Method: ${fields.payment_method || 'Mobile Money'}\n` +
+                        `• Reference:      ${fields.payment_ref || 'CONFIRMED'}\n` +
+                        `• Total Paid:     ${fields.grand_total || fields.total || 'GH₵ 0.00'}\n` +
+                        `──────────────────────────────────────────────\n` +
+                        `Items Ordered:\n${fields.items || 'Custom Jewelry Package'}\n` +
+                        (fields.notes && fields.notes !== "None" ? `\nCustomer Notes:\n${fields.notes}\n` : '') +
+                        `──────────────────────────────────────────────\n` +
+                        `👉 Reply directly to this email to contact ${clientName} (${clientEmail}).`;
+                } else {
+                    richBody = `💎 CUSTOM JEWELRY INQUIRY\n` +
+                        `──────────────────────────────────────────────\n` +
+                        `• Client Name:    ${clientName}\n` +
+                        `• Client Email:   ${clientEmail}\n` +
+                        `• Phone / WA:     ${clientPhone}\n` +
+                        `• Interested In:  ${pieceOfInterest}\n` +
+                        `──────────────────────────────────────────────\n` +
+                        `Client Message:\n` +
+                        `"${rawMessage || 'Customer inquiry submitted from store website.'}"\n\n` +
+                        `──────────────────────────────────────────────\n` +
+                        `👉 Click "Reply" in your email to respond directly to ${clientName} (${clientEmail}).`;
+                }
+
+                templateParams = {
+                    to_name: recipientName,
+                    to_email: recipientEmail,
+                    recipient_email: recipientEmail,
+                    from_name: clientName,
+                    user_name: clientName,
+                    customer_name: clientName,
+                    name: clientName,
+                    from_email: clientEmail,
+                    user_email: clientEmail,
+                    customer_email: clientEmail,
+                    email: isCustomerFacing ? recipientEmail : clientEmail,
+                    reply_to: fields.reply_to || (isCustomerFacing ? targetEmail : clientEmail),
+                    phone: clientPhone,
+                    customer_phone: clientPhone,
+                    subject: emailSubject,
+                    clean_subject: pieceOfInterest,
+                    piece_of_interest: pieceOfInterest,
+                    message: richBody,
+                    raw_message: rawMessage || (fields.order_id ? richBody : "Customer inquiry submitted from store website."),
+                    content: richBody,
+                    inquiry_details: richBody,
+                    order_id: fields.order_id || "",
+                    items: fields.items || "",
+                    grand_total: fields.grand_total || "",
+                    total: fields.grand_total || "",
+                    delivery_address: fields.delivery_address || "",
+                    payment_method: fields.payment_method || "",
+                    payment_ref: fields.payment_ref || "",
+                    notes: fields.notes || "",
+                    date: fields.order_date || new Date().toLocaleString()
+                };
+            }
 
             // Use EmailJS browser SDK if available, or direct REST API
             if (typeof emailjs !== "undefined" && typeof emailjs.send === "function") {
@@ -5092,6 +5133,8 @@ function initAdminPortal() {
     if (setWeb3) setWeb3.value = storeSettings.web3Key || "";
     if (setEjService) setEjService.value = storeSettings.emailjsServiceId || "service_0wy2cgh";
     if (setEjTemplate) setEjTemplate.value = storeSettings.emailjsTemplateId || "template_ocw57xp";
+    const setEjBcTemplate = document.getElementById("settingEmailjsBroadcastTemplateId");
+    if (setEjBcTemplate) setEjBcTemplate.value = storeSettings.emailjsBroadcastTemplateId || "";
     if (setEjKey) setEjKey.value = storeSettings.emailjsPublicKey || SITE_CONFIG.emailjs?.publicKey || "H29CgoFchjgsnL_0S";
     if (setPaystack) {
         setPaystack.value = storeSettings.paystackPublicKey || "";
@@ -5909,6 +5952,7 @@ function saveAdminSettings(event) {
     // EmailJS (Direct Gmail Dispatch to mensahjerrilyn@gmail.com)
     storeSettings.emailjsServiceId = (document.getElementById("settingEmailjsServiceId")?.value || "").trim() || "service_0wy2cgh";
     storeSettings.emailjsTemplateId = (document.getElementById("settingEmailjsTemplateId")?.value || "").trim() || "template_ocw57xp";
+    storeSettings.emailjsBroadcastTemplateId = (document.getElementById("settingEmailjsBroadcastTemplateId")?.value || "").trim();
     storeSettings.emailjsPublicKey = (document.getElementById("settingEmailjsPublicKey")?.value || "").trim();
 
     // Payment & Cloud Sync settings
@@ -6402,7 +6446,12 @@ function renderAdminBroadcast() {
             `).join("");
     }
 
+    // Populate Broadcast Template ID input if saved
+    const bcTplInput = document.getElementById("broadcastTemplateIdInput");
+    if (bcTplInput) bcTplInput.value = storeSettings.emailjsBroadcastTemplateId || "";
+
     updateBroadcastPreview();
+    initPreviewPanViewport();
 }
 
 function removeSubscriber(email) {
@@ -6566,6 +6615,133 @@ function updateBroadcastPreview() {
     if (cardCta) cardCta.textContent = ctaText;
 }
 
+// ── 2D Drag-To-Pan Viewport Initialization ─────────────────────────────────
+// Allows mouse drag in all 4 directions (left/right, up/down) without visible scrollbars
+function initPreviewPanViewport() {
+    const el = document.getElementById("previewPanViewport");
+    if (!el || el.dataset.panInit) return;
+    el.dataset.panInit = "true";
+
+    let isDown = false;
+    let startX = 0;
+    let startY = 0;
+    let scrollLeft = 0;
+    let scrollTop = 0;
+
+    el.addEventListener("mousedown", (e) => {
+        if (e.button !== 0 || e.target.closest("button, a, input, select, textarea")) return;
+        isDown = true;
+        el.classList.add("is-panning");
+        startX = e.pageX - el.offsetLeft;
+        startY = e.pageY - el.offsetTop;
+        scrollLeft = el.scrollLeft;
+        scrollTop = el.scrollTop;
+    });
+
+    window.addEventListener("mouseup", () => {
+        if (!isDown) return;
+        isDown = false;
+        el.classList.remove("is-panning");
+    });
+
+    el.addEventListener("mouseleave", () => {
+        if (!isDown) return;
+        isDown = false;
+        el.classList.remove("is-panning");
+    });
+
+    el.addEventListener("mousemove", (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - el.offsetLeft;
+        const y = e.pageY - el.offsetTop;
+        const walkX = (x - startX) * 1.3;
+        const walkY = (y - startY) * 1.3;
+        el.scrollLeft = scrollLeft - walkX;
+        el.scrollTop = scrollTop - walkY;
+    });
+}
+
+// ── Apple-Style Template Helper Functions ──────────────────────────────────
+function copyAppleEmailTemplate() {
+    const storefrontUrl = (window.location.origin || "") + (window.location.pathname || "");
+    const htmlTemplate = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{subject}}</title>
+</head>
+<body style="margin:0; padding:0; background:#f8fafc; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <div style="max-width:600px; margin:30px auto; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.06); border:1px solid #e2e8f0;">
+    <div style="background:#0a0a0a; padding:28px 24px; text-align:center;">
+      <div style="font-size:12px; font-weight:800; letter-spacing:4px; color:#c8952c; text-transform:uppercase;">JEWELS BY J</div>
+      <div style="font-size:11px; letter-spacing:1.5px; color:#94a3b8; text-transform:uppercase; margin-top:4px;">A GHANAIAN JEWELRY STUDIO</div>
+    </div>
+    <div style="padding:40px 32px; text-align:center;">
+      <h1 style="font-family:Georgia,Cambria,serif; font-size:28px; font-weight:600; line-height:1.25; color:#0f172a; margin:0 0 14px;">{{subject}}</h1>
+      <p style="font-size:16px; color:#64748b; line-height:1.6; margin:0 auto 24px; max-width:480px;">{{subtitle}}</p>
+      {{#if image_url}}
+      <div style="margin:0 auto 24px; max-width:340px; border-radius:12px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.08);">
+        <img src="{{image_url}}" alt="Featured Piece" style="width:100%; height:auto; display:block; border:0;" />
+      </div>
+      {{/if}}
+      <p style="font-size:15px; color:#334155; line-height:1.75; margin:0 auto 28px; max-width:480px; text-align:center; white-space:pre-line;">{{body_text}}</p>
+      <div style="margin-bottom:26px;">
+        <a href="{{cta_url}}" style="display:inline-block; background:#0f172a; color:#ffffff; font-weight:600; font-size:15px; padding:14px 38px; border-radius:30px; text-decoration:none;">{{cta_text}}</a>
+      </div>
+      <div>
+        <a href="https://wa.me/233593252913" style="display:inline-flex; align-items:center; gap:8px; background:#25D366; color:#ffffff; font-weight:600; font-size:13px; padding:10px 24px; border-radius:24px; text-decoration:none;">
+          💬 Chat with Jerrilyn on WhatsApp
+        </a>
+      </div>
+    </div>
+    <div style="border-top:1px solid #f1f5f9; background:#fafafa; padding:24px 32px; text-align:center; font-size:12px; color:#94a3b8; line-height:1.7;">
+      <strong>Jewels by J Studio</strong> • Accra, Ghana • Tel/WA: +233 59 325 2913<br>
+      You received this exclusive alert because you are registered with the Jewels by J family.
+    </div>
+  </div>
+</body>
+</html>`;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(htmlTemplate).then(() => {
+            showToast("Apple HTML Copied! 📋", "Paste into EmailJS > Email Templates > Source Code (<>) to activate 100% pure Apple layout!");
+        }).catch(() => {
+            _fallbackCopyTemplate(htmlTemplate);
+        });
+    } else {
+        _fallbackCopyTemplate(htmlTemplate);
+    }
+}
+
+function _fallbackCopyTemplate(text) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+        document.execCommand("copy");
+        showToast("Apple HTML Copied! 📋", "Paste into EmailJS > Email Templates > Source Code (<>) to activate 100% pure Apple layout!");
+    } catch(e) {
+        prompt("Copy Apple EmailJS Template HTML:", text);
+    }
+    document.body.removeChild(ta);
+}
+
+function saveBroadcastTemplateId(id) {
+    const cleanId = (id || "").trim();
+    storeSettings.emailjsBroadcastTemplateId = cleanId;
+    localStorage.setItem("j_settings", JSON.stringify(storeSettings));
+    const setField = document.getElementById("settingEmailjsBroadcastTemplateId");
+    if (setField) setField.value = cleanId;
+    const composerField = document.getElementById("broadcastTemplateIdInput");
+    if (composerField) composerField.value = cleanId;
+    showToast("Template ID Saved", cleanId ? `Broadcasts will now dispatch using template '${cleanId}'.` : "Broadcasts will use default template.");
+}
+
 async function sendBroadcastToAllSubscribers() {
     const audience = getAllSubscribers();
     if (audience.length === 0) {
@@ -6578,6 +6754,13 @@ async function sendBroadcastToAllSubscribers() {
     const snippet = document.getElementById("broadcastSnippet")?.value || "";
     const message = document.getElementById("broadcastMessageBody")?.value || "";
     const ctaText = document.getElementById("broadcastCtaText")?.value || "Order yours";
+
+    const cardImg = document.getElementById("prevCardImg");
+    const rawImgSrc = cardImg?.getAttribute("src") || cardImg?.src || "images/hand.jpg";
+    const fullImgUrl = (rawImgSrc.startsWith("http") || rawImgSrc.startsWith("//"))
+        ? rawImgSrc
+        : (window.location.origin + "/" + rawImgSrc.replace(/^\.?\//, ""));
+    const storefrontUrl = window.location.origin + window.location.pathname;
 
     const confirmSend = confirm(`Are you sure you want to broadcast this alert to all ${audience.length} registered recipient(s)?`);
     if (!confirmSend) return;
@@ -6602,21 +6785,21 @@ async function sendBroadcastToAllSubscribers() {
         if (statusCount) statusCount.textContent = `${pct}% (${i + 1}/${total})`;
         if (progressBar) progressBar.style.width = `${pct}%`;
 
-        // Build elegant Apple-style announcement text
-        const emailContent = `✨ ${sender.toUpperCase()} VIP ALERT\n` +
-            `──────────────────────────────────────────────\n` +
-            `${subject}\n` +
-            `──────────────────────────────────────────────\n` +
+        // Build elegant Apple-style announcement content
+        const emailContent = `👑 ${subject.toUpperCase()}\n` +
+            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
             `${snippet}\n\n` +
             `${message}\n\n` +
-            `👉 Explore & Order: ${window.location.origin}${window.location.pathname}#shop\n` +
-            `👉 WhatsApp Studio: +233 59 325 2913\n\n` +
-            `──────────────────────────────────────────────\n` +
+            `📷 FEATURED PIECE:\n${fullImgUrl}\n\n` +
+            `🛍️ EXPLORE & ORDER DIRECTLY:\n👉 ${storefrontUrl}#shop\n\n` +
+            `💬 CHAT WITH STUDIO ON WHATSAPP:\n👉 https://wa.me/233593252913 (+233 59 325 2913)\n\n` +
+            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
             `Jewels by J Studio • Accra, Ghana\n` +
-            `You received this email because you are a registered member of the Jewels by J family.`;
+            `You received this exclusive alert because you are a registered member of the Jewels by J family.`;
 
         try {
             await sendStoreEmail(subject, {
+                is_broadcast: true,
                 to_email: sub.email,
                 recipient: sub.email,
                 to_name: sub.name || "VIP Member",
@@ -6625,6 +6808,12 @@ async function sendBroadcastToAllSubscribers() {
                 from_email: "mensahjerrilyn@gmail.com",
                 reply_to: "mensahjerrilyn@gmail.com",
                 subject: subject,
+                snippet: snippet,
+                subtitle: snippet,
+                image_url: fullImgUrl,
+                message_body: message,
+                cta_text: ctaText,
+                cta_url: `${storefrontUrl}#shop`,
                 message: emailContent
             });
             successCount++;
@@ -6659,33 +6848,47 @@ async function sendTestBroadcastToAdmin() {
     const subject = document.getElementById("broadcastSubject")?.value || "The new piece is here.";
     const snippet = document.getElementById("broadcastSnippet")?.value || "";
     const message = document.getElementById("broadcastMessageBody")?.value || "";
+    const ctaText = document.getElementById("broadcastCtaText")?.value || "Order yours";
+
+    const cardImg = document.getElementById("prevCardImg");
+    const rawImgSrc = cardImg?.getAttribute("src") || cardImg?.src || "images/hand.jpg";
+    const fullImgUrl = (rawImgSrc.startsWith("http") || rawImgSrc.startsWith("//"))
+        ? rawImgSrc
+        : (window.location.origin + "/" + rawImgSrc.replace(/^\.?\//, ""));
+    const storefrontUrl = window.location.origin + window.location.pathname;
 
     showToast("Sending Test Alert...", `Dispatching preview to ${adminEmail}`);
 
-    const emailContent = `✨ [TEST PREVIEW] ${sender.toUpperCase()} VIP ALERT\n` +
-        `──────────────────────────────────────────────\n` +
-        `${subject}\n` +
-        `──────────────────────────────────────────────\n` +
+    const emailContent = `👑 [VIP PREVIEW] ${subject.toUpperCase()}\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
         `${snippet}\n\n` +
         `${message}\n\n` +
-        `👉 Explore & Order: ${window.location.origin}${window.location.pathname}#shop\n` +
-        `👉 WhatsApp Studio: +233 59 325 2913\n\n` +
-        `──────────────────────────────────────────────\n` +
+        `📷 FEATURED PIECE:\n${fullImgUrl}\n\n` +
+        `🛍️ EXPLORE & ORDER DIRECTLY:\n👉 ${storefrontUrl}#shop\n\n` +
+        `💬 CHAT WITH STUDIO ON WHATSAPP:\n👉 https://wa.me/233593252913 (+233 59 325 2913)\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
         `Jewels by J Studio • Accra, Ghana`;
 
     try {
-        await sendStoreEmail(`[Test Preview] ${subject}`, {
+        await sendStoreEmail(`[VIP Preview] ${subject}`, {
+            is_broadcast: true,
             to_email: adminEmail,
             recipient: adminEmail,
-            to_name: "Jerrilyn Mensah (Admin)",
-            name: "Jerrilyn Mensah (Admin)",
+            to_name: "Jerrilyn Mensah (Admin Preview)",
+            name: "Jerrilyn Mensah (Admin Preview)",
             from_name: sender,
             from_email: "mensahjerrilyn@gmail.com",
             reply_to: "mensahjerrilyn@gmail.com",
-            subject: `[Test Preview] ${subject}`,
+            subject: `[VIP Preview] ${subject}`,
+            snippet: snippet,
+            subtitle: snippet,
+            image_url: fullImgUrl,
+            message_body: message,
+            cta_text: ctaText,
+            cta_url: `${storefrontUrl}#shop`,
             message: emailContent
         });
-        showToast("Test Email Delivered!", `Check ${adminEmail} (and Spam/Promotions folder) for the Apple-style alert.`);
+        showToast("Test Email Delivered! ✅", `Check ${adminEmail} (and Promotions/Spam folder) for the VIP Announcement.`);
     } catch (e) {
         showToast("Notice", "Test dispatch completed.");
     }
@@ -6755,6 +6958,9 @@ window.applyBroadcastPreset = applyBroadcastPreset;
 window.onBroadcastProductSelect = onBroadcastProductSelect;
 window.sendBroadcastToAllSubscribers = sendBroadcastToAllSubscribers;
 window.sendTestBroadcastToAdmin = sendTestBroadcastToAdmin;
+window.copyAppleEmailTemplate = copyAppleEmailTemplate;
+window.saveBroadcastTemplateId = saveBroadcastTemplateId;
+window.initPreviewPanViewport = initPreviewPanViewport;
 window.removeSubscriber = removeSubscriber;
 window.addSubscriberManual = addSubscriberManual;
 window.getUnsubscribedEmails = getUnsubscribedEmails;

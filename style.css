@@ -6201,38 +6201,28 @@ html[data-theme="dark"] #broadcastLogList {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   HORIZONTAL SCROLL & OVERFLOW BAR FOR LIVE PREVIEW
+   2D PAN & SCROLL VIEWPORT FOR LIVE PREVIEW
+   Allows seamless free movement left/right and up/down without visible scrollbars
    ═══════════════════════════════════════════════════════════════════════════ */
+.preview-pan-viewport,
 .custom-horizontal-scroll {
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
+    overflow: auto !important;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-gold) #f1f5f9;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    cursor: grab;
+    touch-action: pan-x pan-y;
 }
 
+.preview-pan-viewport::-webkit-scrollbar,
 .custom-horizontal-scroll::-webkit-scrollbar {
-    height: 8px;
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
 }
 
-.custom-horizontal-scroll::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 6px;
-}
-
-.custom-horizontal-scroll::-webkit-scrollbar-thumb {
-    background: var(--color-gold);
-    border-radius: 6px;
-}
-
-.custom-horizontal-scroll::-webkit-scrollbar-thumb:hover {
-    background: var(--color-gold-dark);
-}
-
-html[data-theme="dark"] .custom-horizontal-scroll::-webkit-scrollbar-track {
-    background: #1b1718 !important;
-}
-
-html[data-theme="dark"] .custom-horizontal-scroll::-webkit-scrollbar-thumb {
-    background: #c8952c !important;
+.preview-pan-viewport.is-panning,
+.custom-horizontal-scroll.is-panning {
+    cursor: grabbing !important;
+    user-select: none !important;
 }
