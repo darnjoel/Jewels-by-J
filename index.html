@@ -71,14 +71,7 @@
                 </a>
             </div>
 
-            <!-- Desktop Navigation Links (Admin Portal visible only when Administrator is logged in) -->
-            <nav class="nav-links admin-only" id="desktopNavLinks" aria-label="Main Navigation" style="display:none;">
-                <a href="#admin" class="nav-link admin-only" id="desktopAdminNavLink" data-nav="admin" title="Admin Portal" style="display:none;"><i
-                        class="fa-solid fa-shield-halved" style="color:var(--color-gold); margin-right:4px;"></i>
-                    Admin Portal</a>
-            </nav>
-
-            <!-- Actions (Search, Favorite, Cart, Sign In / Log In, Admin) -->
+            <!-- Actions (Search, Favorite, Cart, Sign In / Log In) -->
             <div class="nav-actions">
                 <!-- 1. Search Button -->
                 <button class="nav-action-btn" id="navSearchTrigger" title="Search Jewelry Catalog"
@@ -100,14 +93,7 @@
                     <span class="badge-count" id="cartBadgeCount" style="display:none;">0</span>
                 </button>
 
-                <!-- 4. Admin Portal Shortcut (Shown only when Administrator mensahjerrilyn@gmail.com logs in) -->
-                <button class="nav-action-btn admin-quick-btn admin-only" id="navAdminTrigger" title="Admin Portal"
-                    aria-label="Admin Portal" onclick="navigateTo('admin')" style="display:none;">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    <span class="admin-notify-dot" id="navAdminNotifyDot"></span>
-                </button>
-
-                <!-- 5. Sign In or Log In Button -->
+                <!-- 4. Sign In or Log In Button -->
                 <button class="nav-auth-btn" id="navAuthBtn" title="Sign In or Log In" aria-label="Sign In or Log In"
                     onclick="openAuthModal()">
                     <i class="fa-regular fa-user"></i>
@@ -182,7 +168,7 @@
             <li><a href="#track" class="drawer-menu-link" data-nav="track"><i class="fa-solid fa-truck-fast"
                         style="margin-right:8px; color:var(--color-gold);"></i> Track Your Order <i
                         class="fa-solid fa-chevron-right"></i></a></li>
-            <li id="drawerAdminItem" class="admin-only" style="display:none;"><a href="#admin" class="drawer-menu-link" data-nav="admin" onclick="closeMobileDrawer(); navigateTo('admin');"><i class="fa-solid fa-shield-halved"
+            <li id="drawerAdminItem"><a href="#admin" class="drawer-menu-link" data-nav="admin" onclick="closeMobileDrawer(); navigateTo('admin');"><i class="fa-solid fa-shield-halved"
                         style="margin-right:8px; color:var(--color-gold);"></i> Admin Portal <i
                         class="fa-solid fa-chevron-right"></i></a></li>
             <li style="height:1px; background:var(--color-border); margin:8px 0;"></li>

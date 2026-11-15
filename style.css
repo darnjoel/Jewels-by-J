@@ -3389,44 +3389,24 @@ body.modal-open {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   FEATURE 1 & NAVIGATION: HEADER DESKTOP LINKS & ADMIN TRIGGER
-   Privileged Admin Controls: Hidden by default for guests & customers.
-   Only displayed when Administrator (mensahjerrilyn@gmail.com) is logged in.
+   FEATURE 1 & NAVIGATION: ADMIN CONTROLS
+   Taken off completely from both customer and admin website header view.
+   Displayed and working inside the hamburger icon (drawer menu).
    ═══════════════════════════════════════════════════════════════════════════ */
-.admin-only,
 #navAdminTrigger,
 #desktopNavLinks,
 #desktopAdminNavLink,
-#footerAdminLink,
-#drawerAdminItem,
-#accountAdminBtn {
+#footerAdminLink {
     display: none !important;
 }
 
-body.is-admin .admin-only,
-body.is-admin #navAdminTrigger,
-body.is-admin #desktopAdminNavLink,
-body.is-admin #accountAdminBtn {
-    display: inline-flex !important;
-}
-
-body.is-admin #desktopNavLinks {
-    display: flex !important;
-}
-
-@media (max-width: 960px) {
-    body.is-admin #desktopNavLinks,
-    body.is-admin #desktopAdminNavLink {
-        display: none !important;
-    }
-}
-
-body.is-admin #footerAdminLink {
-    display: list-item !important;
-}
-
-body.is-admin #drawerAdminItem {
+#drawerAdminItem {
     display: block !important;
+}
+
+body.is-admin #drawerAdminItem a {
+    color: var(--color-gold) !important;
+    font-weight: 600;
 }
 
 .admin-quick-btn {

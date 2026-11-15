@@ -3325,7 +3325,7 @@ function updateAuthUI() {
     // Toggle body class so CSS rules apply immediately
     document.body.classList.toggle("is-admin", isAdmin);
 
-    // Sync admin triggers
+    // Sync admin triggers: taken off from website header view, displayed & working in hamburger icon
     const navAdminTrigger = document.getElementById("navAdminTrigger");
     const desktopNavLinks = document.getElementById("desktopNavLinks");
     const desktopAdminNavLink = document.getElementById("desktopAdminNavLink");
@@ -3333,20 +3333,19 @@ function updateAuthUI() {
     const drawerAdminItem = document.getElementById("drawerAdminItem");
     const accountAdminBtn = document.getElementById("accountAdminBtn");
 
+    // Never display admin buttons on the website header view
+    if (navAdminTrigger) navAdminTrigger.style.display = "none";
+    if (desktopNavLinks) desktopNavLinks.style.display = "none";
+    if (desktopAdminNavLink) desktopAdminNavLink.style.display = "none";
+    if (footerAdminLink) footerAdminLink.style.display = "none";
+
+    // Displayed and active in the hamburger icon
+    if (drawerAdminItem) drawerAdminItem.style.display = "block";
+
     if (isAdmin) {
-        if (navAdminTrigger) navAdminTrigger.style.display = "inline-flex";
-        if (desktopNavLinks) desktopNavLinks.style.display = "";
-        if (desktopAdminNavLink) desktopAdminNavLink.style.display = "inline-flex";
-        if (footerAdminLink) footerAdminLink.style.display = "list-item";
-        if (drawerAdminItem) drawerAdminItem.style.display = "block";
         if (accountAdminBtn) accountAdminBtn.style.display = "inline-flex";
         isAdminAuthenticated = true;
     } else {
-        if (navAdminTrigger) navAdminTrigger.style.display = "none";
-        if (desktopNavLinks) desktopNavLinks.style.display = "none";
-        if (desktopAdminNavLink) desktopAdminNavLink.style.display = "none";
-        if (footerAdminLink) footerAdminLink.style.display = "none";
-        if (drawerAdminItem) drawerAdminItem.style.display = "none";
         if (accountAdminBtn) accountAdminBtn.style.display = "none";
         isAdminAuthenticated = false;
     }
