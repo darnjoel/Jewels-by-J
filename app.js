@@ -801,10 +801,11 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
             let templateParams = {};
 
             if (fields.is_broadcast) {
-                // ── VIP Broadcast Announcement Mode ──
-                // Formatted specifically as a brand alert, NEVER as a customer inquiry
+                // ── Studio Announcement Mode ──
+                // Clean, professional format - no spam triggers
                 const broadcastSender = fields.from_name || "Jewels by J";
-                richBody = fields.message || "";
+                richBody = fields.message_body || fields.message || "";
+                const unsubUrl = `mailto:mensahjerrilyn@gmail.com?subject=Unsubscribe&body=Please remove ${encodeURIComponent(recipientEmail)} from your mailing list.`;
 
                 templateParams = {
                     to_name: recipientName,
@@ -812,23 +813,21 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
                     recipient_email: recipientEmail,
                     to: recipientEmail,
                     recipient: recipientEmail,
-                    to: recipientEmail,
-                    recipient: recipientEmail,
                     subscriber_email: recipientEmail,
                     from_name: broadcastSender,
                     user_name: broadcastSender,
                     customer_name: broadcastSender,
-                    name: `VIP Family Member (${recipientName})`,
+                    name: recipientName,
                     from_email: "mensahjerrilyn@gmail.com",
                     user_email: "mensahjerrilyn@gmail.com",
                     customer_email: "mensahjerrilyn@gmail.com",
                     email: recipientEmail,
                     reply_to: fields.reply_to || "mensahjerrilyn@gmail.com",
-                    phone: "+233 59 325 2913 (Jewels by J Studio WhatsApp)",
+                    phone: "+233 59 325 2913",
                     customer_phone: "+233 59 325 2913",
                     subject: emailSubject,
                     clean_subject: emailSubject,
-                    piece_of_interest: `✨ VIP Drop: ${emailSubject}`,
+                    piece_of_interest: emailSubject,
                     headline: emailSubject,
                     subtitle: fields.snippet || fields.subtitle || "",
                     snippet: fields.snippet || fields.subtitle || "",
@@ -842,14 +841,15 @@ async function sendStoreEmail(subject, fields = {}, extra = {}) {
                     product_image: fields.image_url || "",
                     photo: fields.image_url || "",
                     picture: fields.image_url || "",
-                    body_text: fields.message_body || richBody,
-                    cta_text: fields.cta_text || "Order Yours",
+                    body_text: richBody,
+                    cta_text: fields.cta_text || "View Collection",
                     cta_url: fields.cta_url || `${window.location.origin}${window.location.pathname}#shop`,
                     message: richBody,
                     raw_message: richBody,
                     content: richBody,
                     inquiry_details: richBody,
-                    date: new Date().toLocaleString()
+                    unsubscribe_url: unsubUrl,
+                    date: new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
                 };
             } else {
                 if (fields.message) {
@@ -2320,39 +2320,39 @@ function initNewsletterForm() {
         if (typeof renderAdminInbox === "function") renderAdminInbox();
 
         // 3. Prepare Welcome Letter for the subscriber
-        const welcomeLetter = `✨ WELCOME TO THE JEWELS BY J FAMILY!\n` +
-            `──────────────────────────────────────────────\n` +
-            `Hello,\n\n` +
-            `Thank you for subscribing to Jewels by J! You are now officially enrolled on our VIP list with ${email}.\n\n` +
-            `Here is what you will receive directly from our Accra jewelry studio:\n` +
-            `• 🌸 EXCLUSIVE SEASONAL DROPS: Priority 24-hour advance VIP access to limited-edition seasonal releases before public availability.\n` +
-            `• 🔔 NEW ARRIVAL NOTIFICATIONS: Direct alerts the moment new custom cursive nameplates, chains, and pendants leave our studio.\n` +
-            `• ✨ STYLING INSPIRATIONS: Curated layering guides, precious metal pairing advice, and personalized jewelry care direct from Jerrilyn Mensah.\n\n` +
-            `💎 VIP WELCOME PRIVILEGE:\n` +
-            `Enjoy priority crafting queue & complimentary luxury packaging on your orders.\n\n` +
-            `Have a custom design idea or question?\n` +
-            `• WhatsApp Jerrilyn directly: +233 59 325 2913\n` +
-            `• Website: Jewels by J Studio, Accra, Ghana\n\n` +
-            `With love & fine craftsmanship,\n` +
-            `Jerrilyn Mensah & The Jewels by J Studio Team`;
+        const welcomeLetter = `Hi there,\n\n` +
+            `Thank you for subscribing to Jewels by J! We are thrilled to have you.\n\n` +
+            `Here is what you will receive from our Accra studio:\n` +
+            `- Seasonal drops and new arrivals\n` +
+            `- Custom nameplate, bracelet and chain updates\n` +
+            `- Styling tips from Jerrilyn Mensah\n\n` +
+            `Have a question or custom order in mind?\n` +
+            `WhatsApp: +233 59 325 2913\n\n` +
+            `Warm regards,\n` +
+            `Jerrilyn Mensah\n` +
+            `Jewels by J Studio, Accra, Ghana\n\n` +
+            `---\n` +
+            `You are receiving this message because you signed up at Jewels by J.\n` +
+            `To unsubscribe, reply with "Unsubscribe" or email mensahjerrilyn@gmail.com.`;
 
         // Dispatch Welcome Email directly TO THE CUSTOMER'S EMAIL INBOX
         try {
             const welcomeImgUrl = resolvePublicImageUrl("images/moesha.jpg");
             const storefrontUrl = resolvePublicStorefrontUrl();
-            await sendStoreEmail("✨ Welcome to the Jewels by J Family!", {
-                subtitle: "Your name. Your style. Made by hand in Ghana.",
+            await sendStoreEmail("Welcome to Jewels by J - Made by hand in Ghana", {
+                subtitle: "Your name. Your style. Handcrafted in Ghana.",
                 image_url: welcomeImgUrl,
                 cta_text: "Discover the Collection",
                 cta_url: `${storefrontUrl}#shop`,
                 is_broadcast: true,
                 to_email: email,
                 recipient: email,
-                to_name: "VIP Family Member",
-                from_name: "Jewels by J Studio",
+                to_name: "there",
+                from_name: "Jerrilyn at Jewels by J",
                 from_email: "mensahjerrilyn@gmail.com",
                 reply_to: "mensahjerrilyn@gmail.com",
-                subject: "✨ Welcome to the Jewels by J Family! (VIP Perks Inside)",
+                subject: "Welcome to Jewels by J - Made by hand in Ghana",
+                message_body: "Thank you for joining us. We will keep you updated on new arrivals, seasonal drops and styling inspiration from our Accra studio.",
                 message: welcomeLetter
             });
             console.log("Welcome email dispatched to customer:", email);
@@ -2361,11 +2361,11 @@ function initNewsletterForm() {
         }
 
         // Also notify store owner (Jerrilyn)
-        sendStoreEmail("✨ New VIP Subscriber Joined", {
-            name: "VIP Family Member",
+        sendStoreEmail("New Subscriber - Jewels by J", {
+            name: "New Subscriber",
             email: email,
-            subject: "✨ New Jewels Family VIP Subscription: " + email,
-            message: `A new customer (${email}) subscribed for exclusive seasonal drops, new arrival notifications, and styling inspirations.\nTimestamp: ${new Date().toLocaleString()}`
+            subject: "New Jewels by J Subscriber: " + email,
+            message: `A new customer (${email}) subscribed for updates.\nTimestamp: ${new Date().toLocaleString()}`
         }).catch(() => {});
 
         // 4. Show VIP notification modal & toast
@@ -6907,41 +6907,76 @@ function initPreviewPanViewport() {
 
 // ── Apple-Style Template Helper Functions ──────────────────────────────────
 function copyAppleEmailTemplate() {
-    const storefrontUrl = (window.location.origin || "") + (window.location.pathname || "");
+    const storefrontUrl = "https://darnjoel.github.io/Jewels-by-J/";
     const htmlTemplate = `<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{subject}}</title>
 </head>
-<body style="margin:0; padding:0; background:#f8fafc; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
-  <div style="max-width:600px; margin:30px auto; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.06); border:1px solid #e2e8f0;">
-    <div style="background:#0a0a0a; padding:28px 24px; text-align:center;">
-      <div style="font-size:12px; font-weight:800; letter-spacing:4px; color:#c8952c; text-transform:uppercase;">JEWELS BY J</div>
-      <div style="font-size:11px; letter-spacing:1.5px; color:#94a3b8; text-transform:uppercase; margin-top:4px;">A GHANAIAN JEWELRY STUDIO</div>
-    </div>
-    <div style="padding:40px 32px; text-align:center;">
-      <h1 style="font-family:Georgia,Cambria,serif; font-size:28px; font-weight:600; line-height:1.25; color:#0f172a; margin:0 0 14px;">{{subject}}</h1>
-      <p style="font-size:16px; color:#64748b; line-height:1.6; margin:0 auto 24px; max-width:480px;">{{subtitle}}</p>
-      <div style="margin:0 auto 24px; max-width:320px; border-radius:12px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.08);">
-        <img src="{{{image_url}}}" alt="Jewels by J Featured Piece" width="320" style="width:100%; max-width:320px; height:auto; display:block; margin:0 auto; border:0;" />
-      </div>
-      <p style="font-size:15px; color:#334155; line-height:1.75; margin:0 auto 28px; max-width:480px; text-align:center; white-space:pre-line;">{{body_text}}</p>
-      <div style="margin-bottom:26px;">
-        <a href="{{cta_url}}" style="display:inline-block; background:#0f172a; color:#ffffff; font-weight:600; font-size:15px; padding:14px 38px; border-radius:30px; text-decoration:none;">{{cta_text}}</a>
-      </div>
-      <div>
-        <a href="https://wa.me/233593252913" style="display:inline-flex; align-items:center; gap:8px; background:#25D366; color:#ffffff; font-weight:600; font-size:13px; padding:10px 24px; border-radius:24px; text-decoration:none;">
-          💬 Chat with Jerrilyn on WhatsApp
-        </a>
-      </div>
-    </div>
-    <div style="border-top:1px solid #f1f5f9; background:#fafafa; padding:24px 32px; text-align:center; font-size:12px; color:#94a3b8; line-height:1.7;">
-      <strong>Jewels by J Studio</strong> • Accra, Ghana • Tel/WA: +233 59 325 2913<br>
-      You received this exclusive alert because you are registered with the Jewels by J family.
-    </div>
-  </div>
+<body style="margin:0; padding:0; background:#f4f4f4; font-family:Georgia,'Times New Roman',serif;">
+  <div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">{{subtitle}}</div>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f4f4f4; padding:30px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; width:100%; background:#ffffff; border-radius:4px; overflow:hidden;">
+
+          <!-- Header -->
+          <tr>
+            <td style="background:#0a0a0a; padding:28px 32px; text-align:center;">
+              <div style="font-size:11px; font-weight:700; letter-spacing:5px; color:#c8952c; text-transform:uppercase; font-family:Arial,sans-serif;">JEWELS BY J</div>
+              <div style="font-size:10px; letter-spacing:2px; color:#94a3b8; text-transform:uppercase; margin-top:5px; font-family:Arial,sans-serif;">Handcrafted in Ghana</div>
+            </td>
+          </tr>
+
+          <!-- Main Content -->
+          <tr>
+            <td style="padding:40px 48px 32px; text-align:center;">
+              <h1 style="font-family:Georgia,serif; font-size:26px; font-weight:600; line-height:1.3; color:#1a1a1a; margin:0 0 16px;">{{subject}}</h1>
+              <p style="font-size:16px; color:#555555; line-height:1.6; margin:0 auto 28px; max-width:440px; font-family:Arial,sans-serif;">{{subtitle}}</p>
+
+              <!-- Featured Image -->
+              <div style="margin:0 auto 28px; max-width:320px;">
+                <img src="{{{image_url}}}" alt="Jewels by J" width="320" style="width:100%; max-width:320px; height:auto; display:block; border-radius:4px; border:0;" />
+              </div>
+
+              <!-- Body Text -->
+              <p style="font-size:15px; color:#444444; line-height:1.75; margin:0 auto 32px; max-width:460px; text-align:center; font-family:Arial,sans-serif; white-space:pre-line;">{{body_text}}</p>
+
+              <!-- CTA Button -->
+              <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 28px;">
+                <tr>
+                  <td style="border-radius:30px; background:#0f172a;">
+                    <a href="{{cta_url}}" style="display:inline-block; background:#0f172a; color:#ffffff; font-weight:600; font-size:15px; padding:14px 40px; border-radius:30px; text-decoration:none; font-family:Arial,sans-serif;">{{cta_text}}</a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- WhatsApp -->
+              <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+                <tr>
+                  <td style="border-radius:24px; background:#25D366;">
+                    <a href="https://wa.me/233593252913" style="display:inline-block; background:#25D366; color:#ffffff; font-weight:600; font-size:13px; padding:10px 26px; border-radius:24px; text-decoration:none; font-family:Arial,sans-serif;">Chat with Jerrilyn on WhatsApp</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="border-top:1px solid #e8e8e8; background:#f9f9f9; padding:24px 32px; text-align:center; font-size:12px; color:#888888; line-height:1.7; font-family:Arial,sans-serif;">
+              <strong style="color:#555555;">Jewels by J Studio</strong> &bull; Accra, Ghana &bull; +233 59 325 2913<br>
+              You are receiving this message because you signed up for updates from Jewels by J.<br>
+              <a href="mailto:mensahjerrilyn@gmail.com?subject=Unsubscribe&body=Please remove my email from your mailing list." style="color:#888888; text-decoration:underline;">Unsubscribe</a>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>`;
 
@@ -7111,23 +7146,26 @@ async function sendBroadcastToAllSubscribers() {
         if (statusCount) statusCount.textContent = `${pct}% (${i + 1}/${total})`;
         if (progressBar) progressBar.style.width = `${pct}%`;
 
-        // Build elegant Apple-style announcement content (clean text fallback to prevent spam flagging)
-        const emailContent = `${subject}\n\n` +
-            `${snippet ? snippet + '\n\n' : ''}` +
+        // Build plain-text fallback body (no emojis, no spam triggers)
+        const recipientFirstName = sub.name ? sub.name.split(" ")[0] : "there";
+        const emailContent = `Hi ${recipientFirstName},\n\n` +
+            `${subject}\n\n` +
+            `${snippet ? snippet + "\n\n" : ""}` +
             `${message}\n\n` +
-            `Featured Piece: ${fullImgUrl}\n\n` +
-            `Explore & Order: ${storefrontUrl}#shop\n` +
+            `View & Order: ${storefrontUrl}#shop\n` +
             `WhatsApp: +233 59 325 2913\n\n` +
-            `Jewels by J Studio • Accra, Ghana\n` +
-            `You received this email because you are a registered member of the Jewels by J family.`;
+            `---\n` +
+            `Jewels by J Studio, Accra, Ghana\n` +
+            `You are receiving this message because you signed up for updates from Jewels by J.\n` +
+            `To unsubscribe, reply with "Unsubscribe" or email mensahjerrilyn@gmail.com.`;
 
         try {
             await sendStoreEmail(subject, {
                 is_broadcast: true,
                 to_email: sub.email,
                 recipient: sub.email,
-                to_name: sub.name || "VIP Member",
-                name: sub.name || "VIP Member",
+                to_name: sub.name || "there",
+                name: sub.name || "there",
                 from_name: sender,
                 from_email: "mensahjerrilyn@gmail.com",
                 reply_to: "mensahjerrilyn@gmail.com",
@@ -7152,9 +7190,9 @@ async function sendBroadcastToAllSubscribers() {
             }
         }
 
-        // Small pause between dispatches to maintain clean rate limits
+        // Pause between sends — avoids bulk-send spam flags
         if (i < total - 1) {
-            await new Promise(r => setTimeout(r, 350));
+            await new Promise(r => setTimeout(r, 1200));
         }
     }
 
@@ -7181,27 +7219,29 @@ async function sendTestBroadcastToAdmin() {
     const fullImgUrl = resolvePublicImageUrl(rawImgSrc);
     const storefrontUrl = resolvePublicStorefrontUrl();
 
-    showToast("Sending Test Alert...", `Dispatching preview to ${adminEmail}`);
+    showToast("Sending Test...", `Sending preview to ${adminEmail}`);
 
-    const emailContent = `${subject}\n\n` +
-        `${snippet ? snippet + '\n\n' : ''}` +
+    const emailContent = `Hi Jerrilyn,\n\n` +
+        `Here is a preview of your upcoming broadcast:\n\n` +
+        `${subject}\n\n` +
+        `${snippet ? snippet + "\n\n" : ""}` +
         `${message}\n\n` +
-        `Featured Piece: ${fullImgUrl}\n\n` +
-        `Explore & Order: ${storefrontUrl}#shop\n` +
+        `View & Order: ${storefrontUrl}#shop\n` +
         `WhatsApp: +233 59 325 2913\n\n` +
-        `Jewels by J Studio • Accra, Ghana`;
+        `---\n` +
+        `Jewels by J Studio, Accra, Ghana`;
 
     try {
-        await sendStoreEmail(`Preview: ${subject}`, {
+        await sendStoreEmail(subject, {
             is_broadcast: true,
             to_email: adminEmail,
             recipient: adminEmail,
-            to_name: "Jerrilyn Mensah (Admin Preview)",
-            name: "Jerrilyn Mensah (Admin Preview)",
+            to_name: "Jerrilyn",
+            name: "Jerrilyn",
             from_name: sender,
             from_email: "mensahjerrilyn@gmail.com",
             reply_to: "mensahjerrilyn@gmail.com",
-            subject: `Preview: ${subject}`,
+            subject: subject,
             snippet: snippet,
             subtitle: snippet,
             image_url: fullImgUrl,
