@@ -1665,6 +1665,16 @@ function updateCartUI() {
     if (drawerBadge) {
         drawerBadge.textContent = totalItems;
     }
+    const quickCartBadge = document.getElementById("drawerQuickCartBadge");
+    if (quickCartBadge) {
+        quickCartBadge.textContent = totalItems;
+        quickCartBadge.style.display = totalItems > 0 ? "flex" : "none";
+    }
+    const hamburgerBadge = document.getElementById("hamburgerBadgeCount");
+    if (hamburgerBadge) {
+        hamburgerBadge.textContent = totalItems;
+        hamburgerBadge.style.display = totalItems > 0 ? "flex" : "none";
+    }
 }
 
 function renderCart() {
@@ -1809,6 +1819,11 @@ function updateWishlistUI() {
     const sidebarBadge = document.getElementById("sidebarWishlistCount");
     if (sidebarBadge) {
         sidebarBadge.textContent = wishlist.length;
+    }
+    const quickWishlistBadge = document.getElementById("drawerQuickWishlistBadge");
+    if (quickWishlistBadge) {
+        quickWishlistBadge.textContent = wishlist.length;
+        quickWishlistBadge.style.display = wishlist.length > 0 ? "flex" : "none";
     }
 }
 
@@ -3325,7 +3340,10 @@ function updateAuthUI() {
     // Toggle body class so CSS rules apply immediately
     document.body.classList.toggle("is-admin", isAdmin);
 
-    // Sync admin triggers: taken off from website header view, displayed & working in hamburger icon
+    // Sync header action icons and admin triggers: taken off from website header view, displayed & working in hamburger icon
+    const navSearchTrigger = document.getElementById("navSearchTrigger");
+    const wishlistToggleBtn = document.getElementById("wishlistToggleBtn");
+    const cartToggleBtn = document.getElementById("cartToggleBtn");
     const navAdminTrigger = document.getElementById("navAdminTrigger");
     const desktopNavLinks = document.getElementById("desktopNavLinks");
     const desktopAdminNavLink = document.getElementById("desktopAdminNavLink");
@@ -3333,7 +3351,10 @@ function updateAuthUI() {
     const drawerAdminItem = document.getElementById("drawerAdminItem");
     const accountAdminBtn = document.getElementById("accountAdminBtn");
 
-    // Never display admin buttons on the website header view
+    // Never display search, wishlist, cart, or admin buttons on the website header view
+    if (navSearchTrigger) navSearchTrigger.style.display = "none";
+    if (wishlistToggleBtn) wishlistToggleBtn.style.display = "none";
+    if (cartToggleBtn) cartToggleBtn.style.display = "none";
     if (navAdminTrigger) navAdminTrigger.style.display = "none";
     if (desktopNavLinks) desktopNavLinks.style.display = "none";
     if (desktopAdminNavLink) desktopAdminNavLink.style.display = "none";

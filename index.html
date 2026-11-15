@@ -61,6 +61,7 @@
                     <span></span>
                     <span></span>
                     <span></span>
+                    <span class="badge-count hamburger-badge" id="hamburgerBadgeCount" style="display:none;">0</span>
                 </button>
                 <a href="#" class="nav-brand" data-nav="home">
                     <img src="images/logo.jpg" alt="Jewels by J Logo" class="nav-logo-img">
@@ -71,24 +72,24 @@
                 </a>
             </div>
 
-            <!-- Actions (Search, Favorite, Cart, Sign In / Log In) -->
+            <!-- Actions (Search, Favorite, Cart taken off from header view; displayed & working in hamburger icon) -->
             <div class="nav-actions">
-                <!-- 1. Search Button -->
+                <!-- 1. Search Button (Moved to hamburger icon) -->
                 <button class="nav-action-btn" id="navSearchTrigger" title="Search Jewelry Catalog"
-                    aria-label="Search Catalog" onclick="toggleHeaderSearch(undefined, event)">
+                    aria-label="Search Catalog" onclick="toggleHeaderSearch(undefined, event)" style="display:none !important;">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
 
-                <!-- 2. Favorite / Wishlist Button -->
+                <!-- 2. Favorite / Wishlist Button (Moved to hamburger icon) -->
                 <button class="nav-action-btn" id="wishlistToggleBtn" title="My Favorites" aria-label="View Favorites"
-                    onclick="viewWishlist()">
+                    onclick="viewWishlist()" style="display:none !important;">
                     <i class="fa-regular fa-heart"></i>
                     <span class="badge-count" id="wishlistBadgeCount" style="display:none;">0</span>
                 </button>
 
-                <!-- 3. Cart / Shopping Bag Button -->
+                <!-- 3. Cart / Shopping Bag Button (Moved to hamburger icon) -->
                 <button class="nav-action-btn" id="cartToggleBtn" title="Shopping Bag" aria-label="Open Shopping Bag"
-                    onclick="openCartDrawer()">
+                    onclick="openCartDrawer()" style="display:none !important;">
                     <i class="fa-solid fa-bag-shopping"></i>
                     <span class="badge-count" id="cartBadgeCount" style="display:none;">0</span>
                 </button>
@@ -135,6 +136,30 @@
             </button>
         </div>
 
+        <!-- Quick Action Icons in Hamburger Drawer (Search, Favorites, Bag) -->
+        <div class="drawer-action-strip" id="drawerActionStrip">
+            <button type="button" class="drawer-action-item" onclick="closeMobileDrawer(); navigateTo('shop'); toggleHeaderSearch(true);" title="Search Jewelry" aria-label="Search Jewelry">
+                <div class="drawer-action-icon-wrap">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <span class="drawer-action-text">Search</span>
+            </button>
+            <button type="button" class="drawer-action-item" onclick="closeMobileDrawer(); viewWishlist();" title="My Favorites" aria-label="My Favorites">
+                <div class="drawer-action-icon-wrap">
+                    <i class="fa-regular fa-heart"></i>
+                    <span class="badge-count drawer-icon-badge" id="drawerQuickWishlistBadge" style="display:none;">0</span>
+                </div>
+                <span class="drawer-action-text">Favorites</span>
+            </button>
+            <button type="button" class="drawer-action-item" onclick="closeMobileDrawer(); openCartDrawer();" title="Shopping Bag" aria-label="Shopping Bag">
+                <div class="drawer-action-icon-wrap">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span class="badge-count drawer-icon-badge" id="drawerQuickCartBadge" style="display:none;">0</span>
+                </div>
+                <span class="drawer-action-text">Bag</span>
+            </button>
+        </div>
+
         <!-- Account / Sign In Box in Drawer -->
         <div class="drawer-account-box" id="drawerAccountBox">
             <div class="drawer-account-prompt">
@@ -155,7 +180,7 @@
         </div>
 
         <ul class="drawer-menu">
-            <li><a href="#shop" class="drawer-menu-link" onclick="closeMobileDrawer(); toggleHeaderSearch(true);"><i
+            <li><a href="#shop" class="drawer-menu-link" onclick="closeMobileDrawer(); navigateTo('shop'); toggleHeaderSearch(true);"><i
                         class="fa-solid fa-magnifying-glass" style="margin-right:8px; color:var(--color-gold);"></i>
                     Search Jewelry <i class="fa-solid fa-chevron-right"></i></a></li>
             <li><a href="#shop" class="drawer-menu-link" onclick="closeMobileDrawer(); viewWishlist();"><i
