@@ -6907,7 +6907,6 @@ function initPreviewPanViewport() {
 
 // ── Apple-Style Template Helper Functions ──────────────────────────────────
 function copyAppleEmailTemplate() {
-    const storefrontUrl = "https://darnjoel.github.io/Jewels-by-J/";
     const htmlTemplate = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6915,61 +6914,66 @@ function copyAppleEmailTemplate() {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{subject}}</title>
 </head>
-<body style="margin:0; padding:0; background:#f4f4f4; font-family:Georgia,'Times New Roman',serif;">
-  <div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">{{subtitle}}</div>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f4f4f4; padding:30px 0;">
+<body style="margin:0; padding:0; background-color:#f8fafc; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:#0f172a;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc; padding:32px 12px;">
     <tr>
       <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; width:100%; background:#ffffff; border-radius:4px; overflow:hidden;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:580px; background-color:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e2e8f0; box-shadow:0 8px 30px rgba(0,0,0,0.06);">
 
-          <!-- Header -->
+          <!-- Brand Header -->
           <tr>
-            <td style="background:#0a0a0a; padding:28px 32px; text-align:center;">
-              <div style="font-size:11px; font-weight:700; letter-spacing:5px; color:#c8952c; text-transform:uppercase; font-family:Arial,sans-serif;">JEWELS BY J</div>
-              <div style="font-size:10px; letter-spacing:2px; color:#94a3b8; text-transform:uppercase; margin-top:5px; font-family:Arial,sans-serif;">Handcrafted in Ghana</div>
+            <td style="background-color:#0a0a0a; padding:28px 24px; text-align:center;">
+              <div style="font-size:13px; font-weight:800; letter-spacing:4px; color:#c8952c; text-transform:uppercase;">JEWELS BY J</div>
+              <div style="font-size:10px; letter-spacing:1.5px; color:#94a3b8; text-transform:uppercase; margin-top:4px;">A GHANAIAN JEWELRY STUDIO</div>
             </td>
           </tr>
 
-          <!-- Main Content -->
+          <!-- Main Announcement Card -->
           <tr>
-            <td style="padding:40px 48px 32px; text-align:center;">
-              <h1 style="font-family:Georgia,serif; font-size:26px; font-weight:600; line-height:1.3; color:#1a1a1a; margin:0 0 16px;">{{subject}}</h1>
-              <p style="font-size:16px; color:#555555; line-height:1.6; margin:0 auto 28px; max-width:440px; font-family:Arial,sans-serif;">{{subtitle}}</p>
+            <td style="padding:40px 32px; text-align:center;">
 
-              <!-- Featured Image -->
-              <div style="margin:0 auto 28px; max-width:320px;">
-                <img src="{{{image_url}}}" alt="Jewels by J" width="320" style="width:100%; max-width:320px; height:auto; display:block; border-radius:4px; border:0;" />
+              <h1 style="font-family:Georgia,Cambria,serif; font-size:28px; font-weight:600; line-height:1.25; color:#0f172a; margin:0 0 14px;">
+                {{subject}}
+              </h1>
+
+              <p style="font-size:16px; color:#64748b; line-height:1.6; margin:0 auto 24px; max-width:460px;">
+                {{subtitle}}
+              </p>
+
+              <!-- Featured Piece Image — TRIPLE braces keep the URL unescaped -->
+              <div style="margin:0 auto 24px; max-width:320px; border-radius:12px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.08);">
+                <img src="{{{image_url}}}" alt="Jewels by J Featured Piece" width="320" style="width:100%; height:auto; display:block; border:0;" />
               </div>
 
               <!-- Body Text -->
-              <p style="font-size:15px; color:#444444; line-height:1.75; margin:0 auto 32px; max-width:460px; text-align:center; font-family:Arial,sans-serif; white-space:pre-line;">{{body_text}}</p>
+              <p style="font-size:15px; color:#334155; line-height:1.75; margin:0 auto 28px; max-width:480px; text-align:center; white-space:pre-line;">
+                {{body_text}}
+              </p>
 
-              <!-- CTA Button -->
-              <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 28px;">
-                <tr>
-                  <td style="border-radius:30px; background:#0f172a;">
-                    <a href="{{cta_url}}" style="display:inline-block; background:#0f172a; color:#ffffff; font-weight:600; font-size:15px; padding:14px 40px; border-radius:30px; text-decoration:none; font-family:Arial,sans-serif;">{{cta_text}}</a>
-                  </td>
-                </tr>
-              </table>
+              <!-- Order CTA Button -->
+              <div style="margin-bottom:24px;">
+                <a href="{{cta_url}}" style="display:inline-block; background-color:#0a0a0a; color:#ffffff; font-weight:600; font-size:15px; padding:14px 40px; border-radius:30px; text-decoration:none; letter-spacing:0.3px;">
+                  {{cta_text}}
+                </a>
+              </div>
 
               <!-- WhatsApp -->
-              <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
-                <tr>
-                  <td style="border-radius:24px; background:#25D366;">
-                    <a href="https://wa.me/233593252913" style="display:inline-block; background:#25D366; color:#ffffff; font-weight:600; font-size:13px; padding:10px 26px; border-radius:24px; text-decoration:none; font-family:Arial,sans-serif;">Chat with Jerrilyn on WhatsApp</a>
-                  </td>
-                </tr>
-              </table>
+              <div>
+                <a href="https://wa.me/233593252913" style="display:inline-block; background-color:#25D366; color:#ffffff; font-weight:600; font-size:13px; padding:10px 24px; border-radius:24px; text-decoration:none;">
+                  Chat with Jerrilyn on WhatsApp
+                </a>
+              </div>
+
             </td>
           </tr>
 
-          <!-- Footer -->
+          <!-- Studio Footer -->
           <tr>
-            <td style="border-top:1px solid #e8e8e8; background:#f9f9f9; padding:24px 32px; text-align:center; font-size:12px; color:#888888; line-height:1.7; font-family:Arial,sans-serif;">
-              <strong style="color:#555555;">Jewels by J Studio</strong> &bull; Accra, Ghana &bull; +233 59 325 2913<br>
+            <td style="border-top:1px solid #f1f5f9; background-color:#fafafa; padding:24px 32px; text-align:center; font-size:11px; color:#94a3b8; line-height:1.7;">
+              <strong style="color:#64748b;">Jewels by J Studio</strong> &bull; Accra, Ghana &bull; Tel/WA: +233 59 325 2913<br>
               You are receiving this message because you signed up for updates from Jewels by J.<br>
-              <a href="mailto:mensahjerrilyn@gmail.com?subject=Unsubscribe&body=Please remove my email from your mailing list." style="color:#888888; text-decoration:underline;">Unsubscribe</a>
+              Handcrafted custom jewelry made with love in Ghana.<br><br>
+              <a href="mailto:mensahjerrilyn@gmail.com?subject=Unsubscribe&body=Please remove my email from your mailing list." style="color:#94a3b8; text-decoration:underline; font-size:11px;">Unsubscribe</a>
             </td>
           </tr>
 
