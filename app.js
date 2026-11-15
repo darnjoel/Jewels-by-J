@@ -2142,6 +2142,9 @@ function initContactForm() {
         if (messageInputEl) messageInputEl.value = "";
         sessionStorage.removeItem("j_contact_draft");
 
+        // Automatically enroll client in VIP family list
+        enrollSubscriber(email, name, "Studio Inquiry");
+
         sendStoreEmail(
             "Jewels by J Inquiry",
             {
@@ -2240,6 +2243,68 @@ function closeWelcomeJoinModal() {
     }, 250);
 }
 
+// ── Universal VIP Family Enrollment Engine ───────────────────────────
+// Automatically saves any customer who joins the family (newsletter, account creation, or order)
+// into the VIP broadcast audience and updates the selection state.
+function enrollSubscriber(email, name = "VIP Member", source = "Website") {
+    if (!email) return;
+    const clean = String(email).trim().toLowerCase();
+    if (!clean || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)) return;
+
+    // 1. Remove from unsubscribed blacklist if explicitly joining
+    let unsubscribed = getUnsubscribedEmails();
+    if (unsubscribed.includes(clean)) {
+        unsubscribed = unsubscribed.filter(e => e !== clean);
+        localStorage.setItem("j_unsubscribed_emails", JSON.stringify(unsubscribed));
+    }
+
+    // 2. Add or update in j_subscribers
+    let subs = [];
+    try {
+        subs = JSON.parse(localStorage.getItem("j_subscribers") || "[]");
+        if (!Array.isArray(subs)) subs = [];
+    } catch (_) {
+        subs = [];
+    }
+
+    const idx = subs.findIndex(s => (typeof s === "string" ? s : s.email || "").trim().toLowerCase() === clean);
+    const existing = idx >= 0 ? subs[idx] : null;
+    const finalName = (name && name !== "VIP Member") ? name : (existing?.name || name || "VIP Member");
+
+    const record = {
+        email: clean,
+        name: finalName,
+        date: existing?.date || new Date().toISOString(),
+        source: source || (existing?.source || "VIP Family"),
+        status: "active",
+        notifications: {
+            seasonalDrops: true,
+            newArrivals: true,
+            stylingInspirations: true
+        }
+    };
+
+    if (idx >= 0) {
+        subs[idx] = { ...subs[idx], ...record };
+    } else {
+        subs.unshift(record);
+    }
+
+    localStorage.setItem("j_subscribers", JSON.stringify(subs));
+
+    // Also auto-select this new subscriber for broadcasts
+    if (typeof broadcastSelectedEmails !== "undefined") {
+        broadcastSelectedEmails.add(clean);
+    }
+
+    // Refresh Broadcast Audience UI live if rendered
+    if (typeof renderAdminBroadcast === "function") {
+        try { renderAdminBroadcast(); } catch (_) {}
+    }
+
+    return record;
+}
+
 function initNewsletterForm() {
     const form = document.getElementById("newsletterForm");
     const closeBtn = document.getElementById("welcomeJoinCloseBtn");
@@ -2276,30 +2341,8 @@ function initNewsletterForm() {
             submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Joining...`;
         }
 
-        // 1. Save subscriber in localStorage vault
-        let subscribers = [];
-        try {
-            subscribers = JSON.parse(localStorage.getItem("j_subscribers") || "[]");
-        } catch (_) {
-            subscribers = [];
-        }
-        const existingIdx = subscribers.findIndex(s => (typeof s === "string" ? s : s.email).toLowerCase() === email);
-        const subData = {
-            email: email,
-            date: new Date().toISOString(),
-            status: "active",
-            notifications: {
-                seasonalDrops: true,
-                newArrivals: true,
-                stylingInspirations: true
-            }
-        };
-        if (existingIdx >= 0) {
-            subscribers[existingIdx] = subData;
-        } else {
-            subscribers.push(subData);
-        }
-        localStorage.setItem("j_subscribers", JSON.stringify(subscribers));
+        // 1. Automatically save into VIP subscriber list vault
+        enrollSubscriber(email, "VIP Family Member", "Newsletter");
 
         // 2. Add VIP notification message into store inbox
         const newMsgRecord = {
@@ -3078,23 +3121,7 @@ function initAuthSystem() {
             saveRegisteredUser(newUser);
 
             // Automatically enroll new account into Jewels Family VIP subscription
-            try {
-                let subs = JSON.parse(localStorage.getItem("j_subscribers") || "[]");
-                if (!subs.some(s => (typeof s === "string" ? s : s.email).toLowerCase() === newUser.email.toLowerCase())) {
-                    subs.push({
-                        email: newUser.email,
-                        name: newUser.name,
-                        date: new Date().toISOString(),
-                        status: "active",
-                        notifications: {
-                            seasonalDrops: true,
-                            newArrivals: true,
-                            stylingInspirations: true
-                        }
-                    });
-                    localStorage.setItem("j_subscribers", JSON.stringify(subs));
-                }
-            } catch (_) {}
+            enrollSubscriber(newUser.email, newUser.name, "Registered Account");
 
             // Sync with Firebase Auth and Firestore if initialized
             if (isFirebaseReady && firebaseAuth) {
@@ -4210,6 +4237,9 @@ function finalizeOrderPlacement(paymentMethodName, paymentRef) {
     lastPlacedOrderId = orderId;
     storeOrders.unshift(newOrder);
     localStorage.setItem("j_orders", JSON.stringify(storeOrders));
+
+    // Automatically enroll customer into VIP broadcast subscriber list
+    enrollSubscriber(newOrder.customerEmail, newOrder.customerName, "Order Customer");
 
     // Sync order to Cloud Database (Firebase Firestore & Google Sheets / REST Webhook)
     syncOrderToCloud(newOrder);
@@ -6539,24 +6569,41 @@ function getUnsubscribedEmails() {
     }
 }
 
+// Global selection state for VIP Broadcast recipients
+let broadcastSelectedEmails = new Set();
+let broadcastSelectionInitialized = false;
+
 function getAllSubscribers() {
     const unsubscribed = getUnsubscribedEmails();
     let subs = [];
+    const seen = new Set();
 
-    // 1. Load newsletter subscribers
+    function addSub(email, name, date, source, phone) {
+        if (!email) return;
+        const clean = String(email).trim().toLowerCase();
+        if (!clean || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)) return;
+        if (unsubscribed.includes(clean)) return;
+        if (seen.has(clean)) return;
+        seen.add(clean);
+        subs.push({
+            email: clean,
+            name: name || "VIP Member",
+            date: date || new Date().toISOString(),
+            source: source || "VIP Family",
+            phone: phone || ""
+        });
+    }
+
+    // 1. Load enrolled subscribers from j_subscribers (newsletter, accounts, orders)
     try {
         const rawSubs = JSON.parse(localStorage.getItem("j_subscribers") || "[]");
         if (Array.isArray(rawSubs)) {
             rawSubs.forEach(s => {
-                const email = (typeof s === "string" ? s : s.email || "").trim().toLowerCase();
-                if (email && !unsubscribed.includes(email) && !subs.some(item => item.email === email)) {
-                    subs.push({
-                        email: email,
-                        name: (typeof s === "object" && s.name) ? s.name : "VIP Subscriber",
-                        date: (typeof s === "object" && s.date) ? s.date : new Date().toISOString(),
-                        source: "Newsletter"
-                    });
-                }
+                const email = (typeof s === "string" ? s : s.email || "");
+                const name = (typeof s === "object" && s.name) ? s.name : "VIP Member";
+                const date = (typeof s === "object" && s.date) ? s.date : "";
+                const source = (typeof s === "object" && s.source) ? s.source : "Newsletter";
+                addSub(email, name, date, source);
             });
         }
     } catch (_) {}
@@ -6566,60 +6613,165 @@ function getAllSubscribers() {
         const users = JSON.parse(localStorage.getItem("j_users_db") || "[]");
         if (Array.isArray(users)) {
             users.forEach(u => {
-                const email = (u.email || "").trim().toLowerCase();
-                if (email && !u.unsubscribedFromBroadcasts && !unsubscribed.includes(email) && !subs.some(item => item.email === email)) {
-                    subs.push({
-                        email: email,
-                        name: u.name || "Valued Client",
-                        phone: u.phone,
-                        date: u.createdAt || new Date().toISOString(),
-                        source: "Registered Account"
-                    });
+                if (!u.unsubscribedFromBroadcasts) {
+                    addSub(u.email, u.name, u.createdAt, "Registered Account", u.phone);
                 }
             });
         }
     } catch (_) {}
 
-    // 3. Optional fallback: Include store email for admin preview ONLY if not unsubscribed and audience is empty
+    // 3. Load customers from completed orders
+    try {
+        const orders = JSON.parse(localStorage.getItem("j_orders") || "[]");
+        if (Array.isArray(orders)) {
+            orders.forEach(o => {
+                addSub(o.customerEmail, o.customerName, o.date, "Order Customer", o.customerPhone);
+            });
+        }
+    } catch (_) {}
+
+    // 4. Fallback: Include store owner for preview only if audience is completely empty
     const adminEmail = (storeSettings?.email || SITE_CONFIG.email || "mensahjerrilyn@gmail.com").trim().toLowerCase();
     if (subs.length === 0 && !unsubscribed.includes(adminEmail)) {
-        subs.push({
-            email: adminEmail,
-            name: "Jerrilyn Mensah (Admin)",
-            date: new Date().toISOString(),
-            source: "Studio Admin"
-        });
+        addSub(adminEmail, "Jerrilyn Mensah (Admin)", new Date().toISOString(), "Studio Admin");
     }
 
     return subs;
 }
 
-function renderAdminBroadcast() {
-    const audience = getAllSubscribers();
+function getSelectedSubscribers() {
+    const all = getAllSubscribers();
+    if (!broadcastSelectionInitialized) {
+        broadcastSelectedEmails = new Set(all.map(s => s.email.toLowerCase()));
+        broadcastSelectionInitialized = true;
+    }
+    return all.filter(s => broadcastSelectedEmails.has(s.email.toLowerCase()));
+}
+
+function toggleSubscriberSelection(email, isChecked) {
+    if (!email) return;
+    const clean = email.trim().toLowerCase();
+    if (!broadcastSelectionInitialized) {
+        broadcastSelectedEmails = new Set(getAllSubscribers().map(s => s.email.toLowerCase()));
+        broadcastSelectionInitialized = true;
+    }
+    if (isChecked) {
+        broadcastSelectedEmails.add(clean);
+    } else {
+        broadcastSelectedEmails.delete(clean);
+    }
+    updateBroadcastSelectionUI();
+}
+
+function selectAllBroadcastSubscribers(selectAll = true) {
+    const all = getAllSubscribers();
+    broadcastSelectionInitialized = true;
+    if (selectAll) {
+        broadcastSelectedEmails = new Set(all.map(s => s.email.toLowerCase()));
+    } else {
+        broadcastSelectedEmails.clear();
+    }
+    renderAdminBroadcast();
+}
+
+function updateBroadcastSelectionUI() {
+    const all = getAllSubscribers();
+    const selected = getSelectedSubscribers();
     const countEl = document.getElementById("admTabSubscribersCount");
     const badgeEl = document.getElementById("broadcastAudienceBadge");
+    const summaryEl = document.getElementById("broadcastSelectedSummary");
+    const sendBtn = document.getElementById("btnSendBroadcastAll");
+    const sendBtnText = document.getElementById("btnSendBroadcastText");
+
+    if (countEl) countEl.textContent = all.length;
+    if (badgeEl) badgeEl.textContent = all.length;
+
+    if (summaryEl) {
+        summaryEl.innerHTML = `<i class="fa-solid fa-circle-check" style="margin-right:4px;"></i><strong>${selected.length}</strong> of ${all.length} selected`;
+        summaryEl.style.color = selected.length > 0 ? "var(--color-gold)" : "#ef4444";
+        summaryEl.style.background = selected.length > 0 ? "rgba(200,149,44,0.12)" : "rgba(239,68,68,0.1)";
+        summaryEl.style.borderColor = selected.length > 0 ? "rgba(200,149,44,0.3)" : "rgba(239,68,68,0.3)";
+    }
+
+    if (sendBtnText) {
+        if (selected.length === 0) {
+            sendBtnText.textContent = "No Recipients Selected";
+        } else if (selected.length === all.length) {
+            sendBtnText.textContent = `Send VIP Alert to All ${all.length} Recipient${all.length === 1 ? '' : 's'}`;
+        } else {
+            sendBtnText.textContent = `Send VIP Alert to ${selected.length} Selected Recipient${selected.length === 1 ? '' : 's'}`;
+        }
+    }
+
+    if (sendBtn) {
+        sendBtn.disabled = (selected.length === 0);
+        sendBtn.style.opacity = selected.length === 0 ? "0.55" : "1";
+        sendBtn.style.cursor = selected.length === 0 ? "not-allowed" : "pointer";
+    }
+}
+
+function renderAdminBroadcast() {
+    const audience = getAllSubscribers();
+
+    if (!broadcastSelectionInitialized) {
+        broadcastSelectedEmails = new Set(audience.map(s => s.email.toLowerCase()));
+        broadcastSelectionInitialized = true;
+    } else {
+        // Automatically include any newly enrolled subscribers in current selection
+        audience.forEach(s => {
+            const clean = s.email.toLowerCase();
+            if (!broadcastSelectedEmails.has(clean) && !localStorage.getItem("j_deselected_" + clean)) {
+                broadcastSelectedEmails.add(clean);
+            }
+        });
+    }
+
     const chipsEl = document.getElementById("broadcastAudienceChips");
     const prodSelect = document.getElementById("broadcastProductSelect");
 
-    if (countEl) countEl.textContent = audience.length;
-    if (badgeEl) badgeEl.textContent = audience.length;
-
     if (chipsEl) {
         if (audience.length === 0) {
-            chipsEl.innerHTML = `<span style="font-size:0.8rem; color:var(--color-text-muted);">No subscribers registered yet.</span>`;
+            chipsEl.innerHTML = `<span style="font-size:0.8rem; color:var(--color-text-muted);">No subscribers registered yet. Anyone joining via newsletter or registration will appear here automatically.</span>`;
         } else {
-            chipsEl.innerHTML = audience.map(sub => `
-                <span class="badge" style="background:#ffffff; border:1px solid var(--color-border); color:var(--color-text-main); font-size:0.76rem; padding:4px 10px; display:inline-flex; align-items:center; gap:6px; border-radius:14px;">
-                    <i class="fa-regular fa-envelope" style="color:var(--color-gold); font-size:0.75rem;"></i>
-                    <strong>${escapeHTML(sub.email)}</strong>
-                    ${sub.source ? `<span style="font-size:0.68rem; color:var(--color-text-muted);">(${escapeHTML(sub.source)})</span>` : ''}
-                    <button type="button" onclick="removeSubscriber('${escapeHTML(sub.email)}')" style="background:none; border:none; cursor:pointer; color:#94a3b8; padding:0 2px; font-size:0.8rem;" title="Remove subscriber">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </span>
-            `).join("");
+            chipsEl.innerHTML = audience.map(sub => {
+                const clean = sub.email.toLowerCase();
+                const isChecked = broadcastSelectedEmails.has(clean);
+                return `
+                    <label class="broadcast-subscriber-chip" style="
+                        background: ${isChecked ? '#fffdf7' : '#ffffff'};
+                        border: 1.5px solid ${isChecked ? 'var(--color-gold)' : 'var(--color-border)'};
+                        color: var(--color-text-main);
+                        font-size: 0.77rem;
+                        padding: 5px 12px;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 8px;
+                        border-radius: 20px;
+                        cursor: pointer;
+                        user-select: none;
+                        transition: all 0.15s ease;
+                        box-shadow: ${isChecked ? '0 2px 6px rgba(200,149,44,0.15)' : 'none'};
+                    ">
+                        <input type="checkbox" style="cursor:pointer; accent-color:var(--color-gold); width:14px; height:14px;"
+                            ${isChecked ? 'checked' : ''}
+                            onchange="toggleSubscriberSelection('${escapeHTML(sub.email)}', this.checked)">
+                        <span>
+                            <strong style="color:var(--color-black);">${escapeHTML(sub.name || 'Member')}</strong>
+                            <span style="color:#64748b; font-size:0.73rem; margin-left:3px;">&lt;${escapeHTML(sub.email)}&gt;</span>
+                            ${sub.source ? `<span style="font-size:0.68rem; color:var(--color-gold); background:rgba(200,149,44,0.12); padding:1px 6px; border-radius:10px; margin-left:4px;">${escapeHTML(sub.source)}</span>` : ''}
+                        </span>
+                        <button type="button" onclick="event.preventDefault(); event.stopPropagation(); removeSubscriber('${escapeHTML(sub.email)}');"
+                            style="background:none; border:none; cursor:pointer; color:#94a3b8; padding:0 2px; font-size:0.8rem; margin-left:2px;"
+                            title="Remove subscriber">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </label>
+                `;
+            }).join("");
         }
     }
+
+    updateBroadcastSelectionUI();
 
     // Populate products & brand logo dropdown
     if (prodSelect && prodSelect.options.length <= 2) {
@@ -6651,14 +6803,19 @@ function removeSubscriber(email) {
     if (!email) return;
     const clean = email.trim().toLowerCase();
 
-    // 1. Add to persistent unsubscribed blacklist
+    // 1. Remove from selection set
+    if (typeof broadcastSelectedEmails !== "undefined") {
+        broadcastSelectedEmails.delete(clean);
+    }
+
+    // 2. Add to persistent unsubscribed blacklist
     let unsubscribed = getUnsubscribedEmails();
     if (!unsubscribed.includes(clean)) {
         unsubscribed.push(clean);
         localStorage.setItem("j_unsubscribed_emails", JSON.stringify(unsubscribed));
     }
 
-    // 2. Remove from newsletter subscribers
+    // 3. Remove from newsletter subscribers
     try {
         let subs = JSON.parse(localStorage.getItem("j_subscribers") || "[]");
         if (Array.isArray(subs)) {
@@ -6670,7 +6827,7 @@ function removeSubscriber(email) {
         }
     } catch (_) {}
 
-    // 3. Mark in registered accounts database
+    // 4. Mark in registered accounts database
     try {
         let users = JSON.parse(localStorage.getItem("j_users_db") || "[]");
         if (Array.isArray(users)) {
@@ -6683,7 +6840,7 @@ function removeSubscriber(email) {
         }
     } catch (_) {}
 
-    // 4. Update UI immediately
+    // 5. Update UI immediately
     renderAdminBroadcast();
     showToast("Subscriber Removed", `Removed ${email} from active broadcast list.`);
 }
@@ -6699,32 +6856,9 @@ function addSubscriberManual() {
         return;
     }
 
-    // Remove from unsubscribed list if previously excluded
-    let unsubscribed = getUnsubscribedEmails();
-    unsubscribed = unsubscribed.filter(e => e !== email);
-    localStorage.setItem("j_unsubscribed_emails", JSON.stringify(unsubscribed));
-
-    // Add to subscribers list
-    let subs = [];
-    try {
-        subs = JSON.parse(localStorage.getItem("j_subscribers") || "[]");
-    } catch (_) {
-        subs = [];
-    }
-    if (!subs.some(s => (typeof s === "string" ? s : s.email).toLowerCase() === email)) {
-        subs.push({
-            email: email,
-            name: "VIP Subscriber",
-            date: new Date().toISOString(),
-            status: "active",
-            source: "Manual Admin Entry"
-        });
-        localStorage.setItem("j_subscribers", JSON.stringify(subs));
-    }
-
+    enrollSubscriber(email, "VIP Subscriber", "Manual Admin Entry");
     input.value = "";
-    renderAdminBroadcast();
-    showToast("Subscriber Added", `Added ${email} to broadcast audience.`);
+    showToast("Subscriber Added", `Added ${email} to VIP broadcast audience.`);
 }
 
 function onBroadcastProductSelect(productId) {
@@ -7108,9 +7242,9 @@ function resolvePublicStorefrontUrl() {
 }
 
 async function sendBroadcastToAllSubscribers() {
-    const audience = getAllSubscribers();
+    const audience = getSelectedSubscribers();
     if (audience.length === 0) {
-        showToast("No Subscribers", "Add at least one subscriber to send broadcasts.");
+        showToast("No Recipients Selected", "Please select at least one subscriber checkbox in the audience list before sending.");
         return;
     }
 
@@ -7127,7 +7261,7 @@ async function sendBroadcastToAllSubscribers() {
     const fullImgUrl = resolvePublicImageUrl(rawImgSrc);
     const storefrontUrl = resolvePublicStorefrontUrl();
 
-    const confirmSend = confirm(`Are you sure you want to broadcast this alert to all ${audience.length} registered recipient(s)?`);
+    const confirmSend = confirm(`Are you sure you want to broadcast this VIP alert to the ${audience.length} selected recipient(s)?`);
     if (!confirmSend) return;
 
     const statusBox = document.getElementById("broadcastStatusBox");
@@ -7139,7 +7273,7 @@ async function sendBroadcastToAllSubscribers() {
 
     if (statusBox) statusBox.style.display = "block";
     if (sendBtn) sendBtn.disabled = true;
-    if (logList) logList.innerHTML = `<div style="color:#64748b;">Initializing VIP broadcast engine for ${audience.length} recipient(s)...</div>`;
+    if (logList) logList.innerHTML = `<div style="color:#64748b;">Initializing VIP broadcast engine for ${audience.length} selected recipient(s)...</div>`;
 
     let successCount = 0;
     const total = audience.length;
@@ -7205,7 +7339,7 @@ async function sendBroadcastToAllSubscribers() {
     }
     if (sendBtn) sendBtn.disabled = false;
 
-    showToast("Broadcast Complete! 📢", `Successfully dispatched alert to all ${successCount} registered subscriber(s).`);
+    showToast("Broadcast Complete! 📢", `Successfully dispatched alert to all ${successCount} selected subscriber(s).`);
 }
 
 async function sendTestBroadcastToAdmin() {
@@ -7334,6 +7468,10 @@ window.removeSubscriber = removeSubscriber;
 window.addSubscriberManual = addSubscriberManual;
 window.getUnsubscribedEmails = getUnsubscribedEmails;
 window.isAdminUser = isAdminUser;
+window.enrollSubscriber = enrollSubscriber;
+window.getSelectedSubscribers = getSelectedSubscribers;
+window.toggleSubscriberSelection = toggleSubscriberSelection;
+window.selectAllBroadcastSubscribers = selectAllBroadcastSubscribers;
 
 // Initialize Preferences Immediately
 applyStoredPreferences();
